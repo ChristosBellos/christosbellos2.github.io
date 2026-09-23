@@ -14,9 +14,9 @@ from database import (
     init_db,
     list_cross_competition_teams,
     list_team_names,
-    search_team_names,
     upsert_team_stats,
 )
+from names import option_label
 from scraper import scrape_all
 
 st.set_page_config(
@@ -146,9 +146,9 @@ def chart_layout(fig: go.Figure, title: str) -> go.Figure:
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#e8edf7", family="Arial"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
-        margin=dict(l=10, r=10, t=70, b=10),
-        height=390,
+        legend=dict(orientation="h", yanchor="top", y=-0.2, x=0),
+        margin=dict(l=10, r=10, t=48, b=72),
+        height=420,
         bargap=0.28,
     )
     fig.update_xaxes(showgrid=False)
@@ -230,8 +230,8 @@ def radar_chart(scopes: dict) -> go.Figure:
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#e8edf7"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.05, x=0),
-        margin=dict(l=40, r=40, t=80, b=20),
+        legend=dict(orientation="h", yanchor="top", y=-0.12, x=0),
+        margin=dict(l=40, r=40, t=56, b=64),
         height=430,
         polar=dict(
             bgcolor="rgba(0,0,0,0)",
@@ -300,7 +300,7 @@ def weight_sentence(scopes: dict) -> str:
 
 
 def render_refresh() -> None:
-    if st.button("Ανανέωση Στατιστικών", type="primary", use_container_width=False):
+    if st.button("Ανανέωση Στατιστικών", type="primary", width="content"):
         progress = st.progress(0, text="Ξεκινά η άντληση πινάκων...")
 
         def on_progress(done: int, total: int, label: str) -> None:
@@ -383,32 +383,31 @@ def render_team(profile: dict) -> None:
     with left:
         st.plotly_chart(
             grouped_bars(scopes, ["ppg", "rpg", "apg", "spg", "bpg"], "Παραγωγή ανά αγώνα"),
-            use_container_width=True,
+            width="stretch",
         )
     with right:
         st.plotly_chart(
             grouped_bars(scopes, ["fg_pct", "tp_pct", "ft_pct"], "Ποσοστά σουτ", as_percent=True),
-            use_container_width=True,
+            width="stretch",
         )
 
     left, right = st.columns(2)
     with left:
-        st.plotly_chart(radar_chart(scopes), use_container_width=True)
+        st.plotly_chart(radar_chart(scopes), width="stretch")
     with right:
         st.plotly_chart(
             grouped_bars(scopes, ["orb", "drb", "tov", "pf"], "Ριμπάουντ, λάθη και φάουλ"),
-            use_container_width=True,
+            width="stretch",
         )
 
     st.subheader("Ανα διοργάνωση")
-    st.dataframe(competition_table(competitions), use_container_width=True, hide_index=True)
+    st.dataframe(competition_table(competitions), width="stretch", hide_index=True)
 
 
 def main() -> None:
     if st.session_state.get("pending_team"):
         pending = st.session_state.pop("pending_team")
-        st.session_state["team_query"] = pending
-        st.session_state["team_choice"] = pending
+        st.session_state["team_choice"] = option_label(pending)
         st.session_state["cross_picks"] = None
 
     inject_css()
@@ -439,31 +438,24 @@ def main() -> None:
         return
 
     names = list_team_names()
-    query = st.text_input(
-        "Αναζήτηση ομάδας",
-        key="team_query",
-        placeholder="π.χ. Ολυμπιακός, Real Madrid, Φενέρμπαχτσε",
-    )
-    matches = search_team_names(query) if query.strip() else names
-    if query.strip() and not matches:
-        st.warning("Καμία ομάδα δεν ταιριάζει με αυτή την αναζήτηση.")
-        return
-
-    if "team_choice" in st.session_state and st.session_state["team_choice"] not in matches:
+    labels = {option_label(name): name for name in names}
+    options = list(labels)
+    if "team_choice" in st.session_state and st.session_state["team_choice"] not in options:
         st.session_state.pop("team_choice", None)
 
     select_kwargs = {}
     if "team_choice" not in st.session_state:
         select_kwargs["index"] = None
-    selected = st.selectbox(
-        "Ομάδα",
-        matches,
-        placeholder="Επίλεξε ομάδα από τα αποτελέσματα",
+    selected_label = st.selectbox(
+        "Αναζήτηση ομάδας",
+        options,
+        placeholder="π.χ. Ολυμπιακός, Real Madrid, Partizan",
         key="team_choice",
         **select_kwargs,
     )
+    selected = labels.get(selected_label) if selected_label else None
 
-    if not selected and not query.strip():
+    if not selected:
         picks = list_cross_competition_teams()
         if picks:
             picked = st.pills(
@@ -473,7 +465,7 @@ def main() -> None:
                 key="cross_picks",
                 wrap=True,
             )
-            if picked and picked != st.session_state.get("team_choice"):
+            if picked and option_label(picked) != st.session_state.get("team_choice"):
                 st.session_state["pending_team"] = picked
                 st.rerun()
 

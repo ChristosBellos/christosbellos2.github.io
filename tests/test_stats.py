@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from database import get_team_stats, list_team_names, search_team_names, upsert_team_stats
-from names import canonical_team_name, fold
+from names import canonical_team_name, fold, option_label
 from scraper import (
     OUTPUT_COLUMNS,
     annotate,
@@ -88,6 +88,8 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(canonical_team_name("Ολυμπιακός"), "Olympiacos")
         self.assertEqual(canonical_team_name("FC Barcelona"), "Barca")
         self.assertEqual(fold("Άρης"), fold("αρης"))
+        self.assertIn("Ολυμπιακός", option_label("Olympiacos"))
+        self.assertIn("Partizan", option_label("KK Partizan"))
 
 
 class DatabaseTests(unittest.TestCase):

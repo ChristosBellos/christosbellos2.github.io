@@ -149,6 +149,27 @@ def fold(value: str) -> str:
 ALIASES: dict[str, str] = {fold(key): name for key, name in _RAW_ALIASES.items()}
 
 
+def _has_greek(text: str) -> bool:
+    return any("α" <= char <= "ω" for char in fold(text))
+
+
+GREEK_LABELS: dict[str, str] = {}
+for _raw, _canonical in _RAW_ALIASES.items():
+    if not _has_greek(_raw):
+        continue
+    _current = GREEK_LABELS.get(_canonical)
+    if _current is None or len(_raw) > len(_current):
+        GREEK_LABELS[_canonical] = _raw
+
+
+def option_label(name: str) -> str:
+    """Label used by the search box, including a Greek alias when we have one."""
+    extra = GREEK_LABELS.get(name)
+    if extra and fold(extra) != fold(name):
+        return f"{name} · {extra}"
+    return name
+
+
 def canonical_team_name(name: str) -> str:
     """Return the display name shared across competitions."""
     cleaned = re.sub(r"\s+", " ", (name or "").strip())
