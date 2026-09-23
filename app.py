@@ -1,0 +1,496 @@
+"""Interactive browser for European basketball team averages."""
+
+from __future__ import annotations
+
+from datetime import datetime
+
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
+from database import (
+    dataset_summary,
+    get_team_stats,
+    init_db,
+    list_cross_competition_teams,
+    list_team_names,
+    search_team_names,
+    upsert_team_stats,
+)
+from scraper import scrape_all
+
+st.set_page_config(
+    page_title="Στατιστικά ομάδων",
+    page_icon="🏀",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+SCOPE_LABELS = {
+    "combined": "Ενιαίος μέσος",
+    "europe": "Ευρώπη",
+    "domestic": "Πρωτάθλημα",
+    "regional": "Liga ABA",
+}
+SCOPE_COLORS = {
+    "combined": "#f5b942",
+    "europe": "#4c8dff",
+    "domestic": "#3dbe86",
+    "regional": "#e07a3d",
+}
+STAT_LABELS = {
+    "ppg": "Πόντοι",
+    "rpg": "Ριμπάουντ",
+    "apg": "Ασίστ",
+    "spg": "Κλεψίματα",
+    "bpg": "Κοψίματα",
+    "tov": "Λάθη",
+    "pf": "Φάουλ",
+    "orb": "Επιθ. ριμπ.",
+    "drb": "Αμυν. ριμπ.",
+    "fg_pct": "Εντός πεδιάς",
+    "tp_pct": "Τρίποντα",
+    "ft_pct": "Βολές",
+    "mpg": "Λεπτά",
+}
+RADAR_SCALES = {
+    "ppg": (70, 102),
+    "rpg": (28, 42),
+    "apg": (14, 26),
+    "spg": (4, 10),
+    "bpg": (1.2, 4.5),
+    "fg_pct": (0.42, 0.55),
+    "tp_pct": (0.30, 0.42),
+    "ft_pct": (0.68, 0.88),
+}
+
+
+def inject_css() -> None:
+    st.markdown(
+        """
+        <style>
+          .stApp {
+            background:
+              radial-gradient(1200px 500px at 10% -10%, rgba(245, 185, 66, 0.16), transparent 55%),
+              radial-gradient(900px 420px at 100% 0%, rgba(76, 141, 255, 0.14), transparent 50%),
+              #0b1020;
+          }
+          .block-container { padding-top: 1.4rem; max-width: 1180px; }
+          h1, h2, h3 { letter-spacing: -0.03em; }
+          div[data-testid="stMetric"] {
+            background: rgba(20, 26, 46, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 0.7rem 0.9rem 0.4rem;
+          }
+          div[data-testid="stMetricValue"] { font-variant-numeric: tabular-nums; }
+          .hero-kicker {
+            color: #f5b942;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+          }
+          .team-title { font-size: 2.1rem; font-weight: 750; margin: 0.15rem 0 0.35rem; }
+          .subtle { color: #a9b4cc; font-size: 0.95rem; }
+          .pill {
+            display: inline-block;
+            margin: 0 0.4rem 0.4rem 0;
+            padding: 0.28rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 650;
+            border: 1px solid transparent;
+          }
+          .insight {
+            background: rgba(245, 185, 66, 0.1);
+            border: 1px solid rgba(245, 185, 66, 0.28);
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            color: #f3e2b8;
+            margin: 0.4rem 0 0.8rem;
+          }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def format_when(value: str | None) -> str:
+    if not value:
+        return "ακόμη"
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return value
+    return parsed.strftime("%d/%m/%Y %H:%M UTC")
+
+
+def fmt_stat(key: str, value: object) -> str:
+    if value is None:
+        return "—"
+    number = float(value)
+    if key.endswith("_pct"):
+        return f"{number * 100:.1f}%"
+    if key == "gp":
+        return f"{number:.0f}"
+    return f"{number:.1f}"
+
+
+def chart_layout(fig: go.Figure, title: str) -> go.Figure:
+    fig.update_layout(
+        title=dict(text=title, x=0, xanchor="left", font=dict(size=16)),
+        barmode="group",
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#e8edf7", family="Arial"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        margin=dict(l=10, r=10, t=70, b=10),
+        height=390,
+        bargap=0.28,
+    )
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(gridcolor="rgba(255,255,255,0.06)", zeroline=False)
+    return fig
+
+
+def available_scopes(scopes: dict) -> list[tuple[str, dict]]:
+    """Parts of the profile, plus the combined line when more than one exists."""
+    parts = [key for key in ("europe", "regional", "domestic") if scopes.get(key)]
+    order = parts + (["combined"] if len(parts) > 1 else [])
+    if not order and scopes.get("combined"):
+        order = ["combined"]
+    return [(key, scopes[key]) for key in order]
+
+
+def grouped_bars(scopes: dict, keys: list[str], title: str, as_percent: bool = False) -> go.Figure:
+    fig = go.Figure()
+    for key, block in available_scopes(scopes):
+        values = []
+        for stat in keys:
+            raw = block.get(stat)
+            if raw is None:
+                values.append(None)
+            else:
+                values.append(float(raw) * 100 if as_percent else float(raw))
+        fig.add_trace(
+            go.Bar(
+                name=SCOPE_LABELS[key],
+                x=[STAT_LABELS[stat] for stat in keys],
+                y=values,
+                marker_color=SCOPE_COLORS[key],
+                hovertemplate="%{y:.1f}<extra>%{fullData.name}</extra>",
+            )
+        )
+    chart_layout(fig, title)
+    if as_percent:
+        fig.update_yaxes(ticksuffix="%")
+    return fig
+
+
+def scale_value(stat: str, value: float) -> float:
+    low, high = RADAR_SCALES[stat]
+    if high == low:
+        return 0
+    return max(0, min(100, (value - low) / (high - low) * 100))
+
+
+def radar_chart(scopes: dict) -> go.Figure:
+    stats = ["ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct"]
+    labels = [STAT_LABELS[stat] for stat in stats]
+    fig = go.Figure()
+    for key, block in available_scopes(scopes):
+        if key == "combined" and any(scopes.get(other) for other in ("europe", "domestic", "regional")):
+            continue
+        radii = []
+        custom = []
+        for stat in stats:
+            raw = block.get(stat)
+            if raw is None:
+                radii.append(0)
+                custom.append("—")
+            else:
+                radii.append(scale_value(stat, float(raw)))
+                custom.append(fmt_stat(stat, raw))
+        fig.add_trace(
+            go.Scatterpolar(
+                r=radii + [radii[0]],
+                theta=labels + [labels[0]],
+                name=SCOPE_LABELS[key],
+                fill="toself",
+                line=dict(color=SCOPE_COLORS[key], width=2),
+                customdata=custom + [custom[0]],
+                hovertemplate="%{theta}: %{customdata}<extra>%{fullData.name}</extra>",
+            )
+        )
+    fig.update_layout(
+        title=dict(text="Προφίλ σε κοινή κλίμακα", x=0, xanchor="left"),
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#e8edf7"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.05, x=0),
+        margin=dict(l=40, r=40, t=80, b=20),
+        height=430,
+        polar=dict(
+            bgcolor="rgba(0,0,0,0)",
+            radialaxis=dict(visible=False, range=[0, 100]),
+            angularaxis=dict(gridcolor="rgba(255,255,255,0.08)"),
+        ),
+    )
+    return fig
+
+
+def competition_table(competitions: list[dict]) -> pd.DataFrame:
+    scope_names = {"europe": "Ευρώπη", "domestic": "Πρωτάθλημα", "regional": "Liga ABA"}
+    records = []
+    for row in competitions:
+        records.append(
+            {
+                "Διοργάνωση": row["league_name"],
+                "Κατηγορία": scope_names.get(row["scope"], row["scope"]),
+                "Χώρα": row["country"],
+                "Αγώνες": fmt_stat("gp", row["gp"]),
+                "Πόντοι": fmt_stat("ppg", row["ppg"]),
+                "Ριμπάουντ": fmt_stat("rpg", row["rpg"]),
+                "Ασίστ": fmt_stat("apg", row["apg"]),
+                "Εντός": fmt_stat("fg_pct", row["fg_pct"]),
+                "Τρίποντα": fmt_stat("tp_pct", row["tp_pct"]),
+                "Βολές": fmt_stat("ft_pct", row["ft_pct"]),
+                "Κλεψίματα": fmt_stat("spg", row["spg"]),
+                "Κοψίματα": fmt_stat("bpg", row["bpg"]),
+                "Λάθη": fmt_stat("tov", row["tov"]),
+                "Πηγή": row["source_name"],
+            }
+        )
+    return pd.DataFrame(records)
+
+
+def scoring_insight(scopes: dict) -> str | None:
+    europe = scopes.get("europe")
+    domestic = scopes.get("domestic")
+    if not europe or not domestic or europe.get("ppg") is None or domestic.get("ppg") is None:
+        return None
+    diff = float(domestic["ppg"]) - float(europe["ppg"])
+    if abs(diff) < 0.15:
+        return "Η παραγωγή πόντων στην Ευρώπη και στο πρωτάθλημα είναι σχεδόν ίδια."
+    if diff > 0:
+        return (
+            f"Στο πρωτάθλημα σκοράρει {diff:.1f} πόντους περισσότερους ανά αγώνα "
+            "από ό,τι στην Ευρώπη."
+        )
+    return (
+        f"Στην Ευρώπη σκοράρει {abs(diff):.1f} πόντους περισσότερους ανά αγώνα "
+        "από ό,τι στο πρωτάθλημα."
+    )
+
+
+def weight_sentence(scopes: dict) -> str:
+    parts = [f"{float(scopes['combined']['gp']):.0f} αγώνες συνολικά"]
+    for key, label in (
+        ("europe", "στην Ευρώπη"),
+        ("regional", "στη Liga ABA"),
+        ("domestic", "στο πρωτάθλημα"),
+    ):
+        block = scopes.get(key)
+        if block:
+            parts.append(f"{float(block['gp']):.0f} {label}")
+    return "Ο ενιαίος μέσος σταθμίζεται με τους αγώνες: " + ", ".join(parts) + "."
+
+
+def render_refresh() -> None:
+    if st.button("Ανανέωση Στατιστικών", type="primary", use_container_width=False):
+        progress = st.progress(0, text="Ξεκινά η άντληση πινάκων...")
+
+        def on_progress(done: int, total: int, label: str) -> None:
+            progress.progress(min(done / total, 1) if total else 1, text=label)
+
+        try:
+            frame, reports = scrape_all(on_progress)
+            saved = upsert_team_stats(frame) if not frame.empty else 0
+        except Exception as exc:  # noqa: BLE001 - show the failure in the page
+            st.error(f"Η ανανέωση δεν ολοκληρώθηκε: {exc}")
+            return
+        st.session_state["last_report"] = reports
+        st.session_state["last_saved"] = saved
+        st.session_state.pop("team_choice", None)
+        st.rerun()
+
+    reports = st.session_state.get("last_report")
+    if not reports:
+        return
+    saved = st.session_state.get("last_saved", 0)
+    failed = [item["league"] for item in reports if not item.get("ok") and item.get("error")]
+    if saved:
+        st.success(f"Αποθηκεύτηκαν {saved} γραμμές στατιστικών.")
+    elif failed:
+        st.error("Δεν ενημερώθηκε καμία διοργάνωση. Τα προηγούμενα δεδομένα έμειναν ως έχουν.")
+    if failed:
+        st.warning("Δεν διαβάστηκαν: " + ", ".join(failed))
+    with st.expander("Λεπτομέρειες άντλησης"):
+        for item in reports:
+            if item.get("ok"):
+                note = item.get("note") or ""
+                st.write(f"✓ {item['league']}: {item.get('rows', 0)} ομάδες. {note}")
+            elif item.get("error"):
+                st.write(f"✕ {item['league']}: {item.get('error')}")
+            elif item.get("note"):
+                st.write(f"• {item['league']}: {item['note']}")
+
+
+def render_team(profile: dict) -> None:
+    competitions = profile["competitions"]
+    scopes = profile["scopes"]
+    combined = scopes["combined"]
+
+    st.markdown(f"<div class='team-title'>{profile['team']}</div>", unsafe_allow_html=True)
+    pills = []
+    for row in competitions:
+        color = SCOPE_COLORS.get(row["scope"], "#8892a8")
+        pills.append(
+            "<span class='pill' style='background:"
+            f"{color}22;color:{color};border-color:{color}55'>"
+            f"{row['league_name']} · {row['country']} · {float(row['gp']):.0f} αγ."
+            "</span>"
+        )
+    st.markdown("".join(pills), unsafe_allow_html=True)
+    st.markdown(
+        f"<div class='subtle'>Σεζόν {competitions[0]['season']} · "
+        f"ενημέρωση {format_when(str(profile['updated_at']))}</div>",
+        unsafe_allow_html=True,
+    )
+
+    insight = scoring_insight(scopes)
+    if insight:
+        st.markdown(f"<div class='insight'>{insight}</div>", unsafe_allow_html=True)
+    st.caption(weight_sentence(scopes))
+
+    cards = [
+        ("Πόντοι", "ppg"),
+        ("Ριμπάουντ", "rpg"),
+        ("Ασίστ", "apg"),
+        ("Εντός πεδιάς", "fg_pct"),
+        ("Τρίποντα", "tp_pct"),
+        ("Βολές", "ft_pct"),
+    ]
+    for row_cards in (cards[:3], cards[3:]):
+        columns = st.columns(3)
+        for column, (label, key) in zip(columns, row_cards):
+            column.metric(label, fmt_stat(key, combined.get(key)))
+
+    left, right = st.columns(2)
+    with left:
+        st.plotly_chart(
+            grouped_bars(scopes, ["ppg", "rpg", "apg", "spg", "bpg"], "Παραγωγή ανά αγώνα"),
+            use_container_width=True,
+        )
+    with right:
+        st.plotly_chart(
+            grouped_bars(scopes, ["fg_pct", "tp_pct", "ft_pct"], "Ποσοστά σουτ", as_percent=True),
+            use_container_width=True,
+        )
+
+    left, right = st.columns(2)
+    with left:
+        st.plotly_chart(radar_chart(scopes), use_container_width=True)
+    with right:
+        st.plotly_chart(
+            grouped_bars(scopes, ["orb", "drb", "tov", "pf"], "Ριμπάουντ, λάθη και φάουλ"),
+            use_container_width=True,
+        )
+
+    st.subheader("Ανα διοργάνωση")
+    st.dataframe(competition_table(competitions), use_container_width=True, hide_index=True)
+
+
+def main() -> None:
+    if st.session_state.get("pending_team"):
+        pending = st.session_state.pop("pending_team")
+        st.session_state["team_query"] = pending
+        st.session_state["team_choice"] = pending
+        st.session_state["cross_picks"] = None
+
+    inject_css()
+    init_db()
+    summary = dataset_summary()
+
+    title_col, action_col = st.columns([4, 1.3])
+    with title_col:
+        st.markdown("<div class='hero-kicker'>EuroLeague · EuroCup · εγχώρια</div>", unsafe_allow_html=True)
+        st.title("Στατιστικά ομάδων")
+        st.markdown(
+            "<div class='subtle'>Μέσοι όροι από την Ευρώπη και τα πρωταθλήματα. "
+            "Όταν μια ομάδα παίζει σε περισσότερες διοργανώσεις, ο ενιαίος μέσος "
+            "σταθμίζεται με τους αγώνες και οι δύο κατηγορίες μένουν χωριστά.</div>",
+            unsafe_allow_html=True,
+        )
+    with action_col:
+        st.write("")
+        render_refresh()
+
+    st.caption(
+        f"{summary['teams']} ομάδες · {summary['leagues']} διοργανώσεις · "
+        f"{summary['rows']} γραμμές · τελευταία αποθήκευση {format_when(summary['refreshed_at'])}"
+    )
+
+    if summary["teams"] == 0:
+        st.info("Η βάση είναι άδεια. Πάτησε «Ανανέωση Στατιστικών» για να διαβαστούν οι πίνακες.")
+        return
+
+    names = list_team_names()
+    query = st.text_input(
+        "Αναζήτηση ομάδας",
+        key="team_query",
+        placeholder="π.χ. Ολυμπιακός, Real Madrid, Φενέρμπαχτσε",
+    )
+    matches = search_team_names(query) if query.strip() else names
+    if query.strip() and not matches:
+        st.warning("Καμία ομάδα δεν ταιριάζει με αυτή την αναζήτηση.")
+        return
+
+    if "team_choice" in st.session_state and st.session_state["team_choice"] not in matches:
+        st.session_state.pop("team_choice", None)
+
+    select_kwargs = {}
+    if "team_choice" not in st.session_state:
+        select_kwargs["index"] = None
+    selected = st.selectbox(
+        "Ομάδα",
+        matches,
+        placeholder="Επίλεξε ομάδα από τα αποτελέσματα",
+        key="team_choice",
+        **select_kwargs,
+    )
+
+    if not selected and not query.strip():
+        picks = list_cross_competition_teams()
+        if picks:
+            picked = st.pills(
+                "Ομάδες με αγώνες και στην Ευρώπη και στο πρωτάθλημα",
+                picks,
+                selection_mode="single",
+                key="cross_picks",
+                wrap=True,
+            )
+            if picked and picked != st.session_state.get("team_choice"):
+                st.session_state["pending_team"] = picked
+                st.rerun()
+
+    if not selected:
+        st.markdown(
+            "<div class='subtle'>Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους "
+            "και τα γραφήματα.</div>",
+            unsafe_allow_html=True,
+        )
+        return
+
+    profile = get_team_stats(selected)
+    if profile is None:
+        st.error("Τα στατιστικά αυτής της ομάδας δεν βρέθηκαν.")
+        return
+    render_team(profile)
+
+
+if __name__ == "__main__":
+    main()
