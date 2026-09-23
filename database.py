@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from names import matching_names, resolve_team_name
-from scraper import STAT_FIELDS
+from names import canonical_team_name, matching_names, resolve_team_name
+from scraper import CURRENT_SEASON, LEAGUE_META, PREVIOUS_SEASON, STAT_FIELDS
 
 ROOT = Path(__file__).resolve().parent
 DB_PATH = ROOT / "data" / "basketball.db"
@@ -71,6 +71,32 @@ def init_db(db_path: Path | str | None = None) -> None:
                 UNIQUE (team_id, league_code, season)
             );
 
+            CREATE TABLE IF NOT EXISTS game_logs (
+                id INTEGER PRIMARY KEY,
+                team_id INTEGER NOT NULL REFERENCES teams(id),
+                league_code TEXT NOT NULL,
+                season TEXT NOT NULL,
+                game_index INTEGER NOT NULL,
+                round_number INTEGER,
+                points REAL,
+                fgm REAL,
+                fga REAL,
+                tpm REAL,
+                tpa REAL,
+                ftm REAL,
+                fta REAL,
+                orb REAL,
+                drb REAL,
+                reb REAL,
+                ast REAL,
+                stl REAL,
+                blk REAL,
+                tov REAL,
+                pf REAL,
+                minutes REAL,
+                UNIQUE (team_id, league_code, season, game_index)
+            );
+
             CREATE TABLE IF NOT EXISTS refresh_log (
                 id INTEGER PRIMARY KEY,
                 refreshed_at TEXT NOT NULL,
@@ -80,6 +106,33 @@ def init_db(db_path: Path | str | None = None) -> None:
             );
             """
         )
+        _canonicalize_stored_names(connection)
+
+
+def _canonicalize_stored_names(connection: sqlite3.Connection) -> None:
+    """Point sponsor and feed names at the same team used in the season tables."""
+    rows = connection.execute("SELECT id, name FROM teams").fetchall()
+    for row in rows:
+        canonical = canonical_team_name(row["name"])
+        if not canonical or canonical == row["name"]:
+            continue
+        source_id = row["id"]
+        target = connection.execute("SELECT id FROM teams WHERE name = ?", (canonical,)).fetchone()
+        if target is None:
+            connection.execute("UPDATE teams SET name = ? WHERE id = ?", (canonical, source_id))
+            continue
+        target_id = target["id"]
+        connection.execute(
+            "UPDATE OR IGNORE game_logs SET team_id = ? WHERE team_id = ?",
+            (target_id, source_id),
+        )
+        connection.execute("DELETE FROM game_logs WHERE team_id = ?", (source_id,))
+        connection.execute(
+            "UPDATE OR IGNORE competition_stats SET team_id = ? WHERE team_id = ?",
+            (target_id, source_id),
+        )
+        connection.execute("DELETE FROM competition_stats WHERE team_id = ?", (source_id,))
+        connection.execute("DELETE FROM teams WHERE id = ?", (source_id,))
 
 
 def _number(value: object) -> float | None:
@@ -94,8 +147,8 @@ def _number(value: object) -> float | None:
 def upsert_team_stats(frame: pd.DataFrame, db_path: Path | str | None = None) -> int:
     """Insert or replace competition averages for the leagues present in ``frame``.
 
-    Leagues that are absent from the frame are left untouched, so a failed
-    scrape does not wipe the previous snapshot.
+    Only the season carried on each row is replaced. A refresh of 2026-27
+    does not delete 2025-26, and leagues missing from the frame are kept.
     """
     init_db(db_path)
     if frame is None or frame.empty:
@@ -103,12 +156,16 @@ def upsert_team_stats(frame: pd.DataFrame, db_path: Path | str | None = None) ->
 
     now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     saved = 0
-    leagues = sorted({str(code) for code in frame["league_code"].dropna().unique()})
+    pairs = {
+        (str(record.get("league_code")), str(record.get("season")))
+        for record in frame.to_dict(orient="records")
+        if record.get("league_code") and record.get("season")
+    }
     with connect(db_path) as connection:
-        for league_code in leagues:
+        for league_code, season in pairs:
             connection.execute(
-                "DELETE FROM competition_stats WHERE league_code = ?",
-                (league_code,),
+                "DELETE FROM competition_stats WHERE league_code = ? AND season = ?",
+                (league_code, season),
             )
         for record in frame.to_dict(orient="records"):
             team_name = str(record.get("team_name") or "").strip()
@@ -143,13 +200,19 @@ def upsert_team_stats(frame: pd.DataFrame, db_path: Path | str | None = None) ->
                 ],
             )
             saved += 1
-        connection.execute("DELETE FROM teams WHERE id NOT IN (SELECT team_id FROM competition_stats)")
+        connection.execute(
+            """
+            DELETE FROM teams
+            WHERE id NOT IN (SELECT team_id FROM competition_stats)
+              AND id NOT IN (SELECT team_id FROM game_logs)
+            """
+        )
         connection.execute(
             """
             INSERT INTO refresh_log (refreshed_at, rows_saved, leagues_ok, leagues_failed)
             VALUES (?, ?, ?, ?)
             """,
-            (now, saved, len(leagues), 0),
+            (now, saved, len(pairs), 0),
         )
         connection.commit()
     return saved
@@ -163,20 +226,30 @@ def list_team_names(db_path: Path | str | None = None) -> list[str]:
     return [row["name"] for row in rows]
 
 
-def list_cross_competition_teams(db_path: Path | str | None = None) -> list[str]:
-    """Teams that have both a European cup and a domestic league."""
+def list_cross_competition_teams(
+    season: str | None = None,
+    db_path: Path | str | None = None,
+) -> list[str]:
+    """Teams that have both a European cup and a domestic league in one season."""
     init_db(db_path)
+    season_filter = ""
+    parameters: list[object] = []
+    if season:
+        season_filter = "WHERE c.season = ?"
+        parameters.append(season)
     with connect(db_path) as connection:
         rows = connection.execute(
-            """
+            f"""
             SELECT t.name
             FROM teams t
             JOIN competition_stats c ON c.team_id = t.id
+            {season_filter}
             GROUP BY t.id
             HAVING SUM(CASE WHEN c.scope = 'europe' THEN 1 ELSE 0 END) > 0
                AND SUM(CASE WHEN c.scope = 'domestic' THEN 1 ELSE 0 END) > 0
             ORDER BY t.name COLLATE NOCASE
-            """
+            """,
+            parameters,
         ).fetchall()
     return [row["name"] for row in rows]
 
@@ -257,24 +330,30 @@ def _competition_dict(row: sqlite3.Row) -> dict[str, object]:
     return item
 
 
-def get_team_stats(name: str, db_path: Path | str | None = None) -> dict[str, object] | None:
-    """Return one team's competition rows plus Europe, domestic, and combined averages."""
+def get_team_stats(
+    name: str,
+    season: str | None = None,
+    db_path: Path | str | None = None,
+) -> dict[str, object] | None:
+    """Return one team's rows for a single season, plus Europe, domestic, and combined averages."""
     init_db(db_path)
     names = list_team_names(db_path)
     resolved = resolve_team_name(name, names)
     if resolved is None:
         return None
 
+    query = """
+        SELECT c.*
+        FROM competition_stats c
+        JOIN teams t ON t.id = c.team_id
+        WHERE t.name = ?
+    """
+    parameters: list[object] = [resolved]
+    if season:
+        query += " AND c.season = ?"
+        parameters.append(season)
     with connect(db_path) as connection:
-        rows = connection.execute(
-            """
-            SELECT c.*
-            FROM competition_stats c
-            JOIN teams t ON t.id = c.team_id
-            WHERE t.name = ?
-            """,
-            (resolved,),
-        ).fetchall()
+        rows = connection.execute(query, parameters).fetchall()
     competitions = [_competition_dict(row) for row in rows]
     competitions.sort(key=lambda item: (SCOPE_ORDER.get(str(item["scope"]), 9), str(item["league_name"])))
     if not competitions:
@@ -295,9 +374,197 @@ def get_team_stats(name: str, db_path: Path | str | None = None) -> dict[str, ob
     updated = max(str(row["updated_at"]) for row in competitions)
     return {
         "team": resolved,
+        "season": season,
         "updated_at": updated,
         "competitions": competitions,
         "scopes": scopes,
+    }
+
+
+GAME_COUNTING = (
+    "points",
+    "fgm",
+    "fga",
+    "tpm",
+    "tpa",
+    "ftm",
+    "fta",
+    "orb",
+    "drb",
+    "reb",
+    "ast",
+    "stl",
+    "blk",
+    "tov",
+    "pf",
+    "minutes",
+)
+
+
+def replace_game_logs(frame: pd.DataFrame, league_code: str, season: str, db_path: Path | str | None = None) -> int:
+    """Replace stored per-game lines for one competition and season."""
+    init_db(db_path)
+    if frame is None or frame.empty:
+        return 0
+    saved = 0
+    with connect(db_path) as connection:
+        connection.execute(
+            "DELETE FROM game_logs WHERE league_code = ? AND season = ?",
+            (league_code, season),
+        )
+        for record in frame.to_dict(orient="records"):
+            team_name = str(record.get("team_name") or "").strip()
+            if not team_name:
+                continue
+            connection.execute("INSERT OR IGNORE INTO teams (name) VALUES (?)", (team_name,))
+            team_id = connection.execute("SELECT id FROM teams WHERE name = ?", (team_name,)).fetchone()["id"]
+            connection.execute(
+                f"""
+                INSERT INTO game_logs (
+                    team_id, league_code, season, game_index, round_number,
+                    {", ".join(GAME_COUNTING)}
+                ) VALUES ({", ".join("?" for _ in range(5 + len(GAME_COUNTING)))})
+                """,
+                [
+                    team_id,
+                    league_code,
+                    season,
+                    int(record["game_index"]),
+                    int(record.get("round_number") or 0),
+                    *[_number(record.get(field)) for field in GAME_COUNTING],
+                ],
+            )
+            saved += 1
+        connection.commit()
+    return saved
+
+
+def _average_game_rows(games: list[sqlite3.Row], league_code: str, season: str) -> dict[str, object]:
+    count = len(games)
+    meta = LEAGUE_META[league_code]
+    totals = {field: sum(float(game[field] or 0) for game in games) for field in GAME_COUNTING}
+
+    def ratio(made: str, attempted: str) -> float | None:
+        if totals[attempted] <= 0:
+            return None
+        return totals[made] / totals[attempted]
+
+    return {
+        "league_code": league_code,
+        "league_name": meta["league_name"],
+        "scope": meta["scope"],
+        "country": meta["country"],
+        "season": season,
+        "source_name": "Αρχείο αγώνων",
+        "source_url": "",
+        "updated_at": "",
+        "gp": float(count),
+        "mpg": totals["minutes"] / count,
+        "ppg": totals["points"] / count,
+        "fgm": totals["fgm"] / count,
+        "fga": totals["fga"] / count,
+        "fg_pct": ratio("fgm", "fga"),
+        "tpm": totals["tpm"] / count,
+        "tpa": totals["tpa"] / count,
+        "tp_pct": ratio("tpm", "tpa"),
+        "ftm": totals["ftm"] / count,
+        "fta": totals["fta"] / count,
+        "ft_pct": ratio("ftm", "fta"),
+        "orb": totals["orb"] / count,
+        "drb": totals["drb"] / count,
+        "rpg": totals["reb"] / count,
+        "apg": totals["ast"] / count,
+        "spg": totals["stl"] / count,
+        "bpg": totals["blk"] / count,
+        "tov": totals["tov"] / count,
+        "pf": totals["pf"] / count,
+    }
+
+
+def comparison_profile(
+    name: str,
+    game_limits: dict[str, int],
+    season: str = PREVIOUS_SEASON,
+    db_path: Path | str | None = None,
+) -> dict[str, object] | None:
+    """Averages from the first N games of `season`, per competition.
+
+    N comes from the current season's games played in that same competition.
+    Competitions without a stored game log are left out instead of using the
+    full-season average.
+    """
+    init_db(db_path)
+    names = list_team_names(db_path)
+    resolved = resolve_team_name(name, names)
+    if resolved is None:
+        return None
+    limits = {code: int(games) for code, games in game_limits.items() if int(games) > 0}
+    if not limits:
+        return None
+
+    competitions: list[dict[str, object]] = []
+    missing: list[str] = []
+    with connect(db_path) as connection:
+        team_row = connection.execute("SELECT id FROM teams WHERE name = ?", (resolved,)).fetchone()
+        if team_row is None:
+            return None
+        team_id = team_row["id"]
+        for league_code, games_played in limits.items():
+            if league_code not in LEAGUE_META:
+                missing.append(league_code)
+                continue
+            stored_games = connection.execute(
+                """
+                SELECT COUNT(*) AS n FROM game_logs
+                WHERE team_id = ? AND league_code = ? AND season = ?
+                """,
+                (team_id, league_code, season),
+            ).fetchone()["n"]
+            season_gp = connection.execute(
+                """
+                SELECT gp FROM competition_stats
+                WHERE team_id = ? AND league_code = ? AND season = ?
+                """,
+                (team_id, league_code, season),
+            ).fetchone()
+            if season_gp is not None and season_gp["gp"] is not None and stored_games < int(season_gp["gp"]):
+                missing.append(league_code)
+                continue
+            rows = connection.execute(
+                """
+                SELECT * FROM game_logs
+                WHERE team_id = ? AND league_code = ? AND season = ? AND game_index <= ?
+                ORDER BY game_index
+                """,
+                (team_id, league_code, season, games_played),
+            ).fetchall()
+            if len(rows) < games_played:
+                missing.append(league_code)
+                continue
+            competitions.append(_average_game_rows(list(rows), league_code, season))
+
+    if not competitions:
+        return None
+    competitions.sort(key=lambda item: (SCOPE_ORDER.get(str(item["scope"]), 9), str(item["league_name"])))
+    scopes = {
+        "combined": _weighted(competitions),
+        "europe": _weighted([row for row in competitions if row["scope"] == "europe"])
+        if any(row["scope"] == "europe" for row in competitions)
+        else None,
+        "domestic": _weighted([row for row in competitions if row["scope"] == "domestic"])
+        if any(row["scope"] == "domestic" for row in competitions)
+        else None,
+        "regional": _weighted([row for row in competitions if row["scope"] == "regional"])
+        if any(row["scope"] == "regional" for row in competitions)
+        else None,
+    }
+    return {
+        "team": resolved,
+        "season": season,
+        "updated_at": "",
+        "competitions": competitions,
+        "scopes": scopes,
+        "missing_leagues": missing,
     }
 
 
@@ -310,6 +577,14 @@ def dataset_summary(db_path: Path | str | None = None) -> dict[str, object]:
             "SELECT COUNT(DISTINCT league_code) AS n FROM competition_stats"
         ).fetchone()["n"]
         rows = connection.execute("SELECT COUNT(*) AS n FROM competition_stats").fetchone()["n"]
+        current_rows = connection.execute(
+            "SELECT COUNT(*) AS n FROM competition_stats WHERE season = ?",
+            (CURRENT_SEASON,),
+        ).fetchone()["n"]
+        previous_rows = connection.execute(
+            "SELECT COUNT(*) AS n FROM competition_stats WHERE season = ?",
+            (PREVIOUS_SEASON,),
+        ).fetchone()["n"]
         latest = connection.execute(
             "SELECT refreshed_at, rows_saved FROM refresh_log ORDER BY id DESC LIMIT 1"
         ).fetchone()
@@ -317,6 +592,8 @@ def dataset_summary(db_path: Path | str | None = None) -> dict[str, object]:
         "teams": teams,
         "leagues": leagues,
         "rows": rows,
+        "current_rows": current_rows,
+        "previous_rows": previous_rows,
         "refreshed_at": latest["refreshed_at"] if latest else None,
         "rows_saved": latest["rows_saved"] if latest else 0,
     }

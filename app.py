@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from database import (
+    comparison_profile,
     dataset_summary,
     get_team_stats,
     init_db,
@@ -17,7 +18,9 @@ from database import (
     upsert_team_stats,
 )
 from names import option_label
-from scraper import scrape_all
+from scraper import CURRENT_SEASON, LEAGUE_META, PREVIOUS_SEASON, scrape_all
+
+UNAVAILABLE = "Μη διαθέσιμων στατιστικών"
 
 st.set_page_config(
     page_title="Στατιστικά ομάδων",
@@ -322,8 +325,11 @@ def render_refresh() -> None:
         return
     saved = st.session_state.get("last_saved", 0)
     failed = [item["league"] for item in reports if not item.get("ok") and item.get("error")]
+    empty = [item for item in reports if item.get("empty")]
     if saved:
-        st.success(f"Αποθηκεύτηκαν {saved} γραμμές στατιστικών.")
+        st.success(f"Αποθηκεύτηκαν {saved} γραμμές για τη σεζόν {CURRENT_SEASON}.")
+    elif empty and not failed:
+        st.info(UNAVAILABLE)
     elif failed:
         st.error("Δεν ενημερώθηκε καμία διοργάνωση. Τα προηγούμενα δεδομένα έμειναν ως έχουν.")
     if failed:
@@ -339,12 +345,13 @@ def render_refresh() -> None:
                 st.write(f"• {item['league']}: {item['note']}")
 
 
-def render_team(profile: dict) -> None:
+def render_team(profile: dict, *, show_title: bool = True) -> None:
     competitions = profile["competitions"]
     scopes = profile["scopes"]
     combined = scopes["combined"]
 
-    st.markdown(f"<div class='team-title'>{profile['team']}</div>", unsafe_allow_html=True)
+    if show_title:
+        st.markdown(f"<div class='team-title'>{profile['team']}</div>", unsafe_allow_html=True)
     pills = []
     for row in competitions:
         color = SCOPE_COLORS.get(row["scope"], "#8892a8")
@@ -419,9 +426,9 @@ def main() -> None:
         st.markdown("<div class='hero-kicker'>EuroLeague · EuroCup · εγχώρια</div>", unsafe_allow_html=True)
         st.title("Στατιστικά ομάδων")
         st.markdown(
-            "<div class='subtle'>Μέσοι όροι από την Ευρώπη και τα πρωταθλήματα. "
-            "Όταν μια ομάδα παίζει σε περισσότερες διοργανώσεις, ο ενιαίος μέσος "
-            "σταθμίζεται με τους αγώνες και οι δύο κατηγορίες μένουν χωριστά.</div>",
+            "<div class='subtle'>Η ανανέωση διαβάζει τη σεζόν 2026-27. "
+            "Ο ενιαίος μέσος σταθμίζεται μόνο μέσα σε αυτή τη σεζόν. "
+            "Η περσινή αντίστοιχη αγωνιστική μένει χωριστή επιλογή και δεν μπαίνει στον μέσο όρο.</div>",
             unsafe_allow_html=True,
         )
     with action_col:
@@ -429,8 +436,9 @@ def main() -> None:
         render_refresh()
 
     st.caption(
-        f"{summary['teams']} ομάδες · {summary['leagues']} διοργανώσεις · "
-        f"{summary['rows']} γραμμές · τελευταία αποθήκευση {format_when(summary['refreshed_at'])}"
+        f"Σεζόν {CURRENT_SEASON}: {summary['current_rows']} γραμμές · "
+        f"αποθηκευμένη σεζόν {PREVIOUS_SEASON}: {summary['previous_rows']} γραμμές · "
+        f"τελευταία αποθήκευση {format_when(summary['refreshed_at'])}"
     )
 
     if summary["teams"] == 0:
@@ -456,10 +464,10 @@ def main() -> None:
     selected = labels.get(selected_label) if selected_label else None
 
     if not selected:
-        picks = list_cross_competition_teams()
+        picks = list_cross_competition_teams(PREVIOUS_SEASON)
         if picks:
             picked = st.pills(
-                "Ομάδες με αγώνες και στην Ευρώπη και στο πρωτάθλημα",
+                "Ομάδες με Ευρώπη και πρωτάθλημα τη σεζόν 2025-26",
                 picks,
                 selection_mode="single",
                 key="cross_picks",
@@ -470,6 +478,8 @@ def main() -> None:
                 st.rerun()
 
     if not selected:
+        if summary["current_rows"] == 0:
+            st.info(UNAVAILABLE)
         st.markdown(
             "<div class='subtle'>Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους "
             "και τα γραφήματα.</div>",
@@ -477,11 +487,47 @@ def main() -> None:
         )
         return
 
-    profile = get_team_stats(selected)
-    if profile is None:
-        st.error("Τα στατιστικά αυτής της ομάδας δεν βρέθηκαν.")
+    st.markdown(f"<div class='team-title'>{selected}</div>", unsafe_allow_html=True)
+    st.subheader(f"Σεζόν {CURRENT_SEASON}")
+    current = get_team_stats(selected, CURRENT_SEASON)
+    if current is None:
+        st.info(UNAVAILABLE)
+    else:
+        render_team(current, show_title=False)
+
+    show_previous = st.toggle(
+        f"Εμφάνιση στατιστικών αντίστοιχης αγωνιστικής {PREVIOUS_SEASON}",
+        key="show_previous_round",
+    )
+    if not show_previous:
         return
-    render_team(profile)
+
+    limits = {}
+    if current is not None:
+        limits = {
+            row["league_code"]: int(float(row["gp"] or 0))
+            for row in current["competitions"]
+        }
+    if not any(limits.values()):
+        st.info(UNAVAILABLE)
+        return
+
+    previous = comparison_profile(selected, limits, PREVIOUS_SEASON)
+    if previous is None:
+        st.info(UNAVAILABLE)
+        return
+    st.subheader(f"Σεζόν {PREVIOUS_SEASON} · αντίστοιχη αγωνιστική")
+    st.caption(
+        "Μέσοι όροι μόνο από τους πρώτους αγώνες της περσινής σεζόν, "
+        "όσους έχει δώσει η ομάδα φέτος σε κάθε διοργάνωση. "
+        "Δεν προστίθενται στον μέσο όρο του 2026-27."
+    )
+    render_team(previous, show_title=False)
+    missing = previous.get("missing_leagues") or []
+    if missing:
+        labels = [LEAGUE_META[code]["league_name"] for code in missing if code in LEAGUE_META]
+        if labels:
+            st.caption("Χωρίς αρχείο αγώνα-αγώνα για: " + ", ".join(labels) + ".")
 
 
 if __name__ == "__main__":

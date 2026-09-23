@@ -10,9 +10,13 @@ not counted twice.
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
+import urllib.request
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from typing import Callable
 
 import pandas as pd
@@ -44,6 +48,16 @@ EUROLEAGUE_TEAM_API = (
     "https://api-live.euroleague.net/v3/competitions/"
     "{competition}/statistics/teams/traditional"
 )
+EUROLEAGUE_GAMES_URL = (
+    "https://api-live.euroleague.net/v2/competitions/{competition}/seasons/{season_code}/games"
+)
+EUROLEAGUE_GAME_STATS_URL = (
+    "https://api-live.euroleague.net/v2/competitions/"
+    "{competition}/seasons/{season_code}/games/{game_code}/stats"
+)
+
+CURRENT_SEASON = "2026-27"
+PREVIOUS_SEASON = "2025-26"
 
 LEAGUES: list[dict[str, str]] = [
     {
@@ -51,10 +65,10 @@ LEAGUES: list[dict[str, str]] = [
         "league_name": "Euroleague",
         "scope": "europe",
         "country": "Ευρώπη",
-        "season": "2025-26",
+        "season": CURRENT_SEASON,
         "url": (
             "https://basketball.realgm.com/international/league/1/Euroleague/"
-            "team-stats/2026/Averages/Team_Totals"
+            "team-stats/2027/points/Team_Totals"
         ),
     },
     {
@@ -62,18 +76,18 @@ LEAGUES: list[dict[str, str]] = [
         "league_name": "Eurocup",
         "scope": "europe",
         "country": "Ευρώπη",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/2/Eurocup/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/2/Eurocup/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "aba",
         "league_name": "Liga ABA",
         "scope": "regional",
         "country": "Αδριατική",
-        "season": "2025-26",
+        "season": CURRENT_SEASON,
         "url": (
             "https://basketball.realgm.com/international/league/18/"
-            "Adriatic-League-Liga-ABA/team-stats/2026/Averages"
+            "Adriatic-League-Liga-ABA/team-stats/2027/points/Team_Totals"
         ),
     },
     {
@@ -81,42 +95,42 @@ LEAGUES: list[dict[str, str]] = [
         "league_name": "Spanish ACB",
         "scope": "domestic",
         "country": "Ισπανία",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/4/Spanish-ACB/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/4/Spanish-ACB/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "greek_a1",
         "league_name": "Greek HEBA A1",
         "scope": "domestic",
         "country": "Ελλάδα",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/8/Greek-HEBA-A1/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/8/Greek-HEBA-A1/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "turkish_bsl",
         "league_name": "Turkish BSL",
         "scope": "domestic",
         "country": "Τουρκία",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/7/Turkish-BSL/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/7/Turkish-BSL/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "israeli_bsl",
         "league_name": "Israeli BSL",
         "scope": "domestic",
         "country": "Ισραήλ",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/11/Israeli-BSL/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/11/Israeli-BSL/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "lega_a",
         "league_name": "Italian Lega Basket Serie A",
         "scope": "domestic",
         "country": "Ιταλία",
-        "season": "2025-26",
+        "season": CURRENT_SEASON,
         "url": (
             "https://basketball.realgm.com/international/league/6/"
-            "Italian-Lega-Basket-Serie-A/team-stats/2026/Averages"
+            "Italian-Lega-Basket-Serie-A/team-stats/2027/points/Team_Totals"
         ),
     },
     {
@@ -124,10 +138,10 @@ LEAGUES: list[dict[str, str]] = [
         "league_name": "French Jeep Elite",
         "scope": "domestic",
         "country": "Γαλλία",
-        "season": "2025-26",
+        "season": CURRENT_SEASON,
         "url": (
             "https://basketball.realgm.com/international/league/12/"
-            "French-Jeep-Elite/team-stats/2026/Averages"
+            "French-Jeep-Elite/team-stats/2027/points/Team_Totals"
         ),
     },
     {
@@ -135,18 +149,27 @@ LEAGUES: list[dict[str, str]] = [
         "league_name": "German BBL",
         "scope": "domestic",
         "country": "Γερμανία",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/15/German-BBL/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/15/German-BBL/team-stats/2027/points/Team_Totals",
     },
     {
         "league_code": "lkl",
         "league_name": "Lithuanian LKL",
         "scope": "domestic",
         "country": "Λιθουανία",
-        "season": "2025-26",
-        "url": "https://basketball.realgm.com/international/league/10/Lithuanian-LKL/team-stats/2026/Averages",
+        "season": CURRENT_SEASON,
+        "url": "https://basketball.realgm.com/international/league/10/Lithuanian-LKL/team-stats/2027/points/Team_Totals",
     },
 ]
+
+LEAGUE_META = {
+    league["league_code"]: {
+        "league_name": league["league_name"],
+        "scope": league["scope"],
+        "country": league["country"],
+    }
+    for league in LEAGUES
+}
 
 HEADER_MAP = {
     "#": None,
@@ -365,6 +388,11 @@ def parse_html_table(html: str) -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def season_unavailable(text: str) -> bool:
+    """True when the stats page exists but the season has no games yet."""
+    return "stats are not available for this season" in (text or "").lower()
+
+
 def parse_stats_document(text: str) -> pd.DataFrame:
     """Parse either a markdown reader page or raw HTML into team averages."""
     if not text or _is_challenge(text):
@@ -406,6 +434,8 @@ def _fetch_direct(url: str) -> str | None:
     if response.status_code >= 400 or _is_challenge(response.text):
         logger.info("Direct request blocked for %s (%s)", url, response.status_code)
         return None
+    if season_unavailable(response.text):
+        return response.text
     if parse_stats_document(response.text).empty and "application/json" not in response.headers.get(
         "content-type", ""
     ):
@@ -428,6 +458,8 @@ def _fetch_rendered(url: str) -> str:
             last_error = str(exc)
             time.sleep(1.2 * (attempt + 1))
             continue
+        if season_unavailable(response.text):
+            return response.text
         if _is_challenge(response.text) or parse_stats_document(response.text).empty:
             last_error = "Η σελίδα απάντησε χωρίς πίνακα στατιστικών."
             time.sleep(1.2 * (attempt + 1))
@@ -439,14 +471,21 @@ def _fetch_rendered(url: str) -> str:
 def fetch_page(url: str) -> str:
     """Download a stats page with requests, rendering it if the table is missing."""
     direct = _fetch_direct(url)
-    if direct is not None and not parse_stats_document(direct).empty:
+    if direct is not None and (
+        season_unavailable(direct) or not parse_stats_document(direct).empty
+    ):
         return direct
     return _fetch_rendered(url)
 
 
 def scrape_league(league: dict[str, str]) -> pd.DataFrame:
-    """Scrape one competition table into a clean DataFrame."""
+    """Scrape one competition table into a clean DataFrame.
+
+    An empty frame means the season page loaded and has no games yet.
+    """
     document = fetch_page(league["url"])
+    if season_unavailable(document):
+        return pd.DataFrame(columns=OUTPUT_COLUMNS)
     frame = parse_stats_document(document)
     if frame.empty:
         raise RuntimeError(f"Δεν βρέθηκε πίνακας για {league['league_name']}.")
@@ -514,19 +553,28 @@ def fetch_euroleague_team_api(competition: str, season_code: str) -> list[dict[s
     return rows
 
 
-def euroleague_fallback(league_code: str) -> pd.DataFrame:
-    """Official team averages used only when that RealGM table is missing."""
-    league = next(item for item in LEAGUES if item["league_code"] == league_code)
+def euroleague_api_codes(league_code: str, season: str) -> tuple[str, str] | None:
+    """Map a league and season label to the Euroleague feed codes."""
+    start_year = season.split("-")[0]
     if league_code == "euroleague":
-        competition, season_code = "E", "E2025"
-    elif league_code == "eurocup":
-        competition, season_code = "U", "U2025"
-    else:
+        return "E", f"E{start_year}"
+    if league_code == "eurocup":
+        return "U", f"U{start_year}"
+    return None
+
+
+def euroleague_fallback(league: dict[str, str]) -> pd.DataFrame:
+    """Official team averages used only when that RealGM page cannot be read."""
+    codes = euroleague_api_codes(league["league_code"], league["season"])
+    if codes is None:
         return pd.DataFrame(columns=OUTPUT_COLUMNS)
+    competition, season_code = codes
     rows = fetch_euroleague_team_api(competition, season_code)
     frame = annotate(pd.DataFrame(rows), league, "Euroleague API")
     if not frame.empty:
-        frame["source_url"] = EUROLEAGUE_TEAM_API.format(competition=competition) + f"?SeasonCode={season_code}"
+        frame["source_url"] = (
+            EUROLEAGUE_TEAM_API.format(competition=competition) + f"?SeasonCode={season_code}"
+        )
     return frame
 
 
@@ -548,36 +596,73 @@ def probe_euroleague_site() -> dict[str, object]:
 
 
 def scrape_all(progress: ProgressCallback | None = None) -> tuple[pd.DataFrame, list[dict[str, object]]]:
-    """Scrape every configured competition and return one combined DataFrame."""
+    """Scrape the current season and return one combined DataFrame.
+
+    Leagues with no games yet are reported as empty. They are not filled
+    with the previous season.
+    """
     frames: list[pd.DataFrame] = []
     reports: list[dict[str, object]] = []
-    total = len(LEAGUES) + 1
-    succeeded: set[str] = set()
+    total = len(LEAGUES)
 
     for index, league in enumerate(LEAGUES):
         if progress:
-            progress(index, total, f"Ανάγνωση {league['league_name']}...")
+            progress(index, total, f"Ανάγνωση {league['league_name']} ({CURRENT_SEASON})...")
         try:
             frame = scrape_league(league)
         except Exception as exc:  # noqa: BLE001 - one league should not abort the rest
             logger.warning("Failed to scrape %s: %s", league["league_name"], exc)
+            fallback = pd.DataFrame(columns=OUTPUT_COLUMNS)
+            try:
+                fallback = euroleague_fallback(league)
+            except Exception as fallback_exc:  # noqa: BLE001
+                logger.warning("Euroleague API fallback failed for %s: %s", league["league_name"], fallback_exc)
+            if not fallback.empty:
+                frames.append(fallback)
+                reports.append(
+                    {
+                        "league": league["league_name"],
+                        "league_code": league["league_code"],
+                        "season": league["season"],
+                        "ok": True,
+                        "rows": int(len(fallback)),
+                        "url": league["url"],
+                        "note": "Εναλλακτική πηγή επειδή ο πίνακας της RealGM δεν διαβάστηκε.",
+                    }
+                )
+            else:
+                reports.append(
+                    {
+                        "league": league["league_name"],
+                        "league_code": league["league_code"],
+                        "season": league["season"],
+                        "ok": False,
+                        "rows": 0,
+                        "error": str(exc),
+                        "url": league["url"],
+                    }
+                )
+            continue
+        if frame.empty:
             reports.append(
                 {
                     "league": league["league_name"],
                     "league_code": league["league_code"],
-                    "ok": False,
+                    "season": league["season"],
+                    "ok": True,
                     "rows": 0,
-                    "error": str(exc),
+                    "empty": True,
                     "url": league["url"],
+                    "note": "Δεν έχουν παιχτεί αγώνες.",
                 }
             )
             continue
         frames.append(frame)
-        succeeded.add(league["league_code"])
         reports.append(
             {
                 "league": league["league_name"],
                 "league_code": league["league_code"],
+                "season": league["season"],
                 "ok": True,
                 "rows": int(len(frame)),
                 "url": league["url"],
@@ -586,78 +671,107 @@ def scrape_all(progress: ProgressCallback | None = None) -> tuple[pd.DataFrame, 
         time.sleep(0.25)
 
     if progress:
-        progress(len(LEAGUES), total, "Έλεγχος επίσημης σελίδας Euroleague...")
-    site = probe_euroleague_site()
-    if "euroleague" in succeeded:
-        reports.append(
-            {
-                "league": "Euroleague (επίσημη σελίδα)",
-                "league_code": "euroleague_site",
-                "ok": True,
-                "rows": 0,
-                "url": EUROLEAGUE_PLAYERS_URL,
-                "note": (
-                    "Ο πίνακας ομάδων της Euroleague ήρθε από τη RealGM, "
-                    "ώστε η ίδια διοργάνωση να μην μετρήσει δύο φορές."
-                ),
-            }
-        )
-    elif site.get("ok"):
-        euro_league = next(item for item in LEAGUES if item["league_code"] == "euroleague")
-        frame = annotate(parse_stats_document(str(site["document"])), euro_league, "Euroleague")
-        if not frame.empty and len(frame) <= 40:
-            frames.append(frame)
-            succeeded.add("euroleague")
-            reports.append(
-                {
-                    "league": "Euroleague (επίσημη σελίδα)",
-                    "league_code": "euroleague",
-                    "ok": True,
-                    "rows": int(len(frame)),
-                    "url": EUROLEAGUE_PLAYERS_URL,
-                }
-            )
-    else:
-        reports.append(
-            {
-                "league": "Euroleague (επίσημη σελίδα)",
-                "league_code": "euroleague_site",
-                "ok": False,
-                "rows": 0,
-                "error": str(site.get("detail") or "Χωρίς πίνακα ομάδων."),
-                "url": EUROLEAGUE_PLAYERS_URL,
-            }
-        )
-
-    for league_code, label in (("euroleague", "Euroleague"), ("eurocup", "Eurocup")):
-        if league_code in succeeded:
-            continue
-        try:
-            frame = euroleague_fallback(league_code)
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("Euroleague API fallback failed for %s: %s", league_code, exc)
-            continue
-        if frame.empty:
-            continue
-        frames.append(frame)
-        reports.append(
-            {
-                "league": f"{label} (επίσημο feed)",
-                "league_code": league_code,
-                "ok": True,
-                "rows": int(len(frame)),
-                "url": EUROLEAGUE_TEAM_API.format(competition="E" if league_code == "euroleague" else "U"),
-                "note": "Εναλλακτική πηγή επειδή ο πίνακας της RealGM δεν διαβάστηκε.",
-            }
-        )
-
-    if progress:
         progress(total, total, "Ολοκληρώθηκε η άντληση")
 
     if not frames:
         return pd.DataFrame(columns=OUTPUT_COLUMNS), reports
     combined = pd.concat(frames, ignore_index=True)
     return combined, reports
+
+
+def _fetch_json(url: str) -> dict:
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": BROWSER_HEADERS["User-Agent"], "Accept": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=40) as response:
+        return json.load(response)
+
+
+def _game_row(total: dict, team_name: str, league_code: str, season: str, round_number: int) -> dict:
+    made = float(total.get("fieldGoalsMadeTotal") or 0)
+    attempted = float(total.get("fieldGoalsAttemptedTotal") or 0)
+    return {
+        "team_name": canonical_team_name(team_name),
+        "league_code": league_code,
+        "season": season,
+        "round_number": round_number,
+        "points": float(total.get("points") or 0),
+        "fgm": made,
+        "fga": attempted,
+        "tpm": float(total.get("fieldGoalsMade3") or 0),
+        "tpa": float(total.get("fieldGoalsAttempted3") or 0),
+        "ftm": float(total.get("freeThrowsMade") or 0),
+        "fta": float(total.get("freeThrowsAttempted") or 0),
+        "orb": float(total.get("offensiveRebounds") or 0),
+        "drb": float(total.get("defensiveRebounds") or 0),
+        "reb": float(total.get("totalRebounds") or 0),
+        "ast": float(total.get("assistances") or 0),
+        "stl": float(total.get("steals") or 0),
+        "blk": float(total.get("blocksFavour") or 0),
+        "tov": float(total.get("turnovers") or 0),
+        "pf": float(total.get("foulsCommited") or 0),
+        "minutes": float(total.get("timePlayed") or 0) / 60.0,
+    }
+
+
+def collect_euro_game_logs(
+    competition: str,
+    season_code: str,
+    league_code: str,
+    season: str,
+    workers: int = 4,
+) -> pd.DataFrame:
+    """Per-game team lines for one Euroleague or Eurocup season, in round order."""
+    games_payload = _fetch_json(
+        EUROLEAGUE_GAMES_URL.format(competition=competition, season_code=season_code) + "?limit=600"
+    )
+    games = [game for game in games_payload.get("data", []) if game.get("played")]
+    games.sort(key=lambda game: (game.get("round") or 0, game.get("utcDate") or "", game.get("gameCode") or 0))
+
+    def one_game(game: dict) -> list[dict]:
+        stats = None
+        for attempt in range(5):
+            time.sleep(0.15 * (attempt + 1))
+            try:
+                stats = _fetch_json(
+                    EUROLEAGUE_GAME_STATS_URL.format(
+                        competition=competition,
+                        season_code=season_code,
+                        game_code=game["gameCode"],
+                    )
+                )
+                break
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Game %s failed (%s): %s", game.get("gameCode"), attempt + 1, exc)
+                time.sleep(0.8 * (attempt + 1))
+        if not stats:
+            return []
+        rows = []
+        for side in ("local", "road"):
+            club = (game.get(side) or {}).get("club") or {}
+            total = (stats.get(side) or {}).get("total") or {}
+            name = club.get("name") or ""
+            if not name or not total:
+                continue
+            rows.append(
+                _game_row(total, str(name), league_code, season, int(game.get("round") or 0))
+            )
+        return rows
+
+    ordered: list[dict] = []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for game_rows in pool.map(one_game, games):
+            ordered.extend(game_rows)
+
+    buckets: dict[str, list[dict]] = defaultdict(list)
+    for row in ordered:
+        buckets[row["team_name"]].append(row)
+    indexed: list[dict] = []
+    for team_rows in buckets.values():
+        for index, row in enumerate(team_rows, start=1):
+            indexed.append({**row, "game_index": index})
+    return pd.DataFrame(indexed)
 
 
 if __name__ == "__main__":
