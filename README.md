@@ -1,3 +1,9 @@
+# The Sixth Man και στατιστικά ομάδων
+
+Αυτό το repository είναι ενιαίο: το site [The Sixth Man](index.html) και η εφαρμογή στατιστικών EuroLeague / EuroCup. Το `main` είναι αυτό που φαίνεται στο [codebase](https://cursor.com/codebase/xristosmp2002/hoop-stats/tree/main).
+
+Το site ανοίγει με `index.html`. Ο σύνδεσμος **European Team Stats** πηγαίνει στην εφαρμογή Streamlit.
+
 # Στατιστικά ευρωπαϊκών ομάδων
 
 Εφαρμογή σε Streamlit που διαβάζει μέσους όρους ομάδων από τη EuroLeague, το EuroCup, τη Liga ABA και τα εγχώρια πρωταθλήματα (Ισπανία, Ελλάδα, Τουρκία, Ισραήλ, Ιταλία, Γαλλία, Γερμανία, Λιθουανία). Τα αποθηκεύει σε SQLite και τα δείχνει με διαδραστικά γραφήματα.

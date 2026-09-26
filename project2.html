@@ -1,0 +1,1656 @@
+<!--
+    Project 2 Page
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 2 | Sports Analytics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">The Sixth Man</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="http://127.0.0.1:47211/">European Team Stats</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="project-hero2">
+            <h1>Panathinaikos Aktor January Analysis</h1>
+            <p class="subtitle">EuroLeague: A Data-Driven Deep Dive</p>
+        </section>
+
+        <section class="project-content">
+            <div class="content-wrapper">
+                <h2 class="section-title">Project Analysis: January – February Deep Dive</h2>
+        
+                <p>
+                    Just like in <a href="project1.html" class="proj1">Project 1</a>, this project examines the performance of <strong>Panathinaikos</strong> in the EuroLeague, covering all matches from <strong>January 6</strong>, 2026, to <strong>February 3</strong>, 2026. Our goal is to dissect every possession to uncover the tactical trends of the Greek team
+                    and find any possible patterns that will help preventing it from negative results.
+                </p>
+
+                <p>
+                    This analysis is based on original data collected by watching every game of the period one by one. The project focuses on non-traditional statistics 
+                    to determine if these data points can yield significant insights about a team's performance. To simplify the analysis, the metrics are split into offensive and 
+                    defensive categories, providing a clear view of how the team operates in each phase of the game.
+                </p>
+                <p>
+                    Before diving into the project, if you want you can download the custom datasets (excel file) from here:<br>
+                    <a href="Panathinaikos January Stats.xlsx" download class="download-btn">Download Offense Dataset (.xlsx)</a>
+                </p>
+                <p>
+                    <a href="Panathinaikos Defense Stats.xlsx" download class="download-btn">Download Defense Dataset (.xlsx)</a>
+                </p>
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h3><span class="icon">🏀</span> Offensive End Metrics</h3>
+                        <p>Detailed tracking of scoring efficiency and shot creation:</p>
+                        <ul>
+                            <li><strong>Offense Second:</strong> Seconds taken to execute the offense.</li>
+                            <li><strong>Time Zone:</strong> The specific "Time Zone" of each shot attempt (3 different zones: Fastbreak/Transition, Set Game, Late Clock).</li>
+                            <li><strong>C/U:</strong> Contested, slightly contested, or uncontested attempts.</li>
+                           <li><strong>2p/3p:</strong> 2-pointers vs. 3-pointers.</li>
+                            <li><strong>Made/Missed:</strong> Shooting results (Made/Missed/Foul).</li>
+                            <li><strong>Off. Reb. After Miss:</strong> Offensive rebounds secured.</li>
+                            <li><strong>Who Took It (O.R.):</strong> Identifying the responsible player for the rebound.</li>
+                            <li><strong>Shot Created:</strong> Method of shot creation (8 distinct categories).</li>
+                            <li><strong>Player Of Interest:</strong> Key involved players.</li>
+                        </ul>
+                    </div>
+
+                    <div class="analysis-card">
+                        <h3><span class="icon">🛡️</span> Defensive End Metrics</h3>
+                        <p>Analysis of defensive schemes and effectiveness:</p>
+                        <ul>
+                            <li><strong>Screen Defense:</strong> Type of defense applied on opponent screens (5 different types of defenses).</li>
+                            <li><strong>Player:</strong> Player defending screen.</li>
+                            <li><strong>Basket Allowed:</strong> Tracking allowed shots vs. not allowed ones.</li>
+                            <li><strong>No Shot Result:</strong> Turnover, steals, fouls, etc.</li>
+                            <li><strong>C/U:</strong> Contest levels on allowed shots.</li>
+                            <li><strong>2p/3p:</strong> 2-pointers vs. 3-pointers.</li>
+                            <li><strong>Made/Missed:</strong> Shooting results (Made/Missed/Foul).</li>
+                        </ul>
+                    </div>
+                </div>
+                <br>
+                <h2 class="section-title">Panathinaikos Aktor</h2>
+
+                <p>
+                    During this time period, Panathinaikos played, in both Greek League and Euroleague, a total of <strong>11 games</strong>. The team
+                    managed to <strong>win 7</strong> of them and <strong>lost 4</strong>. During those matches 
+                    some interesting stats were collected, that deserve some notice.
+                </p>
+                <p>
+                Panathinaikos' average time for each game, before a shot was taken, was approximately <strong>13.58 seconds</strong>. Specifically, a 
+                discrimination between the team's wins and losses is appplied.
+                <div class="analysis-visual">
+                    <h3 class="section-subtitle">Average Possession Length: Wins vs Losses</h3>
+                    <div class="pace-comparison">
+                        <div class="pace-card win">
+                            <span class="label">Wins</span>
+                            <div class="time-value">13.40s</div>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 53%;"></div> </div>
+                        </div>
+
+                        <div class="pace-card win">
+                            <span class="label">Wins (Euroleague Only)</span>
+                            <div class="time-value">14.32s</div>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 56%;"></div> </div>
+                        </div>
+
+                        <div class="pace-card loss">
+                            <span class="label">Losses</span>
+                            <div class="time-value">13.83s</div>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 52.7%;"></div> </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                It is easily observed that Panathinaikos' average time before taking a shot, does not differenciate
+                between wins and losses. So this is not a key factor that needs further analysis.
+            </p>
+            <p>
+                Team's offense is separated into three parts. The first 5 seconds refer to <strong>fastbreaks / 
+                transition</strong> offenses, the seconds in range 6-19 belong to <strong>set games</strong>
+                and the last 5 seconds are about <strong>late clock</strong> situations.
+                After counting each offense the team executed, the <strong>percentage of each time zone in relation to the total
+                amount of offenses</strong> was calculated.
+                <section class="distribution-analysis">
+                    <h3 class="section-subtitle">Offensive Time Zone Distribution</h3>
+                    
+                    <div class="dist-container">
+                        <div class="dist-group">
+                            <h4>Wins</h4>
+                            <div class="stacked-bar">
+                            <div class="segment fastbreak" style="width: 7.73%" title="Fastbreak: 7.73%">7.73%</div>
+                            <div class="segment setgame" style="width: 67.83%" title="Set Game: 67.83%">67.83%</div>
+                            <div class="segment lateclock" style="width: 24.44%" title="Late Clock: 24.44%">24.44%</div>
+                            </div>
+                        </div>
+
+                        <div class="dist-group">
+                            <h4>Losses</h4>
+                            <div class="stacked-bar">
+                            <div class="segment fastbreak" style="width: 5.13%" title="Fastbreak: 5.13%">5.13%</div>
+                            <div class="segment setgame" style="width: 70.33%" title="Set Game: 70.33%">70.33%</div>
+                            <div class="segment lateclock" style="width: 24.54%" title="Late Clock: 24.54%">24.54%</div>
+                            </div>
+                        </div>
+
+                        <div class="dist-legend">
+                            <span class="legend-item"><i class="dot fb"></i> Fastbreak / Transition</span>
+                            <span class="legend-item"><i class="dot sg"></i> Set Game</span>
+                            <span class="legend-item"><i class="dot lc"></i> Late Clock</span>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Also here, there isn't any major difference that can provide us with important information.
+                </p>
+                <p>
+                    Moving forward, we are going to have an small analysis on shots per time zone. Starting with the missed shots for each time zone.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                <h3 class="section-subtitle">Missed Shots Percentage per Time Zone</h3>
+                
+                Continuing the per-time-zone analysis, we calculated <strong>the percentage of total missed shots in each particular time zone, regarding 
+                to the total amount of shots taken</strong> in that time period.
+                <div class="table-container">
+                    <table class="analysis-table">
+                        <thead>
+                        <tr>
+                            <th>Time Zone</th>
+                            <th>Result</th>
+                            <th>Missed %</th>
+                            <th>Missed Shots Rate</th>
+                            <th>Shots Ratio (Missed/Taken)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="group-header"><td colspan="5">Fastbreak / <br>Transition</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>19.35%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 19.35%"></div></div></td>
+                            <td>1.00 / 5.17</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>28.57%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 28.57%"></div></div></td>
+                            <td>1.00 / 3.50</td>
+                        </tr>
+
+                        <tr class="group-header"><td colspan="5">Set Game</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>43.01%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 43.01%"></div></div></td>
+                            <td>19.50 / 45.33</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>44.27%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 44.27%"></div></div></td>
+                            <td>21.25 / 48.00</td>
+                        </tr>
+
+                        <tr class="group-header"><td colspan="5">Late Clock</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>55.10%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 55.10%"></div></div></td>
+                            <td>9.00 / 16.33</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>50.75%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 50.75%"></div></div></td>
+                            <td>8.50 / 16.75</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                </section>
+
+                <p>
+                    In games lost, Panathinaikos has <strong>two fastbreaks/transition situations less</strong> than the games the team won. This means two less opportunities
+                    with high chance of scoring relatively easy points.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Contested Shots Analysis</h3>
+                    Added to the previous analysis, instead of calculating the missed shots rate per time zone, we 're going to calculate <strong>the contested shot rate per
+                    timezone</strong> (total amount of contested shots taken in relation to total amount of shots taken, in that time period).
+                    
+                    <div class="table-container">
+                    <table class="analysis-table">
+                        <thead>
+                        <tr>
+                            <th>Time Zone</th>
+                            <th>Result</th>
+                            <th>Missed %</th>
+                            <th>Contested Shots Rate</th>
+                            <th>Shots Ratio (Contested/Taken)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="group-header"><td colspan="5">Fastbreak / <br>Transition</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>32.26%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 32.26%"></div></div></td>
+                            <td>1.67 / 5.17</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>42.86%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 42.86%"></div></div></td>
+                            <td>1.50 / 3.50</td>
+                        </tr>
+
+                        <tr class="group-header"><td colspan="5">Set Game</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>52.57%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 52.57%"></div></div></td>
+                            <td>23.83 / 45.33</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>51.56%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 51.56%"></div></div></td>
+                            <td>24.75 / 48.00</td>
+                        </tr>
+
+                        <tr class="group-header"><td colspan="5">Late Clock</td></tr>
+                        <tr>
+                            <td></td>
+                            <td class="win-label">Wins</td>
+                            <td>66.33%</td>
+                            <td><div class="bar-bg"><div class="bar-fill win" style="width: 66.33%"></div></div></td>
+                            <td>10.83 / 16.33</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="loss-label">Losses</td>
+                            <td>64.18%</td>
+                            <td><div class="bar-bg"><div class="bar-fill loss" style="width: 64.18%"></div></div></td>
+                            <td>10.75 / 16.75</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                </section>
+
+            </p>
+
+            <p>
+                <p>
+                    We can draw some early conclusions from the table above, about the difficulty of the shots taken. But it is easily more understandable if we check the <strong>uncontested shots 
+                    percentage for all the shots taken</strong> across time zones.
+                </p>
+                    <div class="dist-container">
+                        <div class="dist-group">
+                        <h4>Wins (Breakdown)</h4>
+                            <div class="stacked-bar">
+                                <div class="segment fastbreak" style="width: 58.03%" title="Fastbreak: 58.03%">58.03%</div>
+                                <div class="segment setgame" style="width: 27.93%" title="Set Game: 27.93%">27.93%%</div>
+                                <div class="segment lateclock" style="width: 12.25%" title="Late Clock: 12.25%">12.25%</div>
+                            </div>
+                        </div>
+
+                        <div class="dist-group">
+                            <h4>Losses (Breakdown)</h4>
+                            <div class="stacked-bar">
+                                <div class="segment fastbreak" style="width: 28.57%" title="Fastbreak: 28.57%">28.57%</div>
+                                <div class="segment setgame" style="width: 27.08%" title="Set Game: 27.08%">27.08%</div>
+                                <div class="segment lateclock" style="width: 20.90%" title="Late Clock: 20.90%">20.90%</div>
+                            </div>
+                        </div>
+        
+                        <div class="dist-legend">
+                            <span class="legend-item"><i class="dot fb"></i> Fastbreak / Transition</span>
+                            <span class="legend-item"><i class="dot sg"></i> Set Game</span>
+                            <span class="legend-item"><i class="dot lc"></i> Late Clock</span>
+                        </div>
+                    </div>
+                <p>
+                    The difference between each time zone's uncontested shots is perfectly clear now. Although during set game and late clock situations
+                    the uncontested shots percentage are almost the same, if not greater in late clock time zones, the significant difference is made during fastbreak situations.
+                </p>
+                <p>
+                    For every <strong>10 fastbreak/transition shots</strong> the team takes in games won, <strong>almost 6 of them will be uncontested</strong>, whereas <strong>in lost games less than
+                    3 shots, out of 10, will be uncontested</strong>. In that major part of Panathinaikos' game style, which is to run the floor, opponents apply more pressure to fastbreak shots
+                    in order to take away an important tool that will lead the team to a winning result.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Analysis of Uncontested Shots</h3>
+
+                    <!--<div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Result Type</th>
+                                    <th>Percentage</th>
+                                    <th>Visual Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="group-header"><td colspan="4">Total Made Uncontested Shots</td></tr>
+                                <tr>
+                                    <td>Uncontested vs Total Made</td>
+                                    <td class="win-label">Total Games</td>
+                                    <td>40.75%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 40.75%"></div></div></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="win-label">Wins</td>
+                                    <td>43.02%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 43.02%"></div></div></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="loss-label">Losses</td>
+                                    <td>37.17%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 37.17%"></div></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>-->
+                </section>
+
+                <section class="analysis-section">
+                    <div class="stats-card general-bg">
+                        <h3>Total Overview</h3>
+                        <p><strong>40.75%</strong> of all made shots are uncontested.</p>
+                        <div class="distribution-grid">
+                            <div class="dist-item"><span>72.27%</span> Set Game</div>
+                            <div class="dist-item"><span>15.97%</span> Fastbreak</div>
+                            <div class="dist-item"><span>11.76%</span> Late Clock</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-card win-border">
+                            <h3>In Wins</h3>
+                            <div class="main-stat">43.02% <small>Uncontested Made</small></div>
+                            <ul class="sub-stats">
+                                <li><strong>Fastbreak:</strong> 20.78%</li>
+                                <li><strong>Set Game:</strong> 71.43%</li>
+                                <li><strong>Late Clock:</strong> 7.79%</li>
+                            </ul>
+                        </div>
+
+                        <div class="comparison-card loss-border">
+                            <h3>In Losses</h3>
+                            <div class="main-stat">37.17% <small>Uncontested Made</small></div>
+                            <ul class="sub-stats">
+                                <li><strong>Fastbreak:</strong> 7.14%</li>
+                                <li><strong>Set Game:</strong> 73.81%</li>
+                                <li><strong>Late Clock:</strong> 19.05%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    In games won out of the total uncontested shots taken, <strong>almost 21% came from fastbreak/transition situations (2 out of 10 uncontested shots)</strong>,
+                    and <strong>71.5% came from set game situations (more than 7 out of 10 uncontested shots)</strong>. The least percentage amount comes from <strong>late clock situations</strong>
+                    with a percentage of <strong>7.8% (less than 1 out of 10 uncontested shots).</strong> 
+                </p>
+                <p>
+                    In games lost the metric switches between fastbreaks and late clock situations. Out of all uncontested shots taken <strong>almost 7% comes from
+                    fastbreaks/transitions (less than 1 out of 10 uncontested shots)</strong> and <strong>almost 20% comes from late clock situations (2 out of 10 uncontested shots).</strong>
+                    The percentage of set game situations is almost the same as the one in games won.
+                </p>
+                <p>
+                    This means that Panathinaikos has more uncontested options during fastbreaks in games won, which is a result of opponent's turnovers or missed shots that led to
+                    quick offenses. In games lost, the team has less easy options during fastbreaks, which is a result of <strong>1. less fastbreaks performed</strong> and <strong>2. more pressure applied from the 
+                    opponent</strong>.
+                </p>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    
+                    <h3 class="section-subtitle">Shot Creation Methods</h3>
+                    Moving from the contested/uncontested analysis, we 're going to check out how did the team create all of its shots, during the recorded time period.
+                    We discriminate these methods in several categories. Those categories are <strong>inside-out passes (1)</strong>, <strong>side-to-side passes (2)</strong>,
+                    <strong>player iso (3)</strong>, <strong>transition/fastbreak (5)</strong>, <strong>pick 'n roll (7)</strong>, <strong>in-the-paint/in-the post passes (8)</strong>,
+                    <strong>cut to the basket (9)</strong>, <strong>offensive rebound/2nd chance (10)</strong>.
+        
+                    <div class="creation-grid">
+                        <div class="creation-col">
+                            <h3 class="win-label text-center">Wins (Total Distribution)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Side-to-Side Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 44.8%">91</div> </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Pick 'n Roll</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 44%">90</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Player Isolation</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 40.8%">83</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Offensive Rebound/2nd Chances</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 22.53%">46</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Inside-Out Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 18.02%">36</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Fastbreak/Transition</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 16.8%">32</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">In-the-Paint Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 10%">15</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Cut To The Basket</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 9%">6</div>
+                                    </div>
+                                </div>
+                                </div>
+                        </div>
+
+                        <div class="creation-col">
+                            <h3 class="loss-label text-center">Losses (Total Distribution)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Side-to-Side Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar loss" style="width: 48.17%">65</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Pick 'n Roll</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 46.80%">64</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Player Isolation</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 40.82%">56</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Inside-Out Pass</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 26.01%">35</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Offensive Rebound/2nd Chances</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 20.04%">27</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Fastbreak/Transition</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 11.20%">14</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">In-the-Paint Pass</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 8%">8</div>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    There isn't any significant difference in the way Panathinaikos' players create shots, to score a basket. Νeither in general shot selections, nor for 
+                    uncontested shots, as it we 'll observe below.
+                </p>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    <h3 class="section-subtitle">Uncontested Shot Creation Methods</h3>
+        
+                    <div class="creation-grid">
+                        <div class="creation-col">
+                            <h3 class="win-label text-center">Wins (Total Distribution)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Pick 'n Roll</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 46%">24</div> </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Side-to-Side Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 40%">21</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Offensive Rebound/2nd Chances</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 37%">19</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Fastbreak/Transition</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 35%">18</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Inside-Out Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 24%">13</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Player Isolation</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 12%">6</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="creation-col">
+                            <h3 class="loss-label text-center">Losses (Total Distribution)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Side-to-Side Pass</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar loss" style="width: 56%">19</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Pick 'n Roll</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 52%">18</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Offensive Rebound/2nd Chances</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 32%">11</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Inside-Out Pass</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 26%">9</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Player Isolation</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 20%">7</div>
+                                </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Fastbreak/Transition</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar loss" style="width: 12%">4</div>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    While Panathinaikos' shot creation methods remain consistent and stable across both wins and losses, is this stability enough to 
+                    maintain – if not improve – the team's overall shooting efficiency? This will be shown below, at the shot creation bar charts.
+                </p>
+            </p>
+
+            <p>
+                <h3 class="section-subtitle">Shot Creation & Outcome Analysis (Wins/Losses Distinction)</h3>
+
+                Interactive representation of team effectiveness depending on shot creation method. <strong>Successful shots</strong> are considered
+                the shots made or fouls drawn in these shots. <strong>Unsuccessful shots</strong> are considered the shots that are missed or blocked.
+
+                <section class="visual-analysis">    
+                    <div class="chart-glass-card">
+                        <img src="Pao Wins.png" alt="Shot Creation Efficiency Analysis" class="responsive-chart-img">
+    
+                        <div class="chart-insight-box">
+                            <span class="insight-badge">Static View</span>
+                            <p>Panathinaikos' effectiveness illustration at wins</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-glass-card">
+                        <img src="Pao Losses.png" alt="Shot Creation Efficiency Analysis" class="responsive-chart-img">
+    
+                        <div class="chart-insight-box">
+                            <span class="insight-badge">Static View</span>
+                            <p>Panathinaikos' effectiveness illustration at losses</p>
+                        </div>
+                    </div>
+
+                </section>
+
+                <p>
+                    After seeing the shot creation charts above, the fastbreak/transition realization we made previously has been confirmed. <strong>Fastbreak rate, compared to
+                    the total shots taken, has dropped dramatically in lost games.</strong>
+                </p>
+                <p>
+                    Also, an interesting observation about those two charts is that, although PAO players have a greater rate of successful isolation plays in games won than
+                    in games lost, the successful isolation plays to unsuccessful isolation plays ratio is way bigger in games lost. An interesting contrast to say the least.
+                </p>
+
+                <h3 class="section-subtitle">Uncontested/Semi-Contested Shot Creation & Outcome Analysis (Wins/Losses Distinction)</h3>
+                Interactive representation of team effectiveness depending on uncontested/semi-contested shot creation method.
+                <section class="visual-analysis">
+                    
+                    
+    
+                    <div class="chart-glass-card">
+                        <img src="Pao Unc Wins.png" alt="Shot Creation Efficiency Analysis" class="responsive-chart-img">
+    
+                        <div class="chart-insight-box">
+                            <span class="insight-badge">Static View</span>
+                            <p>Panathinaikos' uncontested/semi-contested shot effectiveness illustration at wins</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-glass-card">
+                        <img src="Pao Unc Losses.png" alt="Shot Creation Efficiency Analysis" class="responsive-chart-img">
+    
+                        <div class="chart-insight-box">
+                            <span class="insight-badge">Static View</span>
+                            <p>Panathinaikos' uncontested/semi-contested shot effectiveness illustration at losses</p>
+                        </div>
+                    </div>
+
+                </section>
+                <p>
+                    Except from the difference in fastbreaks that has been already pointed out, there isn't any major discrimination that we can say, occurs 
+                    here, at the uncontested shot creation categories.
+                </p>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    <h3 class="section-subtitle">Isolation Performance Analysis</h2>
+                    <p>
+                        A deep dive into individual "Player Isolation" situations. This section tracks how many times each player created a shot for himself in 1-on-1 scenarios and their corresponding success rate (Made or Foul shots).
+                    </p>
+
+                    <div class="creation-grid">
+                        <div class="creation-col">
+                        <h3 class="win-label text-center">Isolation Attempts (Count)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Grant</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 100%">39</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Sloukas</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 91.6%">30</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Shorts</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 27.7%">19</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Osman</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 25.0%">18</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="creation-col">
+                            <h3 class="neutral-label text-center">Success Percentage (%)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Grant</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 53.85%">53.85%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Sloukas</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 43.33%">43.33%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Shorts</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 57.89%">57.89%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Osman</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 27.78%">27.78%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <p>
+                    <strong>T.J. Shorts</strong> and <strong>Jerian Grant</strong> have more effective isolation plays that can lead to a made basket or a shooting foul drawn. Team's captain,
+                    <strong>Kostas Sloukas</strong>, also has also a high percentage of effectiveness during isos, and although <strong>Cedi Osman</strong> seems to have a less effective percentage
+                    than his teammates, his contribution is easily observed during fastbreaks and transitions, as we 'll see below.
+                </p>
+                <div class="bar-group">
+                    <span class="category-name">Osman (Fastbreak/Transition)</span>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar neutral" style="width: 84.60%">84.60%</div>
+                    </div>
+                </div>
+                <p>
+                    Cedi Osman's most common play he's involved in are fastbreaks/transitions. His ability to run the floor after a steal, or an opponent's missed shot,
+                    gives him the opportunity to score a basket, or draw a foul in the offensive end (<strong>almost 85% success rate in those shots</strong>).
+                </p>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    <h3 class="section-subtitle">Team Play Involvement & Efficiency</h3>
+
+                    <div class="creation-grid">
+                        <div class="creation-col">
+                            <h3 class="win-label text-center">Total Involvement (Counts)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Holmes</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 100%">84</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Faried</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 88%">32</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Yurtseven</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 75%">25</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Juancho</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 25%">16</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="creation-col">
+                            <h3 class="neutral-label text-center">Primary Play Success Rate</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Holmes (Pick 'n Roll)</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 57.75%">57.75%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Faried (Pick 'n Roll)</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 73.33%">73.33%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Yurtseven (Pick 'n Roll)</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 55.00%">55.00%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Juancho (Pick 'n Roll)</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar neutral" style="width: 63.60%">63.60%</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>
+                        Most common play for players to be involved are <strong>pick 'n rolls</strong>. Because of the nature of this research, the player who sets the screen in offense
+                        is recorded, only at the times when a shot was taken after (the pick 'n roll led to a shot option).
+                    </p>
+                    <p>
+                        Most picks were set from <strong>Richaun Holmes</strong>, who got the most minutes out of all Panathinaikos big men. A bit over than half of the screens he set
+                        led to a successful shot (made or fouled), which is a very good percentage considering the amount pick 'n rolls he was a part of.
+                    </p>
+                    <p>
+                        The following table will also show the second most plays each of the players above was a part of.
+                    </p>
+
+                    <div class="table-container" style="margin-top: 2rem;">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Dominant Play Type</th>
+                                    <th>Success Rate</th>
+                                    <th>Secondary Play Type</th>
+                                    <th>Success Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Holmes</strong></td>
+                                    <td>Pick 'n Roll (71)</td>
+                                    <td>57.75%</td>
+                                    <td>In-the-Paint Pass (12)</td>
+                                    <td class="win-label">66.67%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Faried</strong></td>
+                                    <td>Pick 'n Roll (30)</td>
+                                    <td class="win-label">73.33%</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Yurtseven</strong></td>
+                                    <td>Pick 'n Roll (20)</td>
+                                    <td class="win-label">55.00%</td>
+                                    <td>In-the-Paint Pass (4)</td>
+                                    <td>25.00%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Osman</strong></td>
+                                    <td>Fastbreak/Transition (13)</td>
+                                    <td class="win-label">84.60%</td>
+                                    <td>Pick 'n Roll (8)</td>
+                                    <td>37.50%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Juancho</strong></td>
+                                    <td>Pick 'n Roll (11)</td>
+                                    <td class="win-label">63.60%</td>
+                                    <td>Cut To The Basket (2)</td>
+                                    <td>50.00%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Missed Shots Analysis per Quarter</h3>
+
+                    <div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Quarter</th>
+                                    <th>Total Missed</th>
+                                    <th>Shot Type</th>
+                                    <th>% of Missed in Q</th>
+                                    <th>Visual Distribution</th>
+                                    <th>Specific Miss Rate*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="group-header"><td colspan="6">1st Quarter (Total Missed: 47)</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>2-pointers</td>
+                                    <td>59.57%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 40.58%"></div></div></td>
+                                    <td>40.58%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>3-pointers</td>
+                                    <td>40.43%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 63.33%"></div></div></td>
+                                    <td>63.33%</td>
+                                </tr>
+
+                                <tr class="group-header"><td colspan="6">2nd Quarter (Total Missed: 50)</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>2-pointers</td>
+                                    <td>64.00%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 47.76%"></div></div></td>
+                                    <td>47.76%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>3-pointers</td>
+                                    <td>36.00%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 54.55%"></div></div></td>
+                                    <td>54.55%</td>
+                                </tr>
+
+                                <tr class="group-header"><td colspan="6">3rd Quarter (Total Missed: 48)</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>2-pointers</td>
+                                    <td>43.75%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 37.50%"></div></div></td>
+                                    <td>37.50%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>3-pointers</td>
+                                    <td>56.25%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 60.00%"></div></div></td>
+                                    <td>60.00%</td>
+                                </tr>
+
+                                <tr class="group-header"><td colspan="6">4th Quarter (Total Missed: 46)</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>2-pointers</td>
+                                    <td>43.48%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 37.04%"></div></div></td>
+                                    <td>32.97%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>3-pointers</td>
+                                    <td>56.52%</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 72.22%"></div></div></td>
+                                    <td>72.22%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="description-text" style="font-size: 0.8rem; margin-top: 10px;">
+                        *Specific Miss Rate refers to the percentage of total shots of that specific type (2p or 3p) that were missed during the quarter.
+                    </p>
+                </section>
+
+                <p>
+                    During the fourth quarter Panathinaikos analogy of 3-pointers taken, in relation to the total shots taken, is the biggest out of all quarters. Also,
+                    during that time period, more than 70% of the 3-pointers taken are missed. This means that Panathinaikos chooses a kind of shot during the fourth quarter
+                    that does not have the right effectiveness.
+                </p>
+                <p>
+                    After checking the score per quarter, for each game of the recorded period, it is observed that Panathinaikos had 4 matches (out of 11 total) with
+                    fewer points scored in the 4th quarter. <strong>3 out of those 4 matches were his defeats during that time period</strong> and the game the team did not
+                    lose was with Villeurbahn, in which Panathinaikos won by 1 point.
+                </p>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    <h3 class="section-subtitle">Offensive Rebounds & Second Chances</h3>
+
+                    <div class="creation-grid">
+                        <div class="creation-col">
+                            <h3 class="blue">Top Offensive Rebounders (Counts)</h3>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Holmes</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 100%">21</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Juancho</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 76%">18</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Faried</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 71%">10</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Rogkavopoulos</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 57%">8</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="creation-col">
+                            <h3 class="blue">Organization Distribution</h3>
+                            
+                            <div class="table-container">
+                                <table class="analysis-table" style="font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Player</th>
+                                            <th>EuroLeague</th>
+                                            <th>Greek League</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Holmes</strong></td>
+                                            <td>15</td>
+                                            <td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Juancho</strong></td>
+                                            <td>11</td>
+                                            <td>7</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Faried</strong></td>
+                                            <td>8</td>
+                                            <td>2</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Rogkavopoulos</strong></td>
+                                            <td>7</td>
+                                            <td>1</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>
+                        But, getting the offensive rebound is only half the battle. The other half is to take advantage of the opportunity and put the ball in the basket.
+                        The following section analyzes how effectively Panathinaikos converts these extra possessions into points.
+                    </p>
+                </section>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Second Chance Efficiency: Wins vs Losses</h3>
+                    <p>
+                        For the metric below we are going to check how efficient is Panathinaikos during 2nd chance offenses.
+                    </p>
+
+                    <div class="pace-comparison">
+                        <div class="pace-card win" style="border: 2px solid var(--sky-blue);">
+                            <span class="label">Wins (All Competitions)</span>
+                            <div class="time-value">42.86%</div>
+                            <p class="description-text">2nd Chance Success Rate</p>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 42.86%; background-color: #2ecc71;"></div>
+                            </div>
+                            <ul style="list-style: none; font-size: 0.85rem; padding: 0;">
+                                <li>Avg Rebounds: 8.17</li>
+                            </ul>
+                        </div>
+
+                        <div class="pace-card win">
+                            <span class="label">EuroLeague Wins Only</span>
+                            <div class="time-value">37.50%</div>
+                            <p class="description-text">2nd Chance Success Rate</p>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 37.50%; background-color: var(--sky-blue);"></div>
+                            </div>
+                            <ul style="list-style: none; font-size: 0.85rem; padding: 0;">
+                                <li>Avg Rebounds: 6.34</li>
+                            </ul>
+                        </div>
+
+                        <div class="pace-card loss">
+                            <span class="label">Losses</span>
+                            <div class="time-value">28.57%</div>
+                            <p class="description-text">2nd Chance Success Rate</p>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 28.57%; background-color: #e74c3c;"></div>
+                            </div>
+                            <ul style="list-style: none; font-size: 0.85rem; padding: 0;">
+                                <li>Avg Rebounds: 8.75</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p>
+                        Panathinaikos does not have a good success rate at offenses after an offensive rebound/2nd chance in games lost (<strong>28.57% Success Rate</strong>).
+                        Although the average rebounds are higher in losses, the success rate (made shot/shooting foul drawn) drops significantly, compared to wins.
+                    </p>
+
+                    <div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Wins (General)</th>
+                                    <th>EuroLeague Wins</th>
+                                    <th>Losses</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Total Offensive Rebounds</strong></td>
+                                    <td>49</td>
+                                    <td>24</td>
+                                    <td>35</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Average Second Shots</strong></td>
+                                    <td>91.84%</td>
+                                    <td>87.50%</td>
+                                    <td>77.14%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Shot Accuracy Rate</strong></td>
+                                    <td>46.67%</td>
+                                    <td>42.86%</td>
+                                    <td>37.04%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <p>
+                    Also, during games lost, Panathinaikos does not take as many shots in 2nd chance offenses (<strong>77% compared to almost 92% in wins</strong>)
+                    and from that number of offenses, in which a shot was taken, <strong>only 37% of them were successful (shot made/shooting foul drawn)</strong>.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Screen Defense Strategies</h3>
+                    <p>
+                        A vital component of every team's defensive identity is how they navigate opponent screens. This data tracks the frequency of different defensive schemes (coded 1-5) and how they can affect the game outcome.
+                        The five defensive schemes on opponent screens are: <strong>Switch (1)</strong>, <strong>Hedge Out (2)</strong>, <strong>Deep Cover (3)</strong>, <strong>Flat/Show & Recover (4)</strong> and <strong>Over (5)</strong>.
+                    </p>
+
+                    <div class="analysis-grid">
+                        <div class="analysis-card" style="border-top-color: var(--sky-blue);">
+                            <h3 class="win-label"><span class="icon">🛡️</span> Defense in Wins</h3>
+                            <p class="description-text">Total Screen Actions: 267</p>
+                            <div class="chart-wrapper">
+                                <div class="bar-group">
+                                    <span class="category-name">Flat/Show & Recover (Primary)</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 40.45%">40.45%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Switch</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 25.22%">20.22%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Hedge Out</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 20.48%">16.48%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Deep Cover</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 16.36%">12.36%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Over</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 15%">8.99%</div>
+                                    </div>
+                                </div>
+                                <div class="bar-group">
+                                    <span class="category-name">Under</span>
+                                    <div class="chart-bar-bg">
+                                        <div class="chart-bar win" style="width: 14%">1.12%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-card" style="border-top-color: #e74c3c;">
+                            <h3 class="loss-label"><span class="icon">⚠️</span> Defense in Losses</h3>
+                            <p class="description-text">Total Screen Actions: 189</p>
+                            <div class="chart-wrapper">
+                               <div class="bar-group">
+                                   <span class="category-name">Flat/Show & Recover (Primary)</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 32.80%">32.80%</div>
+                                   </div>
+                               </div>
+                               <div class="bar-group">
+                                   <span class="category-name">Switch</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 24.34%">24.34%</div>
+                                   </div>
+                               </div>
+                               <div class="bar-group">
+                                   <span class="category-name">Hedge Out</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 21.87%">15.87%</div>
+                                   </div>
+                               </div>
+                               <div class="bar-group">
+                                   <span class="category-name">Deep Cover</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 18%">14.29%</div>
+                                   </div>
+                               </div>
+                               <div class="bar-group">
+                                   <span class="category-name">Over</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 16%">8.99%</div>
+                                   </div>
+                               </div>
+                               <div class="bar-group">
+                                   <span class="category-name">Under</span>
+                                   <div class="chart-bar-bg">
+                                       <div class="chart-bar loss" style="width: 14%">3.70%</div>
+                                   </div>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Just like shot selection methods, Panathinaikos navigation for opponent's screens remains the same. We will also see that, opponent's accuracy for the shots
+                    taken after those screens, is better in games won.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Opponent Shooting Analysis (After Screen)</h3>
+
+                    <p>Out of <strong>301 shots allowed</strong> after screen, <strong>120</strong> of them were <strong>made</strong></p>
+
+                    <div class="analysis-grid">
+                        <div class="analysis-card" style="border-top-color: #2ecc71;">
+                            <h3 class="win-label">Opponent Accuracy in Wins</h3>
+                            <div class="time-value">36.78%</div>
+                            <p class="description-text">64 Made / 174 Taken</p>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 36.78%; background-color: #2ecc71;"></div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-card" style="border-top-color: #e74c3c;">
+                            <h3 class="loss-label">Opponent Accuracy in Losses</h3>
+                            <div class="time-value">44.09%</div>
+                            <p class="description-text">56 Made / 127 Taken</p>
+                            <div class="pace-bar-container">
+                                <div class="pace-bar" style="width: 44.09%; background-color: #e74c3c;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>
+                        But as we will see the contest level that Panathinaikos applies to shots after screen is the same, if not a little bit better, in games lost.
+                    </p>
+
+                    <h3 class="section-subtitle" style="margin-top: 2rem;">Contest Levels on Made Shots</h3>
+                    <div class="dist-container">
+                        <div class="dist-group">
+                            <h4>Made Shots in Wins (64 Total)</h4>
+                            <div class="stacked-bar">
+                                <div class="segment lateclock" style="width: 23.44%" title="Contested: 23.44%">23.44%</div>
+                                <div class="segment setgame" style="width: 31.25%" title="Slightly Contested: 31.25%">31.25%</div>
+                                <div class="segment fastbreak" style="width: 37.50%" title="Uncontested: 37.50%">37.50%</div>
+                            </div>
+                        </div>
+
+                        <div class="dist-group">
+                            <h4>Made Shots in Losses (56 Total)</h4>
+                            <div class="stacked-bar">
+                                <div class="segment lateclock" style="width: 28.57%" title="Contested: 28.57%">28.57%</div>
+                                <div class="segment setgame" style="width: 35.71%" title="Slightly Contested: 35.71%">35.71%</div>
+                                <div class="segment fastbreak" style="width: 35.71%" title="Uncontested: 35.71%">35.71%</div>
+                            </div>
+                        </div>
+        
+                        <div class="dist-legend">
+                            <span class="legend-item"><i class="dot lc"></i> Contested</span>
+                            <span class="legend-item"><i class="dot sg"></i> Slightly Contested</span>
+                            <span class="legend-item"><i class="dot fb"></i> Uncontested</span>
+                        </div>
+                    </div>
+
+                </section>
+
+                <p>
+                    As a total result, this shows that a significant part for opponent's wins is the high shot accuracy.
+                </p>
+            </p>
+
+            <p>
+                <section class="shots-analysis">
+                    <h3 class="section-subtitle">Deep Dive: Defensive Scheme Performance</h3>
+                    <p>
+                        A comprehensive evaluation of Panathinaikos' screen defense, categorized by the three most common scheme types. We examine <strong>how often a shot was 
+                        prevented (not allowed)</strong>, <strong>the contest level of allowed shots</strong>, and <strong>the frequency of reach-in fouls committed in offenses with prevented shots</strong>.
+                    </p>
+
+                    <div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Scheme Type</th>
+                                    <th>Result Context</th>
+                                    <th>Shot Prevention Rate</th>
+                                    <th>Uncontested Rate (on allowed)</th>
+                                    <th>Foul Committed Rate (on no-shot)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="group-header"><td colspan="5">Flat/Show & Recover</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="win-label">Wins</td>
+                                    <td>37.04%</td>
+                                    <td>25.00%</td>
+                                    <td>12.50%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="loss-label">Losses</td>
+                                    <td>37.10%</td>
+                                    <td>28.21%</td>
+                                    <td>21.74%</td>
+                                </tr>
+
+                                <tr class="group-header"><td colspan="5">Switch</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="win-label">Wins</td>
+                                    <td>33.33%</td>
+                                    <td>8.33%</td>
+                                    <td>27.78%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="loss-label">Losses</td>
+                                    <td>23.91%</td>
+                                    <td>11.43%</td>
+                                    <td>18.18%</td>
+                                </tr>
+
+                                <tr class="group-header"><td colspan="5">Hedge Out</td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="win-label">Wins</td>
+                                    <td>31.82%</td>
+                                    <td>20.00%</td>
+                                    <td>7.14%</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="loss-label">Losses</td>
+                                    <td>40.00%</td>
+                                    <td>22.22%</td>
+                                    <td>33.33%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>
+                        The percentages shown above, are based on individual defensive possesions and with a first look, the table does not show anything
+                        significant regarding shot prevention rate or uncontested shot rate.
+                        What we can say is important here, is that the reach-in-foul rate of offenses that did not lead to a shot by the opposing team is higher in losses
+                        than in wins. This means that Panathinaikos is not as efficient in playing clean defense at screens, and sometimes commits more fouls than necessery.
+                        This of course comes with Panathinaikos' players having more personal fouls and the opponent going to the free throw line more often.
+                    </p>
+                </section>
+            </p>
+
+            <p>
+                <section class="shot-creation-analysis">
+                    <h3 class="section-subtitle">Individual Player Defense on Screens</h3>
+                    <p>
+                        Detailed tracking of players defending the screener or navigating the screen (Over/Under). This analysis correlates individual defensive 
+                        involvement with opponent shooting success and contest efficiency. The following table presents the 4 big men who are most commonly the defenders
+                        of opposing screeners.
+                    </p>
+
+                    <h3 class="win-label" style="margin-top: 2rem; border-bottom: 2px solid #2ecc71; display: inline-block;">Defensive Performance: Wins</h3>
+                    <div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Total Defenses</th>
+                                    <th>Shots Taken</th>
+                                    <th>Contested %</th>
+                                    <th>Made Shots</th>
+                                    <th>Opponent Accuracy*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Holmes</strong></td>
+                                    <td>103</td>
+                                    <td>64</td>
+                                    <td>53.12%</td>
+                                    <td>30</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 29.13%"></div></div> 29.13%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Faried</strong></td>
+                                    <td>38</td>
+                                    <td>29</td>
+                                    <td>34.48%</td>
+                                    <td>11</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 28.95%"></div></div> 28.95%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Juancho</strong></td>
+                                    <td>23</td>
+                                    <td>15</td>
+                                    <td>46.67%</td>
+                                    <td>5</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 21.74%"></div></div> <strong>21.74%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Yurtseven</strong></td>
+                                    <td>19</td>
+                                    <td>14</td>
+                                    <td class="win-label">71.43%</td>
+                                    <td>6</td>
+                                    <td><div class="bar-bg"><div class="bar-fill win" style="width: 31.58%"></div></div> 31.58%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="loss-label" style="margin-top: 3rem; border-bottom: 2px solid #e74c3c; display: inline-block;">Defensive Performance: Losses</h3>
+                    <div class="table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Total Defenses</th>
+                                    <th>Shots Taken</th>
+                                    <th>Contested %</th>
+                                    <th>Made Shots</th>
+                                    <th>Opponent Accuracy*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Holmes</strong></td>
+                                    <td>76</td>
+                                    <td>51</td>
+                                    <td>49.02%</td>
+                                    <td>25</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 32.89%"></div></div> 32.89%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Juancho</strong></td>
+                                    <td>35</td>
+                                    <td>23</td>
+                                    <td class="win-label">52.17%</td>
+                                    <td>10</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 28.57%"></div></div> <strong>28.57%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Faried</strong></td>
+                                    <td>16</td>
+                                    <td>12</td>
+                                    <td>33.33%</td>
+                                    <td>7</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 43.75%"></div></div> 43.75%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Yurtseven</strong></td>
+                                    <td>14</td>
+                                    <td>9</td>
+                                    <td>44.44%</td>
+                                    <td>5</td>
+                                    <td><div class="bar-bg"><div class="bar-fill loss" style="width: 35.71%"></div></div> 35.71%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: #8892b0; margin-top: 1.5rem; font-style: italic;">
+                        * Opponent Accuracy = Made Shots / Total Defenses. This metric shows the global impact of the player's defense on the final score.<br/>
+                    </p>
+                </section>
+
+                <p>
+                    The player that defends better at these kind of situations, as it is seen above, is <strong>Juancho Hernangomez</strong> both in games won and in
+                    games lost. He is considered one of the best, if not the best defender, on the team and that statement is now proved with numbers.
+                </p>
+            </p>
+
+            <p>
+                <section class="insights-section">
+                    <h3 class="section-subtitle">Key Performance Insights: Winning vs Losing Patterns</h3>
+    
+                    <ul class="insights-list">
+                        <li>
+                            <strong>Transition Control:</strong> Controlling each game's tempo is a major factor. During wins, fastbreak points are significantly more,
+                            while in games lost the team is more attached to 5 on 5 situations.
+
+                        </li>
+                            
+                        <li>
+                            <strong>Tactical Consistency:</strong> Shot creation categories' distribution remains almost the same, regardless of the result. This shows
+                            a team with clear identity, that sticks to the game plan, but maybe can be predictable sometimes.
+                        </li>
+                            
+                        <li>
+                            <strong>The 4th Quarter Shooting Slump:</strong> A trend of Panathinaikos' excessive reliance for the 3-point line is observed during the 
+                            4th quarter. When shot accuracy drops during that time, team's momentum is lost and the opponent finds a chance to build confidence and 
+                            perform a comeback.
+                        </li>
+
+                        <li>
+                            <strong>Second Chance Conversion:</strong> Although the offensive rebounds/2nd chances number remains almost the same, team's effectiveness
+                            on utilizing those second chances drops significantly in lost games, wasting crucial extra possesions.                           
+                        </li>
+                    </ul>
+                </section>
+            </p>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-contact">
+                <h4>Contact Info</h4>
+                <p>Email: <a href="mailto:christosbellos02@gmail.com">christosbellos02@gmail.com</a></p>
+                <p>Instagram: <a href="https://www.instagram.com/thesixthmansa/">thesixthmansa</a></p>
+                <p>Location: Athens, Greece</p>
+            </div>
+            
+            <div class="footer-contact">
+                <h4>Connect</h4>
+                <p><a href="https://www.linkedin.com/in/christosbellos02/">LinkedIn</a></p>
+                <p><a href="https://github.com/ChristosBellos/ChristosBellos.github.io">GitHub Pages</a></p>
+                <p><a href="https://cursor.com/codebase/xristosmp2002/hoop-stats/tree/main">Unified repository</a></p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Sixth Man Sports Analytics. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

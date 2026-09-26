@@ -1,0 +1,1410 @@
+:root {
+    --navy: #0a192f;
+    --royal-blue: #112240;
+    --sky-blue: #3066be;
+    --cyan: #64ffda; /* Highlight Color */
+    --white: #ffffff;
+    --light-gray: #f4f7f6;
+    --text-main: #333333;
+    --text-muted: #8892b0;
+    --font-family: 'Inter', -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-main);
+    background-color: var(--white);
+}
+
+/* --- Navigation --- */
+header {
+    background: var(--navy);
+    padding: 1rem 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    color: var(--cyan);
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+}
+
+nav ul li {
+    margin-left: 2rem;
+}
+
+nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--cyan);
+}
+
+/* --- Hero Section --- */
+.hero {
+    background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), 
+                url('https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=1600') center/cover;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--cyan);
+    max-width: 600px;
+}
+
+/* --- Content Sections --- */
+section {
+    padding: 4rem 10%;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--navy);
+    border-left: 4px solid #0056b3;
+    padding-left: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.6rem;               /* Μεγαλύτερο μέγεθος για έμφαση */
+    color: var(--royal-blue);        /* Σκούρο αλλά πιο "μαλακό" από το Navy */
+    font-weight: 700;                /* Έντονη γραφή */
+    margin: 2.5rem 0 1.5rem 0;       /* Περισσότερο κενό από πάνω για "ανάσα" */
+    letter-spacing: -0.02em;         /* Πιο σφιχτό spacing για μοντέρνα εμφάνιση */
+    border-bottom: 2px solid #e0e6ed; /* Διακριτική γραμμή διαχωρισμού */
+    padding-bottom: 0.5rem;          /* Απόσταση κειμένου από τη γραμμή */
+    display: block;                  /* Εξασφαλίζει ότι η γραμμή πιάνει όλο το πλάτος */
+}
+
+/* --- Project Grid --- */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background: var(--light-gray);
+    padding: 2rem;
+    border-radius: 8px;
+    border-bottom: 4px solid var(--sky-blue);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+/* Στοχεύει τους συνδέσμους μέσα στους τίτλους των καρτών */
+.card h3 a {
+    color: var(--navy); /* Χρησιμοποιούμε το σκούρο μπλε/μαύρο του θέματός σου */
+    text-decoration: none; /* Αφαιρεί την υπογράμμιση */
+    transition: color 0.3s ease;
+}
+
+/* Εφέ όταν ο κέρσορας περνάει πάνω από τον σύνδεσμο */
+.card h3 a:hover {
+    text-decoration: underline; /* Εμφανίζει την υπογράμμιση */
+}
+
+.btn {
+    display: inline-block;
+    background: var(--cyan);
+    color: var(--navy);
+    padding: 0.8rem 1.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+/* --- About Page Specifics --- */
+.about-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+.profile-img {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    border-radius: 12px;
+}
+
+.bio-text {
+    flex: 2;
+    min-width: 300px;
+}
+
+.timeline {
+    margin-top: 2rem;
+    border-left: 2px solid var(--sky-blue);
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    background: var(--sky-blue);
+    border-radius: 50%;
+}
+
+/* --- Responsive Menu (Mobile) --- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+    }
+    nav ul {
+        margin-top: 1rem;
+    }
+    nav ul li {
+        margin: 0 1rem;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+}
+
+/* --- Footer Section --- */
+footer {
+    background: var(--navy);
+    color: var(--white);
+    padding: 3rem 10% 2rem;
+    margin-top: 4rem; /* Pushes footer away from content */
+    border-top: 1px solid var(--royal-blue);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.footer-contact h4 {
+    color: var(--cyan);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.footer-contact p {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-contact a {
+    color: var(--white);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-contact a:hover {
+    color: var(--cyan);
+}
+
+.footer-bottom {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Mobile Adjustment */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+}
+
+/* --- Project Page Styles --- */
+
+.project-hero {
+    /* Συνδυασμός gradient overlay και εικόνας σε μία δήλωση background */
+    background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), 
+                url('https://sportal365images.com/process/smp-images-production/sportal.gr/18072025/9ac0d8fc-aef8-4fd7-a345-0dbba4d74a94.jpg?operations=crop(0:8:1199:683),fit(480:)&format=webp') center/cover;
+    
+    height: 60vh; /* Δίνει ύψος παρόμοιο με την εικόνα σας */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white);
+    padding: 0 10%;
+}
+
+.project-hero2 {
+    /* Συνδυασμός gradient overlay και εικόνας σε μία δήλωση background */
+    background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), 
+                url("https://www.ekathimerini.com/wp-content/uploads/2025/12/Panathinaikos_BC_InTime.jpg") center/cover;
+    
+    height: 60vh; /* Δίνει ύψος παρόμοιο με την εικόνα σας */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white);
+    padding: 0 10%;
+}
+
+.project-hero3{
+    background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)),
+                url("https://wallpapercave.com/wp/wp8796954.jpg") center/cover;
+    height: 60vh; /* Δίνει ύψος παρόμοιο με την εικόνα σας */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white);
+    padding: 0 10%;
+}
+
+.project-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--white);
+}
+
+.project-hero h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--white);
+}
+
+.proj1{
+    text-decoration: underline;
+    color: black;
+}
+
+.subtitle {
+    color: var(--cyan);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.project-content {
+    background-color: var(--white);
+    padding: 4rem 10%;
+}
+
+.content-wrapper {
+    max-width: 1000px; /* Για να είναι ευανάγνωστο το κείμενο */
+    margin: 0 auto;
+}
+
+.content-wrapper p {
+    margin-bottom: 1.0rem; /* Ρύθμισε το 1.5rem ανάλογα με το πόσο μεγάλο κενό θέλεις */
+    line-height: 1.7;     /* Προαιρετικό: βελτιώνει την απόσταση μεταξύ των γραμμών */
+}
+
+.content-wrapper p:last-child {
+    margin-bottom: 0;
+}
+
+.project-placeholder {
+    margin-top: 3rem;
+    background: var(--light-gray);
+    border: 2px dashed var(--text-muted);
+    border-radius: 8px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.highlight-text {
+    font-size: 1.25rem;             /* Μεγαλύτερη γραμματοσειρά από το κανονικό κείμενο */
+    font-weight: 600;               /* Έντονη γραφή */
+    color: var(--navy);             /* Χρήση του βασικού σου χρώματος */
+    border-left: 4px solid var(--cyan); /* Μια γραμμή στα αριστερά που ταιριάζει με το design σου */
+    padding-left: 6rem;           /* Απόσταση από τη γραμμή */
+    padding-left: 6rem;           /* Απόσταση από τη γραμμή */
+    margin-top: 2rem;               /* Κενό από την προηγούμενη παράγραφο */
+    font-style: italic;             /* Πλάγια γραφή για περισσότερο ύφος */
+}
+
+.profile-img{
+    height: 500px; /* Ορίζεις το ύψος σε pixels */
+    width: auto;   /* Διατηρεί τις αναλογίες (aspect ratio) για να μην παραμορφωθεί */
+    object-fit: cover; /* Αν το ύψος είναι σταθερό, "γεμίζει" το χώρο χωρίς να την ξεχειλώνει */
+}
+
+/* Analysis Grid Layout */
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.analysis-card {
+    background: var(--light-gray); /* Ίδιο με το index.html */
+    padding: 2rem;
+    border-radius: 12px;
+    border-top: 4px solid var(--sky-blue); /* Μπλε γραμμή στο πάνω μέρος */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.analysis-card h3 {
+    color: var(--navy);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis-card ul {
+    list-style: none; /* Αφαιρούμε τις κλασικές βούλες */
+    padding-left: 0;
+}
+
+.analysis-card li {
+    margin-bottom: 0.8rem;
+    position: relative;
+    padding-left: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Custom bullet points */
+.analysis-card li::before {
+    content: "•";
+    color: var(--sky-blue);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.analysis-card strong {
+    color: var(--navy);
+}
+
+/* Container styling */
+.pace-comparison {
+    display: flex;
+    gap: 1.5rem; /* Μειώνουμε λίγο το κενό για να χωράνε καλύτερα */
+    margin: 2rem 0;
+    flex-wrap: nowrap; /* Απαγορεύει την αλλαγή γραμμής */
+    width: 100%;
+}
+
+.pace-card {
+    flex: 1; /* Δίνει ίσο πλάτος και στα 3 κουτιά */
+    min-width: 0; /* Επιτρέπει στα cards να συρρικνωθούν αν χρειαστεί */
+    background: var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Προσθήκη χρώματος για την τρίτη κάρτα */
+.pace-card.euro .label {
+    color: #3498db; /* Ένα μπλε για να ξεχωρίζει από το πράσινο/κόκκινο */
+}
+
+/* Mobile Responsive: Αν η οθόνη είναι μικρή, τότε μόνο να αλλάζουν γραμμή */
+@media (max-width: 900px) {
+    .pace-comparison {
+        flex-wrap: wrap;
+    }
+    .pace-card {
+        flex: 1 1 250px; /* Επιστρέφει σε stacked διάταξη σε κινητά */
+    }
+}
+
+.pace-card.win .label { color: #2ecc71; } /* Πράσινο για νίκες */
+.pace-card.loss .label { color: #e74c3c; } /* Κόκκινο για ήττες */
+
+.time-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 1rem;
+}
+
+/* Progress Bar Logic */
+.pace-bar-container {
+    background: #ddd;
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.pace-bar {
+    height: 100%;
+    background: var(--sky-blue);
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+.distribution-analysis {
+    margin: 3rem 0;
+    background: var(--light-gray);
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+.dist-container {
+    margin: 2rem 0;
+}
+
+.dist-group {
+    margin-bottom: 2rem;
+}
+
+.dist-group h4 {
+    margin-bottom: 0.5rem;
+    color: var(--navy);
+}
+
+/* Stacked Bar Styling */
+.stacked-bar {
+    display: flex;
+    height: 35px;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+.segment:hover {
+    filter: brightness(1.1);
+    cursor: default;
+}
+
+/* Χρώματα Ζωνών */
+.fastbreak { background-color: #2ecc71; } /* Πράσινο - Γρήγορο/Transition */
+.setgame { background-color: var(--sky-blue); } /* Μπλε - Οργανωμένο παιχνίδι */
+.lateclock { background-color: #e67e22; } /* Πορτοκαλί - Πίεση χρόνου */
+
+/* Legend Styling */
+.dist-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    color: var(--text-main);
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.fb { background-color: #2ecc71; }
+.sg { background-color: var(--sky-blue); }
+.lc { background-color: #e67e22; }
+
+.shots-analysis {
+    max-width: 800px; /* Το ίδιο πλάτος με το content-wrapper */
+    margin: 2rem 0;   /* Πάνω-κάτω περιθώριο, 0 στα πλάγια για να μένει αριστερά */
+    text-align: left; /* Διασφαλίζει την αριστερή στοίχιση */
+    padding: 0
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 0.95rem;
+}
+
+.analysis-table th, .analysis-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.analysis-table th {
+    background: var(--navy);
+    color: var(--cyan);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.group-header {
+    background: #f8f9fa;
+    font-weight: bold;
+    color: var(--navy);
+    border-left: 4px solid var(--sky-blue);
+}
+
+.win-label { color: #2ecc71; font-weight: bold; }
+.loss-label { color: #e74c3c; font-weight: bold; }
+.neutral-label {color: #002d5a; font-weight: bold; }
+
+/* Styling for the Efficiency Bar */
+.bar-bg {
+    background: #eee;
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+}
+
+.bar-fill.win { background: #2ecc71; }
+.bar-fill.loss { background: #e74c3c; }
+
+.description-text {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 1rem;
+    max-width: 800px;
+    width: 100%;
+    justify-content: left;
+}
+
+.shot-creation-analysis {
+    max-width: 800px;
+    margin: 0 auto;   /* Κολλάει αριστερά */
+    width: 100%;
+    justify-items: start;
+    text-align: left;
+    padding-left:0;
+    padding-right:0;
+    /* ΑΥΤΟ ΜΕΙΩΝΕΙ ΤΟ ΚΕΝΟ */
+    padding-top: 1rem; 
+    padding-bottom: 2rem;
+}
+
+.creation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    margin: 2rem auto 0 auto;
+    max-width: 100%;
+    justify-content: center;
+    padding-left:0;
+    padding-right:0;
+}
+
+.chart-wrapper {
+    margin-top: 1.5rem;
+    width: 100%
+}
+
+.bar-group {
+    margin-bottom: 1.2rem;
+}
+
+.category-name {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+.chart-bar-bg {
+    background: #f0f2f5;
+    height: 24px;
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+}
+
+.chart-bar {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: width 0.8s ease-out;
+}
+
+.chart-bar.win { background: #007a33; }
+.chart-bar.loss { background: #e74c3c; }
+.chart-bar.neutral { background: #002d5a}
+
+@media (max-width: 768px) {
+    .creation-grid { grid-template-columns: 1fr; }
+}
+
+.visual-analysis {
+    max-width: 800px; /* Ή το πλάτος που έχετε ορίσει στο content-wrapper */
+    margin: 0;   /* Κεντράρει το section στην οθόνη */
+    width: 100%;
+    text-align: left; /* Στοιχίζει αριστερά τον τίτλο h3 και την παράγραφο p */
+    justify-content: left;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.visual-analysis h3.section-subtitle {
+    text-align: left !important;
+    justify-content: left;
+    max-width: 800;
+    margin-left: 0;
+}
+
+/* Container για το γράφημα με Glass Effect */
+.chart-glass-card {
+    background: rgba(17, 34, 64, 0.6); /* Royal Blue με διαφάνεια */
+    backdrop-filter: blur(10px); /* Το εφέ θολώματος */
+    border: 1px solid rgba(100, 255, 218, 0.2); /* Απαλό Cyan περίγραμμα */
+    border-radius: 16px;
+    padding: 20px;
+    margin: 2rem auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 100%;
+    display: block;
+}
+
+.chart-glass-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Ρυθμίσεις για το Iframe */
+.plotly-iframe {
+    width: 100%;
+    height: 850px; /* Σταθερό μεγάλο ύψος */
+    border: none;
+    border-radius: 8px;
+    display: block;
+    overflow: hidden; /* Εξαφανίζει τις μπάρες κύλισης */
+}
+
+/* Προσαρμογή για tablet/mobile ώστε να μην βγαίνει εκτός οθόνης */
+@media (max-width: 1024px) {
+    .plotly-iframe {
+        height: 700px;
+    }
+}
+
+.responsive-chart-img {
+    width: 100%;       /* Πιάνει όλο το πλάτος του container */
+    height: auto;      /* Το ύψος υπολογίζεται αυτόματα για να μην παραμορφώνεται */
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.chart-glass-card {
+    padding: 10px;    /* Μειώνουμε λίγο το padding για να αναπνέει η εικόνα */
+    background: rgba(17, 34, 64, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.insight-badge {
+    background: var(--cyan);
+    color: var(--navy);
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.chart-insight-box p {
+    color: var(--white);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Mobile Adjustment */
+@media (max-width: 768px) {
+    .plotly-iframe {
+        height: 450px; /* Μικραίνουμε το ύψος σε κινητά */
+    }
+}
+
+/* Glass Container για τον πίνακα */
+.table-glass-container {
+    background: rgba(17, 34, 64, 0.4);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 1px; /* Για να φαίνεται το border-gradient αν προστεθεί */
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    margin: 2rem 0;
+}
+
+.metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--white);
+}
+
+.metrics-table th {
+    background: rgba(10, 25, 47, 0.8);
+    color: var(--cyan);
+    text-align: left;
+    padding: 15px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metrics-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Badges για το Efficiency */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-badge.high {
+    background: rgba(46, 204, 113, 0.2);
+    color: #27ac00;
+    border: 1px solid #2ecc71;
+}
+
+.status-badge.low {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.win-label { font-weight: bold; color: #2ecc71; }
+.loss-label { font-weight: bold; color: #e74c3c; }
+
+.win-label { 
+    font-weight: bold; 
+    /* Χρήση ενός πιο σκούρου και πλούσιου πράσινου (Emerald/Forest) */
+    color: #27ac00; 
+    
+    /* Προαιρετικό: Μικρή αύξηση στο spacing για να "αναπνέει" το περίγραμμα */
+    letter-spacing: 0.5px;
+}
+
+.blue {
+    font-weight: bold;
+    color: rgb(11, 11, 85);
+}
+
+/* Styling για το νέο section */
+.euroleague-overview {
+    padding-bottom: 2rem; /* padding για απόσταση από τα επόμενα */
+}
+
+/* Styling για το clickable summary */
+.euroleague-overview summary {
+    cursor: pointer; /* Αλλαγή pointer σε χεράκι */
+    list-style: none; /* Κρύβει το default τριγωνάκι του browser */
+    outline: none; /* Αφαιρεί το default focus border */
+}
+
+/* Styling για τον τίτλο που μοιάζει με τους άλλους τίτλους */
+.euroleague-overview .section-title-interactive {
+    display: flex; /* Για να ευθυγραμμίσουμε τον τίτλο με το icon */
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 1.5em;
+    font-size: 2rem; /* Ίδιο μέγεθος με τα άλλα H2 */
+    font-weight: bold;
+    color: white; /* Μαύρο χρώμα */
+    margin-top: 0;
+    margin-bottom: 1rem;
+    background-color:#0a192f;
+    border-radius: 10px;
+}
+
+/* Styling για το εικονίδιο '+' */
+.euroleague-overview .expand-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease; /* Animation για την περιστροφή */
+    color: white;
+}
+
+/* Animation: Όταν το <details> είναι ανοιχτό, το '+' περιστρέφεται */
+.euroleague-overview details[open] .expand-icon {
+    transform: rotate(45deg); /* Γίνεται 'x' ή απλά περιστρέφεται */
+}
+
+/* Styling για το περιεχόμενο που εμφανίζεται */
+.euroleague-overview .details-content {
+    padding-left: 19px; /* Ελάχιστη εσοχή για να ευθυγραμμιστεί με το κείμενο */
+    padding-top: 10px;
+    padding-bottom: 20px; /* Πρόσθεσε λίγο κενό πριν τη γραμμή */
+    border-bottom: 2px solid #9da7b5; /* ΠΡΕΠΕΙ να γράψεις 'solid' και το πάχος (3px) */
+}
+
+/* Styling για τις παραγράφους μέσα στο details (image_2.png στυλ) */
+.euroleague-overview .details-content p {
+    font-family: Arial, sans-serif; /* Ή όποια font χρησιμοποιείς */
+    font-size: 1rem;
+    color: #444; /* Γκριζωπό κείμενο */
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+}
+
+.download-btn {
+    background-color: #001f5b; /* Το σκούρο μπλε του site σου */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.download-btn:hover {
+    background-color: #05a535; /* Κόκκινο του Ολυμπιακού στο hover */
+}
+
+/* Insights Section Styling */
+.insights-section {
+    margin: 40px 0;
+    padding: 20px;
+    background-color: #f9f9f9; /* Ελαφρύ φόντο για να ξεχωρίζει η ενότητα */
+    border-radius: 8px;
+}
+
+.insights-list {
+    list-style: none; /* Αφαιρούμε τα κλασικά bullets */
+    padding: 0;
+}
+
+.insights-list li {
+    position: relative;
+    padding: 15px 15px 15px 40px;
+    margin-bottom: 15px;
+    background: white;
+    border-left: 5px solid #001f5b; /* Το σκούρο μπλε σου */
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    line-height: 1.6;
+    color: #333;
+    transition: transform 0.2s ease;
+}
+
+/* Hover εφέ για αλληλεπίδραση */
+.insights-list li:hover {
+    transform: translateX(5px);
+    border-left-color: #e62117; /* Αλλαγή σε κόκκινο στο hover */
+}
+
+/* Custom Bullet Icon (Μπάλα Μπάσκετ ή Dot) */
+.insights-list li::before {
+    content: '🏀'; /* Μπορείς να βάλεις και ένα bullet '•' */
+    position: absolute;
+    left: 12px;
+    top: 15px;
+    font-size: 1.2rem;
+}
+
+.insights-list li strong {
+    color: #001f5b;
+    display: block; /* Βάζει τον τίτλο του bullet σε δική του γραμμή */
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.ending-text{
+    font-size: 1.25rem;             /* Μεγαλύτερη γραμματοσειρά από το κανονικό κείμενο */
+    font-weight: 600;               /* Έντονη γραφή */
+    color: var(--navy);             /* Χρήση του βασικού σου χρώματος */
+    /*border-left: 4px solid var(--cyan); /* Μια γραμμή στα αριστερά που ταιριάζει με το design σου */
+    /*padding-left: 6rem;           /* Απόσταση από τη γραμμή */
+    margin-top: 3rem;               /* Κενό από την προηγούμενη παράγραφο */
+    /*font-style: italic;             /* Πλάγια γραφή για περισσότερο ύφος */
+}
+
+/* Container styling */
+.analysis-section {
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* General Stats Card */
+.stats-card {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #007a33; /* PAO Green */
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.distribution-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+
+.dist-item span {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #007a33;
+}
+
+/* Comparison Grid */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.comparison-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.win-border { border-top: 5px solid #28a745; }
+.loss-border { border-top: 5px solid #dc3545; }
+
+.main-stat {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #333;
+}
+
+.main-stat small {
+    display: block;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.sub-stats {
+    list-style: none;
+    padding: 0;
+}
+
+.sub-stats li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .comparison-grid { grid-template-columns: 1fr; }
+}
+
+
+.Tableau {
+    background: var(--light-gray); /* Ή αν θες σκοτεινό στυλ, βάλε: rgba(17, 34, 64, 0.6) */
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-top: 4px solid var(--sky-blue); /* Η χαρακτηριστική μπλε γραμμή σου */
+    width: 100%;
+    max-width: 800px; /* Ιδανικό πλάτος για τα μεγάλα visualizations */
+    margin: 1.5rem auto;
+    transition: transform 0.3s ease;
+}
+
+.Tableau:hover {
+    transform: translateY(-5px); /* Responsive εφέ όπως οι υπόλοιπες κάρτες σου */
+}
+
+/* Μορφοποίηση των τίτλων H3 μέσα στα Tableau blocks */
+.Tableau h3 {
+    color: var(--navy);
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e0e6ed;
+    padding-bottom: 0.5rem;
+}
+
+/* --- Custom Sports Analytics Tables & Cards --- */
+.custom-analytics-card {
+    background: var(--white);
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-top: 5px solid var(--sky-blue); /* Ευθυγράμμιση με το border style που έχετε */
+    transition: transform 0.3s ease;
+}
+
+.custom-analytics-card:hover {
+    transform: translateY(-5px);
+}
+
+.analytics-title {
+    color: var(--navy);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.custom-analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+}
+
+.custom-analytics-table thead {
+    background-color: var(--navy);
+    color: var(--white);
+}
+
+.custom-analytics-table th {
+    padding: 12px 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.custom-analytics-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--light-gray);
+    color: var(--text-main);
+    text-align: center;
+}
+
+/* Zebra striping χρησιμοποιώντας το light-gray σας */
+.custom-analytics-table tbody tr:nth-child(even) {
+    background-color: rgba(244, 247, 246, 0.6); 
+}
+
+/* Hover εφέ στις γραμμές */
+.custom-analytics-table tbody tr:hover {
+    background-color: rgba(48, 102, 190, 0.05); /* Απαλό sky-blue */
+}
+
+/* Highlight για το όνομα της ομάδας */
+.custom-analytics-table .team-name {
+    text-align: left;
+    font-weight: 500;
+    color: var(--royal-blue);
+}
+
+/* Ανάδειξη του #1 της λίστας με το Cyan χρώμα σας */
+.custom-analytics-table tr.top-row {
+    background-color: rgba(100, 255, 218, 0.15) !important; 
+}
+
+/* Έμφαση στη στήλη Pace (που είναι το κύριο metric) */
+.custom-analytics-table .highlight-stat {
+    font-weight: 700;
+    color: var(--sky-blue);
+}
+
+/* --- Expanded Metrics Table Styled v2 --- */
+.custom-wide-card {
+    background: #ffffff;
+    padding: 10px; /* Αυξήθηκε ελαφρώς το εσωτερικό padding */
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    border-top: 5px solid var(--sky-blue);
+    max-width: 1400px;
+    width: 100%; /* Διασφαλίζει full width */
+}
+
+.custom-expanded-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-family);
+    margin-top: 15px;
+    table-layout: fixed; /* Αναγκάζει τον browser να σεβαστεί τα ποσοστά width */
+}
+
+/* Κεφαλίδες με το Navy χρώμα σας */
+.custom-expanded-table thead th {
+    background-color: var(--navy);
+    color: var(--white);
+    padding: 18px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    border: none;
+}
+
+/* Ρύθμιση πλάτους για τις κεφαλίδες των στατιστικών */
+.custom-expanded-table thead th:not(:first-child) {
+    width: 14%; /* Μοιράζει ομοιόμορφα τις υπόλοιπες 4 στήλες */
+}
+
+/* Ανοιχτόχρωμο γκρι Background στα κελιά & Μεγαλύτερο Padding για διεύρυνση */
+.custom-expanded-table tbody td {
+    padding: 20px 22px; /* Αυξήθηκε για να γίνει πιο "γεμάτος" ο πίνακας */
+    background-color: #f8f9fa; 
+    border-bottom: 2px solid #ffffff; 
+    color: var(--text-main);
+    font-size: 1rem;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Στοίχιση αριστερά και αύξηση πλάτους για την πρώτη στήλη (Κατηγορίες) */
+.custom-expanded-table tbody td.team-category-cell,
+.custom-expanded-table thead th.text-start {
+    text-align: left;
+    width: 44%; /* Αυξήθηκε από 35% για να απλωθεί το κείμενο οριζόντια */
+}
+
+.custom-expanded-table tbody td.team-category-cell {
+    font-weight: 600;
+    color: var(--royal-blue);
+}
+
+.custom-expanded-table tbody td.count-cell {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* Custom Badges για τα ποσοστά με Σκούρο Navy κείμενο αντί για λευκό */
+.badge-stat {
+    display: inline-block;
+    padding: 6px 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    min-width: 85px;
+    text-align: center;
+    color: var(--navy) !important; 
+}
+
+/* Απαλό πράσινο/κόκκινο φόντο που δένει με το light gray */
+.badge-high-custom {
+    background-color: #d1e7dd; 
+    border: 1px solid #a3cfbb;
+}
+
+.badge-low-custom {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+}
+
+.badge-mid-custom {
+    background-color: #fff3cd;
+    border: 1px solid #ffecb5;
+}
+
+/* Μικρός αριθμός (πλήθος ομάδων) δίπλα από το ποσοστό */
+.count-small {
+    display: inline-block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-left: 6px;
+    font-weight: 500;
+}
+
+/* Hover εφέ που κάνει τη γραμμή να ξεχωρίζει */
+.custom-expanded-table tbody tr:hover td {
+    background-color: #f1f3f5;
+}
+
+.small-header {
+    font-size: 120%;
+    color: var(--navy)
+}
+
+.period{
+    font-style:italic;
+    color: var(--text-main);
+}
+
+/* Κινητά - Responsive για τους μεγάλους πίνακες advanced stats */
+@media (max-width: 768px) {
+    .custom-expanded-table {
+        table-layout: auto !important; /* Απελευθερώνει το σταθερό πλάτος */
+    }
+    
+    .custom-expanded-table thead th, 
+    .custom-expanded-table tbody td {
+        padding: 10px 8px !important; /* Μειώνει το padding για να χωράνε */
+        font-size: 0.85rem !important; /* Ελαφρώς μικρότερη γραμματοσειρά */
+        min-width: 90px; /* Αναγκάζει το κείμενο να μην διπλώνει περίεργα */
+    }
+
+    .custom-expanded-table tbody td.team-category-cell,
+    .custom-expanded-table thead th.text-start {
+        width: auto !important; /* Αφήνει την πρώτη στήλη να προσαρμοστεί */
+        min-width: 140px;
+    }
+    
+    .badge-stat {
+        padding: 4px 6px !important;
+        font-size: 0.8rem !important;
+        min-width: 65px !important;
+    }
+    
+    .count-small {
+        display: block; /* Βάζει το "Από τις Χ ομάδες" από κάτω για εξοικονόμηση χώρου */
+        margin-left: 0 !important;
+        font-size: 0.75rem;
+    }
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Επιτρέπει το scroll δεξιά-αριστερά στο κινητό */
+    -webkit-overflow-scrolling: touch; /* Ομαλό scroll σε iOS συσκευές */
+    margin-bottom: 1rem;
+}
+
+/* Ρυθμίσεις Tableau για Κινητά */
+@media (max-width: 768px) {
+    .Tableau {
+        padding: 0.5rem !important; /* Μειώνει το εσωτερικό κενό για να απλωθεί το γράφημα */
+        border-radius: 8px;
+    }
+    
+    /* Αναγκάζει το embedded iframe του Tableau να μην δημιουργεί διπλό scrollbar */
+    .Tableau iframe, 
+    .Tableau object, 
+    .Tableau .tableauPlaceholder {
+        width: 100% !important;
+        min-height: 400px !important; /* Δίνει ένα σταθερό ύψος για να αναπνεύσει το line chart */
+    }
+}
+
+/* ==========================================
+   Διαχωρισμός Tableau (Desktop vs Mobile)
+   ========================================== */
+
+/* 1. Ρυθμίσεις για Υπολογιστές (Default κατάσταση) */
+.tableau-mobile {
+    display: none !important; /* Κρύβει την εικόνα στα PC */
+}
+
+.tableau-desktop {
+    display: block; /* Εμφανίζει κανονικά το interactive Tableau embed */
+}
+
+/* 2. Ρυθμίσεις για Κινητά & Tablet (Οθόνες μικρότερες από 768px) */
+@media (max-width: 768px) {
+    .tableau-desktop {
+        display: none !important; /* Κρύβει το βαρύ embed κώδικα στο κινητό */
+    }
+    
+    .tableau-mobile {
+        display: block !important; /* Εμφανίζει τη στατική εικόνα */
+    }
+    
+    /* Extra βελτίωση: Μειώνουμε το padding του container στο κινητό 
+       για να κερδίσεις ακόμα περισσότερο οριζόντιο χώρο για το γράφημα */
+    .Tableau {
+        padding: 0.6rem !important; 
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    nav ul {
+        flex-wrap: wrap;
+        gap: 0.35rem 1rem;
+    }
+    nav ul li {
+        margin-left: 0;
+    }
+}

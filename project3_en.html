@@ -1,0 +1,680 @@
+<!--
+    English Project Page
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 3 | Sports Analytics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">The Sixth Man</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="http://127.0.0.1:47211/">European Team Stats</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="project-hero3">
+            <h1>Euroleague: The Evolution of Pace Over Time</h1>
+            <p class="subtitle">An Annual Review</p>
+        </section>
+
+        <div class="lang-bar" style="text-align: center; padding: 1.5rem 0 0 0; font-family: var(--font-family); font-size: 0.95rem;">
+            <a href="project3.html" style="color: var(--text-muted); text-decoration: none; margin-right: 1rem; transition: color 0.3s;" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--text-muted)'">Ελληνικά</a>
+            <a href="project3_en.html" style="color: var(--navy); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--cyan); padding-bottom: 2px; margin-left: 1rem;">English</a>
+        </div>
+
+        <section class="project-content">
+            <div class="content-wrapper">
+                <h2 class="section-title">Historical Analysis</h2>
+            
+
+                <p>
+                    In recent years, it is mentioned more and more frequently that European basketball has become faster. Faster possessions, 
+                    more immediate inbound passes after a basket, more fast breaks, while regulations have also been added to help increase 
+                    the speed of the game (see ACB and the rule for inbounding the ball when it goes out of bounds without referee intervention). 
+                </p>
+
+                <p>
+                    At first glance, it seems correct. But does it hold true generally? Has the game actually become faster? If so, then the points scored 
+                    by teams should be more, right? Or do faster possessions lead to more rushed decisions? Are high-pace teams the ones that perform 
+                    better throughout the season? All these questions will be properly answered in this project.
+                </p>
+
+                <p>
+                    Before we begin, I should mention that for this specific project, data tables were used containing <strong>a) advanced stats for every team 
+                    that has competed in the Euroleague (from the 2000-2001 season until today)</strong> and <strong>b) basic stats for every player who has played in the Euroleague 
+                    (from the 2000-2001 season until today)</strong>. 
+                    The data frames are available for download below:<br />
+                    <a href="project-stats.xlsx" download class="download-btn">Euroleague Teams' Advanced Stats (.xlsx)</a>             <a href="player_stats_per_year.xlsx" download class="download-btn">Euroleague Players' Stats (.xlsx)</a><br />
+                </p>
+
+                <p>
+                    Most calculations were done using Python, while the visuals were created via Tableau. The Python code is available for download below:<br />
+                    <a href="Project2.zip" download class="download-btn">Python Code (.ipynb)</a><br />
+                </p>
+
+                <p>
+                    What are the metrics that show team possessions and their efficiency in them? We have <strong>Pace</strong>, which is a team's possessions 
+                    per game (40 minutes), <strong>Offensive Rating</strong>, which shows a team's average points scored per 100 possessions, and 
+                    <strong>True Shooting %</strong>, which measures a team's scoring efficiency across free throws, 2-pointers, and 3-pointers.
+                </p>
+
+                <p>
+                    Beyond a potential increase in possessions, it is crucial to examine whether this increase improves team performance, raising the points they score, 
+                    or if teams achieve better efficiency in scoring (True Shooting Percentage). Obviously, increasing possessions and making the game 
+                    faster makes no sense if team efficiency decreases.
+                </p>
+
+                
+                <h3 class="section-subtitle">A First Look: Has the Pace of the Game Changed?</h3>
+
+                <p>
+                    As a first step, we will make a comparison between the teams with the highest pace during the first 5 years of the Euroleague and the teams with the highest pace over the last 5 years.
+                    <section class="container my-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="custom-analytics-card">
+                                    <h3 class="analytics-title">Top 10 - Highest Pace (From 2021 onwards)</h3>
+                                    <div class="table-responsive">
+                                        <table class="custom-analytics-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Team</th>
+                                                    <th>Year</th>
+                                                    <th>Pace</th>
+                                                    <th>ORtg</th>
+                                                    <th>TS%</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="top-row"><td>559</td><td class="team-name">Paris Basketball</td><td>2026</td><td>77.0</td><td>116.9</td><td>57.6</td></tr>
+                                                <tr><td>561</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2026</td><td>74.6</td><td>119.6</td><td>58.2</td></tr>
+                                                <tr><td>550</td><td class="team-name">Valencia Basket</td><td>2026</td><td>74.3</td><td>120.6</td><td>59.0</td></tr>
+                                                <tr><td>564</td><td class="team-name">Baskonia</td><td>2026</td><td>74.2</td><td>117.5</td><td>59.9</td></tr>
+                                                <tr><td>547</td><td class="team-name">ALBA Berlin</td><td>2025</td><td>73.9</td><td>105.2</td><td>54.2</td></tr>
+                                                <tr><td>556</td><td class="team-name">KK Crvena Zvezda</td><td>2026</td><td>73.6</td><td>117.3</td><td>58.3</td></tr>
+                                                <tr><td>554</td><td class="team-name">AS Monaco Basket</td><td>2026</td><td>73.5</td><td>120.1</td><td>59.4</td></tr>
+                                                <tr><td>518</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2024</td><td>73.1</td><td>119.8</td><td>58.0</td></tr>
+                                                <tr><td>544</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2025</td><td>73.0</td><td>117.6</td><td>58.7</td></tr>
+                                                <tr><td>552</td><td class="team-name">Hapoel Tel Aviv</td><td>2026</td><td>72.7</td><td>120.3</td><td>62.0</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <p>
+                        Currently, the 10 teams with the highest pace in the last 5 years have an <strong>average pace of 73.99 possessions per game</strong>, 
+                        an <strong>average offensive rating of 117.49 points per 100 possessions</strong>, and an <strong>average true shooting of 58.53%</strong>. 
+                    </p>
+
+                    <section class="container my-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="custom-analytics-card">
+                                    <h3 class="analytics-title">Top 10 - Highest Pace (Up to 2006)</h3>
+                                    <div class="table-responsive">
+                                        <table class="custom-analytics-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Team</th>
+                                                    <th>Year</th>
+                                                    <th>Pace</th>
+                                                    <th>ORtg</th>
+                                                    <th>TS%</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="top-row"><td>48</td><td class="team-name">Krka Novo Mesto</td><td>2002</td><td>81.3</td><td>110.6</td><td>58.8</td></tr>
+                                                <tr><td>21</td><td class="team-name">Lugano Tigers</td><td>2001</td><td>78.4</td><td>99.1</td><td>52.5</td></tr>
+                                                <tr><td>38</td><td class="team-name">CSKA Moscow</td><td>2002</td><td>77.9</td><td>109.6</td><td>58.0</td></tr>
+                                                <tr><td>54</td><td class="team-name">Buducnost Voli Podgorica</td><td>2002</td><td>77.2</td><td>107.5</td><td>55.6</td></tr>
+                                                <tr><td>49</td><td class="team-name">KK Zadar</td><td>2002</td><td>76.8</td><td>109.6</td><td>54.4</td></tr>
+                                                <tr><td>3</td><td class="team-name">Barca</td><td>2001</td><td>76.8</td><td>111.0</td><td>56.3</td></tr>
+                                                <tr><td>23</td><td class="team-name">ADO Basquetebol Sad Ovarense</td><td>2001</td><td>76.7</td><td>97.3</td><td>57.7</td></tr>
+                                                <tr><td>32</td><td class="team-name">Universo De'Longhi Treviso</td><td>2002</td><td>76.3</td><td>113.2</td><td>59.3</td></tr>
+                                                <tr><td>17</td><td class="team-name">Saint Petersburg Lions</td><td>2001</td><td>75.9</td><td>101.2</td><td>56.9</td></tr>
+                                                <tr><td>20</td><td class="team-name">London Towers</td><td>2001</td><td>75.4</td><td>102.8</td><td>51.8</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </p>
+            
+                <p>
+                    The 10 teams with the highest pace before 2006 had an <strong>average pace of 77.27 possessions per game</strong>, an <strong>average offensive 
+                    rating of 106.19 points per 100 possessions</strong>, and an <strong>average true shooting of 56.13%</strong>.
+                </p>
+                <p>
+                    At first glance, therefore, while teams had <strong>more possessions per game</strong> during the initial years of the competition, their offensive rating 
+                    and true shooting % <strong>are not at the level of the teams from the last 5 years</strong>. The difference in offensive rating is approximately 
+                    <strong>11 points with 3 fewer possessions</strong>, which demonstrates the increase in team efficiency. Furthermore, while teams do not "run" the court as much as in the early years, 
+                    their performance in scoring via all methods (free throws, 2-pointers, 3-pointers) <strong>increased by about 2.5%</strong>. We will see a more extensive analysis below.
+                </p>
+
+
+
+                <h3 class="section-subtitle">Pace vs Offensive Rating & True Shooting %</h3>
+            
+                <div class="Tableau">
+                    <h3>Average Pace vs Average Off. Rating</h3>
+                    <div class="tableau-desktop">
+                        <div class='tableauPlaceholder' id='viz1781930165502' style='position: relative'><noscript><a href='#'><img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781930165502');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+
+                    <div class="tableau-mobile">
+                        <img src="Sheet 1.png" class="responsive-chart-img" alt="Average Pace vs Average Off. Rating">
+                    </div>
+                </div>
+
+                <p>
+                    In the first years of the Euroleague, average possessions per game were <strong>above 73 (73.9)</strong> and the average off. rating was <strong>around 108</strong>. 
+                    Over a 20-year span, and following several fluctuations, while average possessions have decreased by about <strong>1.5 (72.4)</strong>, the off. rating has increased to <strong>117.88</strong> on average <strong>(about 10 more compared to before)</strong>. 
+                    Thus, even though possessions have decreased (there is an upward trend in recent years), <strong>teams score more points per possession (1.627 versus 1.46)</strong>, highlighting the difference in efficiency.
+                </p>
+
+                <div class="Tableau">
+                    <h3>Average Pace vs Average True Shooting %</h3>
+                    <div class="tableau-desktop">
+                        <div class="tableauPlaceholder">
+                            <div class='tableauPlaceholder' id='viz1779625801460' style='position: relative'><noscript><a href='#'><img alt='Sheet 13 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace2&#47;Sheet13' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779625801460');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>                </div>
+                    </div>
+
+                    <div class="tableau-mobile">
+                        <img src="Sheet 13.png" class="responsive-chart-img" alt="Average Pace vs Average TS%">
+                    </div>
+                </div>
+
+                <p>
+                    The same can be said for the relationship between avg pace and true shooting percentage. TS% <strong>has increased from 56% to 59%</strong>. A 3% difference might not seem significant, but in a competition where 
+                    an average of 20 teams participate each year, increasing scoring efficiency (TS%) by 3% <strong>with 1.5 fewer average possessions</strong> is a clear sign of the tournament's evolution.
+                </p>
+                <p>
+                    Until 2014, during the downward trajectory of the teams' avg pace, TS% would either remain the same or decrease. This means that the teams' scoring efficiency was declining. 
+                    From 2018 until today (with the exception of 2022), alongside the increase in possessions <strong>from around 69.2 to 72.5</strong>, there is <strong>an increase in team scoring efficiency of about 1%</strong>. 
+                    It seems like a negligible amount, but combined with the increase in possessions, even remaining at the same values would be a positive scenario. 
+                    TS% began to increase before the rise of avg pace, from 2016 to 2018, by <strong>over 2.5%</strong>.
+                </p>
+                <p>
+                    It is worth mentioning that since 2022, with the increase in average possessions per game (<strong>from 68.1 to 72.4</strong>), TS% also increased <strong>from 56.9% to 58.9%</strong>.
+                </p>
+
+                <br />
+                <h3>Does Higher Pace Imply a Higher Offensive Rating?</h3>
+
+                <p>
+                    Most people would believe that as possessions increase for each team, the points they score will also increase. 
+                    Based on the charts, however, clear examples are observed that refute this claim.
+                    <ul> 
+                        <li>During the <strong>2016-2018</strong> period, pace <strong>decreased from 70.9 to 69.2</strong>, but offensive rating <strong>increased from 106.6 to 115.9</strong></li>
+                        <li>During the <strong>2001-2004</strong> period, pace <strong>decreased from around 74 to 69.6</strong>, but offensive rating <strong>increased from 108.1 to 111.8</strong></li>
+                        <li>During the <strong>2004-2006</strong> period, pace <strong>remained almost identical from 69.6 to 69.9</strong>, but offensive rating <strong>decreased from 111.8 to 105.8</strong></li>
+                    </ul>
+                    
+                </p>
+                <p>History has shown, therefore, that increasing the speed of the game <strong>does not</strong> imply an increase in the teams' scoring output.</p>
+
+                <br />
+                <h3>Does Higher Offensive Rating Imply a Higher Pace?</h3>
+
+                <p>
+                    Above we proved that a team having a higher pace (more possessions) does not imply that the points scored per 100 possessions (offensive rating) 
+                    will be more. But what happens when the inverse occurs? That is, when a team's offensive rating increases, will its pace increase as well?
+                </p>
+                <p>
+                    Just like before, we will answer by taking into account the line charts of pace and offensive rating. Looking only at these, we identify characteristic examples 
+                    that refute this claim.
+                    <ul>
+                        <li>During the <strong>2001-2004</strong> period, offensive rating <strong>increased from 108.1 to 111.8</strong>, but pace <strong>decreased from 73.95 to 69.67</strong></li>
+                        <li>During the <strong>2017-2018</strong> period, offensive rating <strong>increased from 110.6 to 115.9</strong>, but pace <strong>decreased from 71.01 to 69.2</strong></li>
+                    </ul>
+                </p>
+                <p>
+                    While the examples proving the opposite are not numerous, they are sufficient to reach a safe conclusion that an increase in offensive rating <strong>does not</strong> 
+                    imply an increase in the pace of Euroleague teams.
+                </p>
+
+
+                <h3 class="section-subtitle">Euroleague Breakdown Into Periods</h3>
+
+                <p>
+                    Since basketball was created as a sport, several changes have occurred that altered the way teams play. 
+                    From the addition of the 24-second shot clock (1954 in the NBA, 1956 in FIBA) and the 3-point line 
+                    (1979 in the NBA, 1984 in FIBA), to more recent changes like the coach's challenge and the use of instant replay to contest 
+                    referee decisions, the game has passed through many phases while remaining one of the most popular sports worldwide.
+                </p>
+                <p>
+                    Since the emergence of the Euroleague as a competition, several rule changes have been made, consequently affecting the 
+                    teams' style of play. We will examine if during these periods when changes were implemented, the volume of team possessions 
+                    and their scoring efficiency were affected.
+                </p>
+                
+                <h4 class="small-header">2000 - 2008</h4>
+                <p class="period">
+                    Initial Period of the Euroleague.
+                </p>
+                <p>
+                    The competition begins with an average pace close to 74 possessions per game, a fairly high average considering we are talking about the Euroleague. By the end of the period, the game becomes slower 
+                    (<strong>the pace drops to 70 possessions on average per team</strong>), while both offensive rating and true shooting % <strong>show the same trajectory for each year</strong>, ending up at values 
+                    slightly lower than the initial ones.
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940098429' style='position: relative'><noscript><a href='#'><img alt='(2000-2001) - (2007-2008) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940098429');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 11.png" class="responsive-chart-img" alt="Euroleague First Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2008 - 2016</h4> 
+                <p class="period">
+                    Changes: In the 08-09 season, playoffs changed to a best-of-five series. In the 10-11 season, the 3-point line changed from 6.25 meters to 6.75 meters. In the 14-15 season, the shot clock reset 
+                    after an offensive rebound changed from 24 to 14 seconds.
+                </p>
+                <p>
+                    Here, greater monotony appears in the teams' average pace. It starts at 70 possessions per match and concludes at approximately <strong>71 per team</strong>. 
+                    On the other hand, both offensive rating and true shooting % will experience several fluctuations during this period and will finish at values slightly below the starting ones 
+                    (<strong>Offensive rating from 108 points down to 106.6</strong> and <strong>TS% from 56.5% down to 55.3%</strong>).
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940211325' style='position: relative'><noscript><a href='#'><img alt='(2008-2009) - (2015-2016) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet2&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet2' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet2&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940211325');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 2.png" class="responsive-chart-img" alt="Euroleague Second Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2016 - 2023</h4>
+                <p class="period">
+                    Changes: In the 16-17 season groups were abolished; everyone plays everyone, home and away (round-robin style).
+                </p>
+                <p>
+                    During this period, pace changes move roughly similarly to the previous two. The only difference is that at the end 
+                    of the period, a slight decrease in average possessions occurs (<strong>around 0.5-1.0</strong>). The off. rating will rise above 110 points from 2017 onwards (round-robin games) and will not 
+                    decrease at all until the end of the period, where <strong>it concludes at 115 points</strong>. The same applies to scoring consistency, as 
+                    <strong>TS% does not drop below 56.9% and finishes at 58.5%</strong> at the end of the period.
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940257070' style='position: relative'><noscript><a href='#'><img alt='(2016-2017) - (2022-2023) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet3&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet3' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet3&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940257070');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 3.png" class="responsive-chart-img" alt="Euroleague Third Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2023 - Today</h4>
+                <p class="period">
+                    Changes: The play-in tournament started in 2023. The league teams expanded to 20 in 2024.
+                </p>
+                <p>
+                    The shortest period compared to the others and the one we are currently going through. There is a continuous annual <strong>increase in pace from 69.5 possessions per game 
+                    to approximately 72.5</strong>. Here, the off. rating <strong>has increased up to 117.8 points</strong> and <strong>TS% remains steadily above 
+                    58%</strong>, reaching close to 59% now in 2026.
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940299724' style='position: relative'><noscript><a href='#'><img alt='(2023-2024) - (2026-today) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet4&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet4' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet4&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940299724');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 4.png" class="responsive-chart-img" alt="Euroleague Fourth Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h3 class="section-subtitle">Pace & Offensive Rating By Team Type</h3>
+
+                <p>
+                    In the Euroleague, there are different types of teams with different styles of play. The most prevalent ones that we will focus on 
+                    the most are <strong>teams with at least one dominant scorer or one dominant creator (heliocentric)</strong> and <strong>teams with heavy ball movement in their offenses (motion offense)</strong>.
+                </p>
+                <p>
+                    Euroleague teams will be segmented according to these traits, and for each category, we will test if a trait impacts 
+                    the volume of possessions or the number of points per 100 possessions.
+                </p>
+                <p>
+                    But how can we distinguish from statistics alone whether a team features a dominant scorer/creator or high ball movement? We will be aided by 
+                    each player's individual <strong>USG%</strong> and individual <strong>AST%</strong>, as well as the team's overall metrics.
+                </p>
+                <p>
+                    <strong>USG%</strong> is an advanced statistic that <strong>estimates the percentage of team plays completed by a player while they are on the court</strong>. An offensive possession is completed by a player when they attempt a shot, a free throw, or turn the ball over at the end of it. A player with a <strong>USG% of at least 28%</strong> is considered dominant in finishing plays for their team.
+                </p>
+                <p>
+                    <strong>AST%</strong> is another advanced statistic that <strong>estimates the percentage of field goals that come from an assist by a specific player while on the floor</strong>. When referring to the team, however, it displays <strong>the percentage of the team's total field goals that come from assists in general</strong>. A player with an <strong>AST% greater than 35%</strong> is considered a dominant creator, since over a third of their team's baskets result from their assist. On the other hand, a team with an <strong>AST% of at least 63%</strong> is considered a team with high ball circulation in its offense.
+                </p>
+                <p>
+                    In our evaluation, we also calculate the <strong>Offensive Rating to Pace Ratio</strong>, which shows the average points per possession that teams achieve.
+                </p>
+                
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Metric Analysis By Team Type</h3>
+                        <p class="text-muted mb-4">Comparison of teams based on their players' characteristics (Scorers, Creators, Ball Movement) and their performance relative to the average of the corresponding year.</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Team Category</th>
+                                        <th>Number of Teams</th>
+                                        <th>Above Avg Pace</th>
+                                        <th>Above Avg ORtg</th>
+                                        <th>Above Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with multiple dominant scorers</td>
+                                        <td class="count-cell">28 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">46.43%</span> <span class="count-small">(13)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">25.00%</span> <span class="count-small">(7)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">35.71%</span> <span class="count-small">(10)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with one dominant scorer</td>
+                                        <td class="count-cell">158 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">48.73%</span> <span class="count-small">(77)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">51.27%</span> <span class="count-small">(81)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">45.57%</span> <span class="count-small">(72)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with multiple dominant creators</td>
+                                        <td class="count-cell">19 teams</td>
+                                        <td><span class="badge-stat badge-high-custom">57.89%</span> <span class="count-small">(11)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">42.11%</span> <span class="count-small">(8)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">52.63%</span> <span class="count-small">(10)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with one dominant creator</td>
+                                        <td class="count-cell">106 teams</td>
+                                        <td><span class="badge-stat badge-high-custom">54.72%</span> <span class="count-small">(58)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">52.83%</span> <span class="count-small">(56)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">48.11%</span> <span class="count-small">(51)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">With at least one dominant scorer & creator</td>
+                                        <td class="count-cell">24 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">37.50%</span> <span class="count-small">(9)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">29.17%</span> <span class="count-small">(7)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">29.41%</span> <span class="count-small">(5)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with high ball movement</td>
+                                        <td class="count-cell">83 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">14.46%</span> <span class="count-small">(12)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">25.30%</span> <span class="count-small">(21)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">38.55%</span> <span class="count-small">(32)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    While we would expect most teams that have more than one dominant scorer on their roster to have an offensive rating above the league average for that specific year, 
+                    ultimately <strong>only 25% of them surpass the league's median value</strong>. Apparently, having at least two players with dominant scoring traits on a team is not as ideal as most of us would imagine. Teams with a single dominant scorer appear to be in a better situation, with slightly over half (<strong>51.27%</strong>) exceeding the average of that season.
+                </p>
+
+                <p>
+                    More than half of the recorded teams in history that have one dominant creator on the roster surpass the league average in possessions per game 
+                    and offensive rating. This does not hold true for teams with more than one dominant creator, where although more than half (<strong>around 58% of them</strong>) exceed the 
+                    pace average, they lag in offensive rating (<strong>only 42.11%</strong> surpass the league average).
+                </p>
+
+                <p>
+                    Our subject of study, however, is checking the speed of the game and how it affects the efficiency of teams on offense. Therefore, below is 
+                    a table with the number and percentage of teams from the above categories recorded <strong>after 2018</strong>.
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Temporal Analysis of Metrics (After 2018)</h3>
+                        <p class="text-muted mb-4">Of the teams that have metrics (pace and offensive rating) above the average of that year, what percentage is found after 2018?</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Team Category</th>
+                                        <th>Greater Pace > Avg (After 2018)</th>
+                                        <th>Greater ORtg > Avg (After 2018)</th>
+                                        <th>Greater TS% > Avg (After 2018)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with multiple dominant scorers</td>
+                                        <td><span class="badge-stat badge-high-custom">76.92%</span> <span class="count-small">Out of 13 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">57.14%</span> <span class="count-small">Out of 7 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">50.00%</span> <span class="count-small">Out of 10 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with one dominant scorer</td>
+                                        <td><span class="badge-stat badge-low-custom">46.75%</span> <span class="count-small">Out of 77 teams</span></td>
+                                        <td><span class="badge-stat badge-low-custom">39.51%</span> <span class="count-small">Out of 81 teams</span></td>
+                                        <td><span class="badge-stat badge-low-custom">38.89%</span> <span class="count-small">Out of 72 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with multiple dominant creators</td>
+                                        <td><span class="badge-stat badge-high-custom">90.91%</span> <span class="count-small">Out of 11 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">87.50%</span> <span class="count-small">Out of 8 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">80.00%</span> <span class="count-small">Out of 10 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with one dominant creator</td>
+                                        <td><span class="badge-stat badge-high-custom">53.45%</span> <span class="count-small">Out of 58 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">51.79%</span> <span class="count-small">Out of 56 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">50.98%</span> <span class="count-small">Out of 51 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">With at least one dominant scorer & creator</td>
+                                        <td><span class="badge-stat badge-high-custom">77.78%</span> <span class="count-small">Out of 9 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom">57.14%</span> <span class="count-small">Out of 7 teams</span></td>
+                                        <td><span class="badge-stat badge-low-custom">40.00%</span> <span class="count-small">Out of 5 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Teams with high ball movement</td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Out of 12 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Out of 21 teams</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Out of 32 teams</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    The finding above reinforces the initial hypothesis that in recent years, teams have increased their number of possessions per game, as well as their offensive output.
+                </p>
+                <p>
+                    In the first table, we noticed that historically, fewer than half of the Euroleague teams with at least one dominant creator on their roster would exceed the average pace and offensive rating of that year. In the second table, however, we observe that most teams surpassing the averages of these metrics are identified from 2018 onwards.
+                </p>
+                <p>
+                    An important realization is that all teams with high ball movement in offense (AST% > 63%) <strong>have recorded an average number of possessions and points per 100 possessions above the league average since 2018</strong>. Before 2018, no team in this category exceeded the average of these metrics.
+                </p>
+
+                <h3 class="section-subtitle">Final 4 Teams and European Champions</h3>
+
+                <p>
+                    A record was kept of all European champions and teams that qualified for the Final Four for every year from 2000 onwards. 
+                    An inspection of the average number of possessions and the offensive rating for each of these teams was conducted to see if indeed 
+                    the teams with the best run each year also have the highest values in these statistics.
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Elite Team Performance (Championships & Final Four)</h3>
+                        <p class="text-muted mb-4">Analysis of the teams that reached the top of the competition, examining their percentages above the average (Avg) in Pace and Offensive Rating (ORtg).</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Success Category</th>
+                                        <th>Number of Teams</th>
+                                        <th>Above Avg Pace</th>
+                                        <th>Above Avg ORtg</th>
+                                        <th>Above Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Championship Teams</td>
+                                        <td class="count-cell">24 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">41.67%</span> <span class="count-small">(10)</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">(24)</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">(24)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Final Four Teams</td>
+                                        <td class="count-cell">92 teams</td>
+                                        <td><span class="badge-stat badge-low-custom">42.39%</span> <span class="count-small">(39)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">94.57%</span> <span class="count-small">(87)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">89.13%</span> <span class="count-small">(82)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    We easily realize that while the best teams from each season had a higher offensive rating than the average of all teams (applies to 
+                    <strong>100% of the champions</strong> and roughly <strong>95% of the Final Four participants</strong>), most teams had an average 
+                    number of possessions smaller than the league average that year (<strong>41.67% for the champions</strong> and <strong>42.4% for the Final Four participants</strong>).
+                </p>
+                <p>
+                    This is an quite interesting finding, as it indicates two things. <strong>First</strong>, the elevated efficiency of these teams, since with a pace below the league average, they managed, almost every time, to generate more points per 100 possessions than the mean value. <strong>Second</strong>, it is a rarer phenomenon for a team that relies heavily on a "run-and-gun" style to win the Euroleague.
+                </p>
+                <p>
+                    It is worth noting that up until 2015, out of the 14 recorded champions, only 5 had a pace above the league average for that year 
+                    (<strong>5/14 teams - 35.71%</strong>). From 2015 to the present day, out of the 10 champion teams, 6 had a number of possessions greater than the league average pace 
+                    (<strong>6/10 teams - 60%</strong>), although in recent years (since 2024), where a general increase in team pace is observed, the teams that ultimately won the title had an average pace below the average.
+                </p>
+                <p>
+                    The effectiveness of these teams is not measured solely by offensive rating, but also by True Shooting Percentage (TS%). 
+                    <strong>All 24 champions</strong> recorded from 2002 onwards had a TS% above the league average at the time. For Final Four participants, this figure stands at <strong>94.57% (87/92 teams)</strong>.
+                </p>
+
+                <p>
+                    We will now perform the exact same check as above.
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Elite Team Performance (Championships & Final Four) (After 2018)</h3>
+                        <p class="text-muted mb-4">Below is the same analysis of top teams in the competition, but from 2018 onwards.</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Success Category</th>
+                                        <th>Above Avg Pace</th>
+                                        <th>Above Avg ORtg</th>
+                                        <th>Above Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Championship Teams</td>
+                                        <td><span class="badge-stat badge-mid-custom">40%</span> <span class="count-small">Out of 10 teams</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">33.33%</span> <span class="count-small">Out of 24 teams</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">33.33%</span> <span class="count-small">Out of 24 teams</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Final Four Teams</td>
+                                        <td><span class="badge-stat badge-mid-custom">20.51%</span> <span class="count-small">Out of 39 teams</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">31.03%</span> <span class="count-small">Out of 87 teams</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">31.71%</span> <span class="count-small">Out of 87 teams</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Elevated offensive rating, pace, and true shooting % did not arise primarily after 2018 for the best teams of each season. It has always been a characteristic of the top teams in the competition, which is why the percentages in the table above are below 50%.
+                </p>
+
+                <h3 class="section-subtitle">Conclusions</h3>
+                <p>
+                    The analysis above allows us to draw several conclusions regarding the nature of modern European basketball.
+                </p>
+                <p>
+                    Regarding the first question, whether an increase in possessions implies an increase in team scoring, we can say that <strong>there is no full correlation</strong>. 
+                    The competition went through periods where pace decreased gradually, yet offensive rating surged, debunking the myth that more possessions lead to more points. Instead, the quality of execution and tactical plan on offense outweigh simple speed.
+                </p>
+                <p>
+                    In contrast, there is a major qualitative upgrade. Comparing the fastest teams of the early and late years of the competition, and while older teams had more possessions, the recent ones are considerably more effective on offense (<strong>11 points higher in offensive rating and a 2.5% increased true shooting percentage</strong>), indicating that modern basketball has become more efficient.
+                </p>
+                <p>
+                    It is quite interesting that 2018 marks a turning point for the competition. The average team points per 100 possessions, along with true shooting %, <strong>skyrocketed to higher levels and have followed an upward, if not stable, path ever since</strong>. 2018 coincides chronologically with the change in the competition's format and the decision for all teams to play against each other. Also, a few years prior, the distance of the 3-point line was altered, which might have initially influenced teams to show greater efficiency on offense. Naturally, these claims cannot be validated by statistics alone, but it is something worth mentioning.
+                </p>
+                <p>
+                    Furthermore, 2018 also signals the beginning of combining fast/efficient play with ball movement on offense. While previously teams with high ball movement mostly failed to surpass the average pace and offensive rating, <strong>from 2018 onwards, these teams as a whole record values above the average</strong>, transforming ball circulation into a catalyst for an efficient rhythm.
+                </p>
+                <p>
+                    <strong>The best teams each year feature high offensive rating and true shooting % as their main characteristics</strong>. The possessions they have in each game are not necessarily above the average, showing us that they can dictate their rhythm and achieve greater effectiveness without relying on numerous possessions.
+                </p>
+                <p>
+                    Therefore, <strong>has the game become faster?</strong> The answer is <strong>no</strong>, but it has become higher in quality and efficiency. The average number of possessions nowadays has indeed increased compared to previous years, but it has not reached the levels of the competition's initial seasons. Many believe the game has become faster because they see higher scores at the end of each match. It was proven, however, that <strong>higher scores are not the result of more possessions, but of the rise in team efficiency (offensive rating and true shooting %)</strong>. Modern European basketball has become faster in execution and decision-making. Teams now exploit ball movement and better shot selection to produce more points by the end of the game.
+                </p>
+
+
+
+
+</div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-contact">
+                <h4>Contact Info</h4>
+                <p>Email: <a href="mailto:christosbellos02@gmail.com">christosbellos02@gmail.com</a></p>
+                <p>Instagram: <a href="https://www.instagram.com/thesixthmansa/">thesixthmansa</a></p>
+                <p>Location: Athens, Greece</p>
+            </div>
+            
+            <div class="footer-contact">
+                <h4>Connect</h4>
+                <p><a href="https://www.linkedin.com/in/christosbellos02/">LinkedIn</a></p>
+                <p><a href="https://github.com/ChristosBellos/ChristosBellos.github.io">GitHub Pages</a></p>
+                <p><a href="https://cursor.com/codebase/xristosmp2002/hoop-stats/tree/main">Unified repository</a></p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Sixth Man Sports Analytics. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

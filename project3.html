@@ -1,0 +1,798 @@
+<!--
+    Project Page
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 3 | Sports Analytics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">The Sixth Man</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="http://127.0.0.1:47211/">European Team Stats</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="project-hero3">
+            <h1>Euroleague: Η Εξέλιξη Του Ρυθμού (Pace) Μέσα Στο Χρόνο</h1>
+            <p class="subtitle">Μία Ετήσια Ανασκόπηση</p>
+        </section>
+
+        <div class="lang-bar" style="text-align: center; padding: 1.5rem 0 0 0; font-family: var(--font-family); font-size: 0.95rem;">
+            <a href="project3.html" style="color: var(--navy); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--cyan); padding-bottom: 2px; margin-right: 1rem;">Ελληνικά</a>
+            <a href="project3_en.html" style="color: var(--text-muted); text-decoration: none; margin-left: 1rem; transition: color 0.3s;" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--text-muted)'">English</a>
+        </div>
+
+        <section class="project-content">
+            <div class="content-wrapper">
+                <h2 class="section-title">Διαχρονική Ανάλυση</h2>
+            
+
+                <p>
+                    Τα τελευταία χρόνια, αναφέρεται όλο και πιο συχνά ότι το ευρωπαϊκό μπάσκετ έχει γίνει πιο γρήγορο. Γρηγορότερες επιθέσεις, 
+                    πιο άμεσες επαναφορές της μπάλας μετά από καλάθι, περισσότεροι αιφνιδιασμοί, ενώ έχουν προστεθεί και κανονισμοί που βοηθάνε στην 
+                    αύξηση της ταχύτητας του παιχνιδιού (βλέπε ACB και τον κανόνα για την επαναφορά της μπάλας όταν βγαίνει εκτός ορίων, χωρίς παρέμβαση διαιτητή). 
+                </p>
+
+                <p>
+                    Με μία πρώτη ματιά φαίνεται ότι είναι σωστό. Αλλά ισχύει γενικά; Έχει γίνει όντως το παιχνίδι πιο γρήγορο; Αν ναι, τότε οι πόντοι που πετυχαίνουν 
+                    οι ομάδες θα πρέπει να είναι περισσότεροι, σωστά; Ή μήπως οι γρηγορότερες επιθέσεις οδηγούν και σε πιο βιαστικές αποφάσεις; Οι ομάδες με γρήγορο pace 
+                    είναι αυτές που θα τα πάνε καλύτερα μέσα στη σεζόν; Όλα αυτά τα ερωτήματα θα απαντηθούν κατάλληλα σε αυτό το project.
+                </p>
+
+                <p>
+                    Προτού ξεκινήσουμε, να αναφέρω ότι για το συγκεκριμένο project χρησιμοποιήθηκαν πίνακες δεδομένων <strong>α) που έχουν advanced stats για κάθε ομάδα 
+                    που έχει διαγωνιστεί στην Ευρωλίγκα (από τη σεζόν 2000-2001 μέχρι και σήμερα)</strong> και <strong>β) που έχουν βασικά στατιστικά για κάθε παίκτη που έχει παίξει στην Ευρωλίγκα 
+                    (από τη σεζόν 2000-2001 μέχρι και σήμερα)</strong>. 
+                    Ακολουθούν τα data frames διαθέσιμα προς λήψη:<br />
+                    <a href="project-stats.xlsx" download class="download-btn">Euroleague Teams' Advanced Stats (.xlsx)</a>             <a href="player_stats_per_year.xlsx" download class="download-btn">Euroleague Players' Stats (.xlsx)</a><br />
+                </p>
+
+                <p>
+                    Οι περισσότεροι υπολογισμοί έγιναν με χρήση της python, ενώ τα visuals έγιναν μέσω tableau. Ακολουθεί ο κώδικας της python διαθέσιμος προς λήψη:<br />
+                    <a href="Project2.zip" download class="download-btn">Python Code (.ipynb)</a><br />
+                </p>
+
+                <p>
+                    Ποιες είναι οι μετρικές που δείχνουν τις κατοχές και την αποτελεσματικότητα των ομάδων σε αυτές; Έχουμε το <strong>Pace</strong> που είναι οι κατοχές
+                    της κάθε ομάδας ανά παιχνίδι (40 λεπτά), το <strong>Offensive Rating</strong> που δείχνει τον μέσο όρο των πόντων μίας ομάδας ανά 100 κατοχές και το 
+                    <strong>True Shooting %</strong> που δείχνει την αποτελεσματικότητα μίας ομάδας στο σκοράρισμα, είτε είναι βολές, είτε δίποντα, είτε τρίποντα.
+                </p>
+
+                <p>
+                    Πέρα από την ενδεχόμενη αύξηση των κατοχών, σημαντικό είναι να εξετάσουμε αν αυτή η αύξηση βελτιώνει το παιχνίδι των ομάδων, αυξάνοντας τους πόντους που σκοράρουν,
+                    ή αν έχουν οι ομάδες καλύτερη απόδοση στο σκοράρισμα (True Shooting Percentage). Προφανώς, δεν έχει νόημα η αύξηση των κατοχών και το να γίνει το παιχνίδι
+                    πιο γρήγορο, αν η απόδοση των ομάδων μειωθεί.
+                </p>
+
+                
+                <h3 class="section-subtitle">Μία πρώτη ματιά: Έχει αλλάξει ο ρυθμός του παιχνιδιού;</h3>
+
+                <p>
+                    Σε πρώτη φάση θα κάνουμε μία σύγκριση των ομάδων με το μεγαλύτερο pace τα πρώτα 5 χρόνια της Ευρωλίγκας, με τις ομάδες που έχουν το μεγαλύτερο pace τα τελευταία 5 χρόνια.
+                    <section class="container my-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="custom-analytics-card">
+                                    <h3 class="analytics-title">Top 10 - Υψηλότερο Pace (Από το 2021 και μετά)</h3>
+                                    <div class="table-responsive">
+                                        <table class="custom-analytics-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Team</th>
+                                                    <th>Year</th>
+                                                    <th>Pace</th>
+                                                    <th>ORtg</th>
+                                                    <th>TS%</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="top-row"><td>559</td><td class="team-name">Paris Basketball</td><td>2026</td><td>77.0</td><td>116.9</td><td>57.6</td></tr>
+                                                <tr><td>561</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2026</td><td>74.6</td><td>119.6</td><td>58.2</td></tr>
+                                                <tr><td>550</td><td class="team-name">Valencia Basket</td><td>2026</td><td>74.3</td><td>120.6</td><td>59.0</td></tr>
+                                                <tr><td>564</td><td class="team-name">Baskonia</td><td>2026</td><td>74.2</td><td>117.5</td><td>59.9</td></tr>
+                                                <tr><td>547</td><td class="team-name">ALBA Berlin</td><td>2025</td><td>73.9</td><td>105.2</td><td>54.2</td></tr>
+                                                <tr><td>556</td><td class="team-name">KK Crvena Zvezda</td><td>2026</td><td>73.6</td><td>117.3</td><td>58.3</td></tr>
+                                                <tr><td>554</td><td class="team-name">AS Monaco Basket</td><td>2026</td><td>73.5</td><td>120.1</td><td>59.4</td></tr>
+                                                <tr><td>518</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2024</td><td>73.1</td><td>119.8</td><td>58.0</td></tr>
+                                                <tr><td>544</td><td class="team-name">Maccabi FOX Tel Aviv</td><td>2025</td><td>73.0</td><td>117.6</td><td>58.7</td></tr>
+                                                <tr><td>552</td><td class="team-name">Hapoel Tel Aviv</td><td>2026</td><td>72.7</td><td>120.3</td><td>62.0</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <p>
+                        Τώρα, οι 10 ομάδες με το μεγαλύτερο pace τα τελευταία 5 χρόνια έχουν <strong>μέσο pace: 73.99 κατοχές ανά παιχνίδι</strong>,
+                        <strong>μέσο offensive rating: 117.49 πόντους ανά 100 κατοχές</strong> και <strong>μέσο true shooting %: 58.53%</strong>. 
+                    </p>
+
+                    <section class="container my-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="custom-analytics-card">
+                                    <h3 class="analytics-title">Top 10 - Υψηλότερο Pace (Έως και το 2006)</h3>
+                                    <div class="table-responsive">
+                                        <table class="custom-analytics-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Team</th>
+                                                    <th>Year</th>
+                                                    <th>Pace</th>
+                                                    <th>ORtg</th>
+                                                    <th>TS%</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="top-row"><td>48</td><td class="team-name">Krka Novo Mesto</td><td>2002</td><td>81.3</td><td>110.6</td><td>58.8</td></tr>
+                                                <tr><td>21</td><td class="team-name">Lugano Tigers</td><td>2001</td><td>78.4</td><td>99.1</td><td>52.5</td></tr>
+                                                <tr><td>38</td><td class="team-name">CSKA Moscow</td><td>2002</td><td>77.9</td><td>109.6</td><td>58.0</td></tr>
+                                                <tr><td>54</td><td class="team-name">Buducnost Voli Podgorica</td><td>2002</td><td>77.2</td><td>107.5</td><td>55.6</td></tr>
+                                                <tr><td>49</td><td class="team-name">KK Zadar</td><td>2002</td><td>76.8</td><td>109.6</td><td>54.4</td></tr>
+                                                <tr><td>3</td><td class="team-name">Barca</td><td>2001</td><td>76.8</td><td>111.0</td><td>56.3</td></tr>
+                                                <tr><td>23</td><td class="team-name">ADO Basquetebol Sad Ovarense</td><td>2001</td><td>76.7</td><td>97.3</td><td>57.7</td></tr>
+                                                <tr><td>32</td><td class="team-name">Universo De'Longhi Treviso</td><td>2002</td><td>76.3</td><td>113.2</td><td>59.3</td></tr>
+                                                <tr><td>17</td><td class="team-name">Saint Petersburg Lions</td><td>2001</td><td>75.9</td><td>101.2</td><td>56.9</td></tr>
+                                                <tr><td>20</td><td class="team-name">London Towers</td><td>2001</td><td>75.4</td><td>102.8</td><td>51.8</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </p>
+            
+                <p>
+                    Οι 10 ομάδες με το μεγαλύτερο pace πριν το 2006 έχουν <strong>μέσο pace: 77.27 κατοχές ανά παιχνίδι</strong>, <strong>μέσο offensive 
+                    rating: 106.19 πόντους ανά 100 κατοχές</strong> και <strong>μέσο true shooting %: 56.13%</strong>.
+                </p>
+                <p>
+                    Με μία πρώτη ματιά, λοιπόν, ενώ τα πρώτα χρόνια της διοργάνωσης οι ομάδες είχαν <strong>περισσότερες κατοχές ανά παιχνίδι</strong>, το offensive rating τους
+                    και το true shooting % <strong>δεν είναι στο επίπεδο των ομάδων των τελευταίων 5 χρόνων</strong>. Η διαφορά στο offensive rating είναι περίπου <strong>στους 11 πόντους με 3 κατοχές λιγότερες</strong>,
+                    γεγονός που δείχνει την αύξηση της αποτελεσματικότητας των ομάδων. Επίσης, ναι μεν οι ομάδες δεν "τρέχουν" τόσο το γήπεδο όσο τα πρώτα χρόνια, 
+                    αλλά η επίδοση τους στο να σκοράρουν με όλους τους τρόπους (βολές, δίποντα, τρίποντα) <strong>αυξήθηκε κατά 2.5% περίπου</strong>. Θα δούμε και παρακάτω μία πιο εκτενή ανάλυση.
+                </p>
+
+
+
+                <h3 class="section-subtitle">Pace vs Offensive Rating & True Shooting %</h3>
+            
+                <div class="Tableau">
+                    <h3>Average Pace vs Average Off. Rating</h3>
+                    <div class="tableau-desktop">
+                        <div class='tableauPlaceholder' id='viz1781930165502' style='position: relative'><noscript><a href='#'><img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781930165502');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+
+                    <div class="tableau-mobile">
+                        <img src="Sheet 1.png" class="responsive-chart-img" alt="Average Pace vs Average Off. Rating">
+                    </div>
+                </div>
+
+                <p>
+                    Τα πρώτα χρόνια της Euroleague οι μέσες κατοχές ανά παιχνίδι ήταν <strong>πάνω από 73 (73.9)</strong> και το μέσο off. rating <strong>περίπου 108</strong>.
+                    Σε βάθος 20ετίας, και έπειτα από αρκετές αυξομειώσεις, ενώ οι μέσες κατοχές έχουν μειωθεί κατά περίπου <strong>1.5 (72.4)</strong>, το off. rating έχει αυξηθεί στο <strong>117.88</strong> κατά μ.ο. <strong>(περίπου 10 παραπάνω σε σχέση με πριν)</strong>.
+                    Ενώ, λοιπόν, οι κατοχές έχουν μειωθεί (υπάρχει αυξητική τάση τα τελευταία χρόνια) <strong>οι ομάδες πετυχαίνουν περισσότερους πόντους ανά κατοχή (1.627 έναντι 1.46 )</strong> δείχνοντας την διαφορά στην αποτελεσματικότητα.
+
+                </p>
+
+                <div class="Tableau">
+                    <h3>Average Pace vs Average True Shooting %</h3>
+                    <div class="tableau-desktop">
+                        <div class="tableauPlaceholder">
+                            <div class='tableauPlaceholder' id='viz1779625801460' style='position: relative'><noscript><a href='#'><img alt='Sheet 13 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace2&#47;Sheet13' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779625801460');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>                </div>
+                    </div>
+
+                    <div class="tableau-mobile">
+                        <img src="Sheet 13.png" class="responsive-chart-img" alt="Average Pace vs Average TS%">
+                    </div>
+                </div>
+
+                <p>
+                    Το ίδιο μπορούμε να πούμε και για τη σχέση του avg pace με το true shooting percentage. Το TS% <strong>από 56% έχει αυξηθεί στο 59%</strong>. Μία διαφορά του 3% μπορεί να μην φαίνεται σημαντική, αλλά σε μία διοργάνωση όπου παίρνουν μέρος 
+                    20 ομάδες κατά μέσο όρο κάθε χρόνο, η αύξηση της αποτελεσματικότητας στο σκοράρισμα (TS%) κατά 3% και <strong>με 1.5 μέση κατοχή λιγότερη</strong>, είναι ένα εμφανές δείγμα της αλλαγής της διοργάνωσης.
+                </p>
+                <p>
+                    Μέχρι και το 2014 στην πτωτική πορεία του avg pace των ομάδων, το TS% είτε θα παρέμενε ίδιο, είτε θα μειωνόταν. Κάτι που σημαίνει ότι το efficiency των ομάδων στο σκοράρισμα μειωνόταν.
+                    Από το 2018 μέχρι και σήμερα (με εξαίρεση το 2022) με την αύξηση των κατοχών <strong>από περίπου 69.2 σε 72.5</strong> υπάρχει <strong>μία αύξηση της αποδοτικότητας των ομάδων στο σκοράρισμα της τάξεως του 1%</strong>. 
+                    Φαίνεται αμελητέα ποσότητα, αλλά σε συνδυασμό με την αύξηση των κατοχών, ακόμα και η παραμονή σε ίδιες τιμές θα ήταν θετικό σενάριο.
+                    Το TS% ξεκίνησε βέβαια να αυξάνεται πριν την αύξηση του avg pace, από το 2016 στο 2018, <strong>πάνω από 2.5%</strong>.
+                </p>
+                <p>
+                    Αξίζει να αναφέρουμε ότι, από το 2022 με την αύξηση των μέσων κατοχών ανά παιχνίδι (<strong>από 68.1 σε 72.4</strong>), αυξήθηκε και το TS% <strong>από 56.9% σε 58.9%</strong>.
+                </p>
+
+                <br />
+                <h3>Υψηλότερο pace συνεπάγεται και υψηλότερο offensive rating;</h3>
+
+                <p>
+                    Οι περισσότεροι θα πίστευαν ότι, όσο αυξάνονται οι κατοχές για κάθε ομάδα, θα αυξάνονται και οι πόντοι που σκοράρει.
+                    Βάσει των διαγραμμάτων, όμως, παρατηρούνται ενδεικτικά παραδείγματα που καταρρίπτουν αυτόν τον ισχυρισμό.
+                    <ul> 
+                        <li>Την περίοδο <strong>2016-2018</strong> το pace <strong>από 70.9 μειώνεται σε 69.2</strong>, αλλά το offensive rating <strong>αυξάνεται από 106.6 σε 115.9</strong></li>
+                        <li>Την περίοδο <strong>2001-2004</strong> το pace <strong>από περίπου 74 μειώνεται σε 69.6</strong>, αλλά το offensive rating <strong>αυξάνεται από 108.1 σε 111.8</strong></li>
+                        <li>Την περίοδο <strong>2004-2006</strong> το pace <strong>παραμένει σχεδόν ίδιο 69.6 σε 69.9</strong>, αλλά το offensive rating <strong>μειώνεται από 111.8 σε 105.8</strong></li>
+                    </ul>
+                    
+                </p>
+                <p>Η ιστορία έχει δείξει, λοιπόν, ότι η αύξηση της ταχύτητας του παιχνιδιού <strong>δεν</strong> συνεπάγεται και αύξηση του σκορ των ομάδων.</p>
+
+                <br />
+                <h3>Υψηλότερο offensive rating συνεπάγεται και υψηλότερο pace;</h3>
+
+                <p>
+                    Πιο πάνω αποδείξαμε ότι το να έχει μία ομάδα μεγαλύτερο pace (περισσότερες κατοχές) δεν συνεπάγεται ότι οι πόντοι που θα σκοράρει ανά 100 κατοχές (offensive rating)
+                    θα είναι περισσότεροι. Τι γίνεται όμως όταν συμβαίνει το αντίστροφο; Δηλαδή, όταν το offensive rating μίας ομάδας αυξάνεται, θα αυξηθεί και το pace της;
+                </p>
+                <p>
+                    Όπως και πριν, θα απαντήσουμε λαμβάνοντας υπόψη τα line charts του pace και του offensive rating. Παρατηρώντας μόνο αυτά, εντοπίζουμε χαρακτηριστικά παραδείγματα 
+                    που καταρρίπτουν αυτόν τον ισχυρισμό.
+                    <ul>
+                        <li>Την περίοδο <strong>2001-2004</strong> το offensive rating <strong>από 108.1 αυξάνεται σε 111.8</strong>, αλλά το pace <strong>μειώνεται από 73.95 σε 69.67</strong></li>
+                        <li>Την περίοδο <strong>2017-2018</strong> το offensive rating <strong>από 110.6 αυξάνεται σε 115.9</strong>, αλλά το pace <strong>μειώνεται από 71.01 σε 69.2</strong></li>
+                    </ul>
+                </p>
+                <p>
+                    Ναι μεν τα παραδείγματα που αποδεικνύουν το αντίθετο δεν είναι πολλά, αλλά είναι αρκετά ώστε να βγάλουμε ένα ασφαλές συμπέρασμα ότι η αύξηση του offensive rating <strong>δεν</strong>
+                    συνεπάγεται και αύξηση του pace των ομάδων στην Ευρωλίγκα.
+                </p>
+
+
+                <h3 class="section-subtitle">Διαχωρισμός Euroleague Σε Περιόδους</h3>
+
+                <p>
+                    Από τότε που δημιουργήθηκε το μπάσκετ σαν άθλημα, έχουν γίνει αρκετές αλλαγές οι οποίες έχουν αλλάξει και τον τρόπο παιχνιδιού
+                    των ομάδων. Από την προσθήκη του χρονομέτρου των 24 δευτερολέπτων (1954 στο NBA, 1956 στη FIBA) και της γραμμής του τριπόντου 
+                    (1979 στο NBA, 1984 στη FIBA), μέχρι και τις πιο πρόσφατες αλλαγές όπως το coach's challenge και χρήση replay για την αμφισβήτηση
+                    αποφάσεων των διαιτητών, το παιχνίδι έχει περάσει από πολλές φάσεις παραμένοντας ένα από τα πιο δημοφιλή αθλήματα παγκοσμίως.
+                </p>
+                <p>
+                    Από την εμφάνιση της Euroleague σαν διοργάνωση έχουν γίνει αρκετές αλλαγές στους κανονισμούς, με αποτέλεσμα να επηρεαστεί και ο 
+                    τρόπος παιχνιδιού των ομάδων. Θα ελέγξουμε αν σε αυτές τις περιόδους που έγιναν αυτές οι αλλαγές, επηρεάστηκε το πλήθος των κατοχών των ομάδων
+                    και η αποτελεσματικότητα τους στο σκοράρισμα.
+                </p>
+                
+                <h4 class="small-header">2000 - 2008</h4>
+                <p class="period">
+                    Αρχική περίοδος της Euroleague.
+                </p>
+                <p>
+                    Η διοργάνωση ξεκινάει με μέσο pace κοντά στις 74 κατοχές ανά παιχνίδι, έναν αρκετά μεγάλο μέσο όρο δεδομένου ότι μιλάμε για την Ευρωλίγκα. Μέχρι το τέλος της περιόδου το παιχνίδι γίνεται πιο αργό 
+                    (<strong>το pace πέφτει στις 70 κατοχές μέσο όρο ανά ομάδα</strong>), ενώ τόσο το offensive rating, όσο και το true shooting % <strong>παρουσιάζουν την ίδια πορεία για κάθε έτος</strong>, και καταλλήγουν σε τιμές
+                    λίγο μικρότερες από τις αρχικές. 
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940098429' style='position: relative'><noscript><a href='#'><img alt='(2000-2001) - (2007-2008) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940098429');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 11.png" class="responsive-chart-img" alt="Euroleague First Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2008 - 2016</h4> 
+                <p class="period">
+                    Αλλαγές: Σεζόν 08-09 έγινε η αλλαγή στα playoffs σε best-of-five series. Σεζόν 10-11 άλλαξε η γραμμή του τριπόντου από 6,25 μέτρα σε 6,75 μέτρα. Σεζόν 14-15 άλλαξε ο χρόνος για την 
+                    επαναφορά της μπάλας μετά από ανανέωση επίθεσης, από 24 σε 14 δευτερόλεπτα.
+                </p>
+                <p>
+                    Εδώ εμφανίζεται μία μεγαλύτερη μονοτονία στο μέσο pace των ομάδων. Θα ξεκινήσει στις 70 κατοχές ανά ματς και θα καταλήξει περίπου <strong>στις 71 ανά ομάδα</strong>. 
+                    Από την άλλη, και το offensive rating και το true shooting % θα έχουν αρκετές αυξομειώσεις αυτήν την περίοδο και θα καταλήξουν σε τιμές λίγο πιο κάτω από τις αρχικές
+                    (<strong>Το offensive rating από τους 108 πόντους στους 106.6</strong> και <strong>το TS% από το 56.5% στο 55.3%</strong>).
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940211325' style='position: relative'><noscript><a href='#'><img alt='(2008-2009) - (2015-2016) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet2&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet2' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet2&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940211325');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 2.png" class="responsive-chart-img" alt="Euroleague Second Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2016 - 2023</h4>
+                <p class="period">
+                    Αλλαγές: Σεζόν 16-17 καταργήθηκαν οι ομίλοι, όλοι παίζουν με όλους, μέσα-έξω.
+                </p>
+                <p>
+                    Σε αυτήν την περίοδο η μεταβολή του pace κινείται περίπου όπως και στις προηγούμενες δύο. Με τη μόνη διαφορά ότι στο τέλος 
+                    της περιόδου θα υπάρξει μία μικρή μείωση στις μέσες κατοχές (<strong>περίπου 0.5-1.0</strong>). Το off. rating θα αυξηθεί πάνω από τους 110 πόντους από το 2017 και μετά (round-robin αγώνες) και δεν θα 
+                    μειωθεί καθόλου μέχρι το τέλος της περιόδου, όπου <strong>και θα καταλήξει στους 115 πόντους</strong>. Το ίδιο ισχύει και για τη συνέπεια στο 
+                    σκοράρισμα καθώς <strong>το TS% δεν θα μειωθεί κάτω από το 56.9% και θα καταλήξει στο 58.5%</strong> στο τέλος της περιόδου.
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940257070' style='position: relative'><noscript><a href='#'><img alt='(2016-2017) - (2022-2023) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet3&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet3' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet3&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940257070');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 3.png" class="responsive-chart-img" alt="Euroleague Third Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h4 class="small-header">2023 - Σήμερα</h4>
+                <p class="period">
+                    Αλλαγές: Το 2023 ξεκίνησε το play-in tournament. Αυξήθηκαν οι ομάδες της λίγκας το 2024 στις 20.
+                </p>
+                <p>
+                    Η πιο μικρή περίοδος από τις υπόλοιπες και αυτή που διανύουμε τώρα. Υπάρχει ανά έτος συνεχής <strong>αύξηση του pace από τις 69.5 κατοχές ανά παιχνίδι, 
+                    περίπου στις 72.5</strong>. Εδώ το off. rating <strong>έχει αυξηθεί μέχρι και τους 117.8 πόντους</strong> και <strong>το TS% παραμένει σταθερά πάνω από το 
+                    58%</strong> και έχει φτάσει τώρα, το 2026, να αγγίζει και το 59%.
+                    <div class="Tableau">
+                        <div class="tableau-desktop">
+                            <div class='tableauPlaceholder' id='viz1781940299724' style='position: relative'><noscript><a href='#'><img alt='(2023-2024) - (2026-today) Seasons ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet4&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SplittedSeasons&#47;Sheet4' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SplittedSeasons&#47;Sheet4&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1781940299724');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        </div>
+
+                        <div class="tableau-mobile">
+                            <img src="Sheet 4.png" class="responsive-chart-img" alt="Euroleague Fourth Period">
+                        </div>
+                    </div>
+                </p>
+
+                <h3 class="section-subtitle">Pace & Offensive Rating Ανά Είδος Ομάδας</h3>
+
+                <p>
+                    Στην Ευρωλίγκα υπάρχουν διαφορετικά είδη ομάδων, με διαφορετικούς τρόπους παιχνιδιού η κάθε μία. Τα επικρατέστερα και αυτά στα οποία θα εστιάσουμε
+                    περισσότερο είναι <strong>οι ομάδες με τουλάχιστον έναν κυρίαρχο scorer ή έναν κυρίαρχο δημιουργό (heliocentric)</strong> και <strong>οι ομάδες με έντονο ball movement στις επιθέσεις τους (motion offense)</strong>.
+                </p>
+                <p>
+                    Οι ομάδες της Ευρωλίγκας θα διαχωριστούν ανάλογα με αυτά τα χαρακτηριστικά και για κάθε μία από αυτές θα ελέγξουμε αν κάποιο χαρακτηριστικό επηρεάζει
+                    το πλήθος των κατοχών, ή τον αριθμό των πόντων ανά 100 κατοχές.
+                </p>
+                <p>
+                    Πως όμως μπορούμε να διακρίνουμε μόνο από τα στατιστικά, αν κάποια ομάδα έχει κυρίαρχο scorer/δημιουργό ή έντονο ball movement; Σε αυτό θα μας βοηθήσουν
+                    το <strong>USG%</strong> κάθε παίκτη ξεχωριστά και το <strong>AST%</strong> κάθε παίκτη ξεχωριστά, αλλά και των ομάδων σαν σύνολο.
+                </p>
+                <p>
+                    Το <strong>USG%</strong> είναι ένα πιο εξελιγμένο στατιστικό, το οποίο <strong>εκτιμάει το ποσοστό των επιθέσεων της ομάδας που ολοκληρώνονται από έναν παίκτη, όσο αυτός βρίσκεται
+                    στο παρκέ</strong>. Μία επίθεση ολοκληρώνεται από έναν παίκτη όταν εκείνος εκτελεί κάποιο σουτ, βολή, ή κάνει λάθος στο τέλος αυτής. Ένας παίκτης με <strong>USG%
+                    τουλάχιστον 28%</strong> θεωρείται κυρίαρχος στο να ολοκληρώνει επιθέσεις για την ομάδα του.
+                </p>
+                <p>
+                    Το <strong>AST%</strong> είναι ένα άλλου είδους στατιστικό, επίσης αρκετά εξελιγμένο, που <strong>εκτιμάει το ποσοστό των καλαθιών που προέρχονται από assist ενός 
+                    συγκεκριμένου παίκτη, όσο εκείνος βρίσκεται στο παρκέ</strong>. Όταν αναφερόμαστε όμως στην ομάδα, παρουσιάζει <strong>το ποσοστό των καλαθιών αυτής, που προέρχονται από assist
+                    γενικότερα</strong>. Ένας παίκτης με <strong>AST% μεγαλύτερο του 35%</strong> θεωρείται κυρίαρχος δημιουργός, αφού πάνω από το ένα τρίτο των καλαθιών της ομάδας του προκύπτει έπειτα
+                    από δική του assist. Από την άλλη, μία ομάδα με <strong>AST% τουλάχιστον 63%</strong> θεωρείται ομάδα με έντονη κυκλοφορία της μπάλας στις επιθέσεις της.
+                </p>
+                <p>
+                    Στην εκτίμηση μας υπολογίζουμε και το <strong>Offensive Rating προς Pace Ratio</strong> το οποίο μας δείχνει τους μέσους πόντους ανά κατοχή που πετυχαίνουν
+                    οι ομάδες.
+                </p>
+                
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Ανάλυση Metrics Ανά Είδος Ομάδας</h3>
+                        <p class="text-muted mb-4">Σύγκριση των ομάδων με βάση τα χαρακτηριστικά των παικτών τους (Scorers, Creators, Ball Movement) και την απόδοσή τους σε σχέση με τον μέσο όρο του αντίστοιχου έτους.</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Κατηγορία Ομάδων</th>
+                                        <th>Πλήθος Ομάδων</th>
+                                        <th>Πάνω από το Avg Pace</th>
+                                        <th>Πάνω από το Avg ORtg</th>
+                                        <th>Πάνω από το Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με πολλούς dominant scorers</td>
+                                        <td class="count-cell">28 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">46.43%</span> <span class="count-small">(13)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">25.00%</span> <span class="count-small">(7)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">35.71%</span> <span class="count-small">(10)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με έναν dominant scorer</td>
+                                        <td class="count-cell">158 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">48.73%</span> <span class="count-small">(77)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">51.27%</span> <span class="count-small">(81)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">45.57%</span> <span class="count-small">(72)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με πολλούς dominant creators</td>
+                                        <td class="count-cell">19 ομάδες</td>
+                                        <td><span class="badge-stat badge-high-custom">57.89%</span> <span class="count-small">(11)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">42.11%</span> <span class="count-small">(8)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">52.63%</span> <span class="count-small">(10)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με έναν dominant creator</td>
+                                        <td class="count-cell">106 ομάδες</td>
+                                        <td><span class="badge-stat badge-high-custom">54.72%</span> <span class="count-small">(58)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">52.83%</span> <span class="count-small">(56)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">48.11%</span> <span class="count-small">(51)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Με τουλάχιστον έναν dominant scorer & creator</td>
+                                        <td class="count-cell">24 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">37.50%</span> <span class="count-small">(9)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">29.17%</span> <span class="count-small">(7)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">29.41%</span> <span class="count-small">(5)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με αυξημένο ball movement</td>
+                                        <td class="count-cell">83 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">14.46%</span> <span class="count-small">(12)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">25.30%</span> <span class="count-small">(21)</span></td>
+                                        <td><span class="badge-stat badge-low-custom">38.55%</span> <span class="count-small">(32)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Ενώ θα περιμέναμε οι περισσότερες ομάδες που έχουν πάνω από έναν dominant scorer στο ρόστερ τους να έχουν offensive rating άνω του μέσου όρου για τη συγκεκριμένη χρονιά,
+                    τελικά <strong>μόνο το 25% αυτών ξεπερνάει τη μέση τιμή της λίγκας</strong>. Μάλλον το να έχει μία ομάδα τουλάχιστον δύο παίκτες με κυριαρχικά χαρακτηριστικά στο σκοράρισμα, δεν είναι και τόσο
+                    ιδανικό όσο θα φανταζόμασταν οι περισσότεροι. Σε καλύτερη φάση φαίνεται να είναι οι ομάδες με έναν κυρίαρχο σκόρερ όπου λίγο πάνω από τις μισές (<strong>51.27%</strong>), ξεπερνάνε τον μέσο όρο εκείνης
+                    της χρονιάς.
+                </p>
+
+                <p>
+                    Πάνω από τις μισές ομάδες, που έχουν καταγραφεί στην ιστορία, που έχουν έναν κυρίαρχο δημιουργό στο ρόστερ, ξεπερνάνε τον μέσο όρο της λίγκας σε κατοχές ανά παιχνίδι
+                    και σε offensive rating. Αυτό δεν ισχύει για τις ομάδες με πάνω από έναν κυρίαρχο δημιουργό, όπου ενώ πάνω από τις μισές (<strong>περίπου 58% αυτών</strong>) ξεπερνάνε τον 
+                    μέσο όρο του pace, υστερούν σε offensive rating (<strong>μόνο το 42.11%</strong> ξεπερνάει τον μέσο όρο της λίγκας).
+                </p>
+
+                <p>
+                    Το αντικείμενο μελέτης μας, όμως, είναι ο έλεγχος της ταχύτητας του παιχνιδιού και κατά πόσο αυτή επηρεάζει την αποτελεσματικότητα των ομάδων στην επίθεση. Ακολουθεί, λοιπόν, 
+                    πίνακας με το πλήθος και το ποσοστό των ομάδων των παραπάνω κατηγοριών που καταγράφηκαν <strong>μετά το 2018</strong>.
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Χρονική Ανάλυση Metrics (Μετά το 2018)</h3>
+                        <p class="text-muted mb-4">Από τις ομάδες που έχουν μετρικές (pace και offensive rating) πάνω από τον μέσο όρο εκείνης της χρονιάς, τι ποσοστό αυτών εντοπίζεται μετά το 2018;</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Κατηγορία Ομάδων</th>
+                                        <th>Greater Pace > Avg (Μετά το 2018)</th>
+                                        <th>Greater ORtg > Avg (Μετά το 2018)</th>
+                                        <th>Greater TS% > Avg (Μετά το 2018)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με πολλούς dominant scorers</td>
+                                        <td><span class="badge-stat badge-high-custom">76.92%</span> <span class="count-small">Από τις 13 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">57.14%</span> <span class="count-small">Από τις 7 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">50.00%</span> <span class="count-small">Από τις 10 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με έναν dominant scorer</td>
+                                        <td><span class="badge-stat badge-low-custom">46.75%</span> <span class="count-small">Από τις 77 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-low-custom">39.51%</span> <span class="count-small">Από τις 81 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-low-custom">38.89%</span> <span class="count-small">Από τις 72 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με πολλούς dominant creators</td>
+                                        <td><span class="badge-stat badge-high-custom">90.91%</span> <span class="count-small">Από τις 11 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">87.50%</span> <span class="count-small">Από τις 8 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">80.00%</span> <span class="count-small">Από τις 10 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με έναν dominant creator</td>
+                                        <td><span class="badge-stat badge-high-custom">53.45%</span> <span class="count-small">Από τις 58 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">51.79%</span> <span class="count-small">Από τις 56 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">50.98%</span> <span class="count-small">Από τις 51 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Με τουλάχιστον έναν dominant scorer & creator</td>
+                                        <td><span class="badge-stat badge-high-custom">77.78%</span> <span class="count-small">Από τις 9 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom">57.14%</span> <span class="count-small">Από τις 7 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-low-custom">40.00%</span> <span class="count-small">Από τις 5 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Ομάδες με αυξημένο ball movement</td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Από τις 12 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Από τις 21 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">Από τις 32 ομάδες</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Η παραπάνω διαπίστωση έρχεται να ενισχύσει την αρχική υπόθεση, ότι τα τελευταία χρόνια οι ομάδες έχουν αυξήσει το πλήθος των κατοχών ανά παιχνίδι, αλλά και την απόδοση τους στην επίθεση.
+                </p>
+                <p>
+                    Στον πρώτο πίνακα παρατηρήσαμε ότι, ιστορικά, κάτω από τις μισές ομάδες της Ευρωλίγκας με τουλάχιστον έναν κυρίαρχο δημιουργό στο ρόστερ τους, θα ξεπερνούσαν τον μέσο όρο του pace και του
+                    offensive rating εκείνης της χρονιάς. Στον δεύτερο πίνακα όμως παρατηρούμε ότι, οι περισσότερες ομάδες που ξεπερνούν τον μέσο όρο αυτών των μετρικών εντοπίζονται από το 
+                    2018 και μετά.
+                </p>
+                <p>
+                    Σημαντική διαπίστωση, επίσης, είναι ότι όλες οι ομάδες με αυξημένη κυκλοφορία της μπάλας στην επίθεση (AST% > 63%), <strong>από το 2018 και μετά έχουν μέσο πλήθος κατοχών και πόντων ανά 100 κατοχές πάνω από τον μέσο όρο της λίγκας</strong>.
+                    Πριν από το 2018, καμία ομάδα αυτής της κατηγορίας δεν ξεπερνούσε τον μέσο όρο αυτών των μετρικών.
+                </p>
+
+                <h3 class="section-subtitle">Ομάδες Final 4 Και Πρωταθλητές Ευρώπης</h3>
+
+                <p>
+                    Έγινε καταγραφή όλων πρωταθλητών Ευρώπης και των ομάδων που προκρίθηκαν στο Final Four, για κάθε χρονιά από το 2000 και μετά.
+                    Έγινε έλεγχος του μέσου αριθμού των κατοχών και του offensive rating για κάθε μία από αυτές τις ομάδες για να δούμε, αν όντως
+                    οι ομάδες που έχουν την καλύτερη πορεία κάθε χρονιά, έχουν και τις μεγαλύτερες τιμές σε αυτά τα στατιστικά. 
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Απόδοση Ελίτ Ομάδων (Championships & Final Four)</h3>
+                        <p class="text-muted mb-4">Ανάλυση των ομάδων που έφτασαν στην κορυφή της διοργάνωσης, εξετάζοντας τα ποσοστά τους πάνω από τον μέσο όρο (Avg) σε Pace και Offensive Rating (ORtg).</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Κατηγορία Επιτυχίας</th>
+                                        <th>Πλήθος Ομάδων</th>
+                                        <th>Πάνω από το Avg Pace</th>
+                                        <th>Πάνω από το Avg ORtg</th>
+                                        <th>Πάνω από το Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Championship Teams (Πρωταθλητές)</td>
+                                        <td class="count-cell">24 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">41.67%</span> <span class="count-small">(10)</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">(24)</span></td>
+                                        <td><span class="badge-stat badge-high-custom" style="background-color: #bbf7d0; border-color: #86efac;">100.00%</span> <span class="count-small">(24)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Final Four Teams</td>
+                                        <td class="count-cell">92 ομάδες</td>
+                                        <td><span class="badge-stat badge-low-custom">42.39%</span> <span class="count-small">(39)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">94.57%</span> <span class="count-small">(87)</span></td>
+                                        <td><span class="badge-stat badge-high-custom">89.13%</span> <span class="count-small">(82)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Αντιλαμβανόμαστε εύκολα ότι, ενώ οι καλύτερες ομάδες από κάθε σεζόν είχαν μεγαλύτερο μέσο offensive rating από τον μέσο όρο των ομάδων (ισχύει για το
+                    <strong>100% των πρωταθλητών</strong> και περίπου το <strong>95% των ομάδων που συμμετείχαν σε final four</strong>), οι περισσότερες ομάδες είχαν μέσο
+                    πλήθος κατοχών μικρότερο από τον μέσο όρο της λίγκας εκείνη τη χρονιά (<strong>41.67% για τους πρωταθλητές</strong> και <strong>42.4% για τις ομάδες 
+                    που συμμετείχαν σε final four</strong>).
+                </p>
+                <p>
+                    Είναι ένα αρκετά ενδιαφέρον εύρημα, καθώς δείχνει δύο πράγματα. <strong>Πρώτον</strong>, την αυξημένη αποτελεσματικότητα των ομάδων αυτών, καθώς με pace μικρότερο του μέσου
+                    όρου της λίγκας, τις περισσότερες φορές, κατάφερναν σχεδόν όλες να έχουν ανά 100 κατοχές περισσότερους πόντους από τη μέση τιμή. <strong>Δεύτερον</strong>, είναι πιο σπάνιο
+                    γεγονός το να κερδίσει την Ευρωλίγκα μία ομάδα που "τρέχει".
+                </p>
+                <p>
+                    Αξίζει να αναφέρουμε ότι μέχρι και το 2015, από τους 14 πρωταθλητές που έχουν καταγραφεί, μόνο οι 5 είχαν pace πάνω από τον μέσο όρο της λίγκας εκείνη τη χρονιά
+                    (<strong>5/14 ομάδες - 35.71%</strong>). Από το 2015 και μέχρι σήμερα, από τις 10 πρωταθλήτριες ομάδες οι 6 είχαν πλήθος κατοχών μεγαλύτερο από το μέσο pace της λίγκας
+                    (<strong>6/10 ομάδες - 60%</strong>) αν και τα τελευταία χρόνια (από το 2024) που παρατηρείται μία γενική αύξηση στο pace των ομάδων, οι ομάδες που κατέκτησαν τελικά
+                    τον τίτλο είχαν μέσο pace μικρότερο από το μέσο όρο.
+                </p>
+                <p>
+                    Η αποτελεσματικότητα αυτών των ομάδων δεν καταμετρείται μόνο με το offensive rating, αλλά και με το True Shooting Percentage (TS%).
+                    <strong>Και οι 24 πρωταθλητές</strong> που έχουν καταγραφεί από το 2002 και μετά, είχαν TS% πάνω από τον τότε μέσο όρο της λίγκας. Για τις ομάδες που
+                    συμμετείχαν σε final four, το ποσοστό αυτό είναι <strong>94.57% (87/92) ομάδες</strong>.
+                </p>
+
+                <p>
+                    Θα εφαρμόσουμε τώρα τον ίδιο ακριβώς έλεγχο όπως και πιο πάνω.
+                </p>
+
+                <section class="container-fluid my-5 px-4">
+                    <div class="custom-wide-card">
+                        <h3 class="analytics-title text-start mb-4">Απόδοση Ελίτ Ομάδων (Championships & Final Four) (Μετά Το 2018)</h3>
+                        <p class="text-muted mb-4">Ακολουθεί η ίδια ανάλυση των κορυφαίων ομάδων της διοργάνωσης, αλλά από το 2018 και μετά.</p>
+        
+                        <div class="table-responsive">
+                            <table class="custom-expanded-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Κατηγορία Επιτυχίας</th>
+                                        <th>Πάνω από το Avg Pace</th>
+                                        <th>Πάνω από το Avg ORtg</th>
+                                        <th>Πάνω από το Avg TS%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="team-category-cell">Championship Teams (Πρωταθλητές)</td>
+                                        <td><span class="badge-stat badge-mid-custom">40%</span> <span class="count-small">Από τις 10 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">33.33%</span> <span class="count-small">Από τις 24 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">33.33%</span> <span class="count-small">Από τις 24 ομάδες</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="team-category-cell">Final Four Teams</td>
+                                        <td><span class="badge-stat badge-mid-custom">20.51%</span> <span class="count-small">Από τις 39 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">31.03%</span> <span class="count-small">Από τις 87 ομάδες</span></td>
+                                        <td><span class="badge-stat badge-mid-custom">31.71%</span> <span class="count-small">Από τις 87 ομάδες</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <p>
+                    Το αυξημένο offensive rating, pace και true shooting % δεν προέκυψε κυρίως μετά το 2018 για τις καλύτερες ομάδες κάθε σεζόν. Ανέκαθεν, είναι χαρακτηριστικό των ομάδων της διοργάνωσης,
+                    γι' αυτό και τα ποσοστά του παραπάνω πίνακα είναι κάτω από το 50%.
+                </p>
+
+                <h3 class="section-subtitle">Συμπεράσματα</h3>
+                <p>
+                    Η παραπάνω ανάλυση μας επιτρέπει να καταλήξουμε σε κάποια συμπεράσματα σχετικά με τη φύση του συγχρονου ευρωπαϊκού μπάσκετ.
+                </p>
+                <p>
+                    Στο πρώτο ερώτημα, αν η αύξηση των κατοχών συνεπάγεται και αύξηση των πόντων των ομάδων, μπορούμε να πούμε ότι <strong>δεν υπάρχει πλήρης συσχέτιση</strong>.
+                    Η διοργάνωση πέρασε από περιόδους όπου το pace μειωνόταν σταδιακά, αλλά το offensive rating εκτοξευόταν, καταρρίπτοντας τον μύθο ότι περισσότερες κατοχές
+                    οδηγούν σε περισσότερους πόντους. Αντίθετα, η ποιότητα των αποφάσεων και το σωστό πλάνο στην επίθεση, υπερτερούν της απλής ταχύτητας.
+                </p>
+                <p>
+                    Αντίθετα, υπάρχει μία μεγάλη ποιοτική αναβάθμιση. Συγκρίνοντας τις πιο "γρήγορες" ομάδες των πρώτων και των τελευταίων
+                    ετών της διοργάνωσης και ενώ οι παλιότερες ομάδες είχαν περισσότερες κατοχές, οι τελευταίες είναι αρκετά πιο αποτελεσματικές στην επίθεση (<strong>11 πόντοι παραπάνω στο offensive rating και 2.5% αυξημένο το true shooting percentage</strong>),
+                    δηλώνοντας ότι το σύγχρονο μπάσκετ έχει γίνει πιο αποτελεσματικό.
+                </p>
+                <p>
+                    Αρκετά ενδιαφέρον είναι το γεγονός ότι το 2018 αποτελεί ένα σημείο καμπής της διοργάνωσης. Ο μέσος όρος των πόντων των ομάδων ανά 100 κατοχές, μαζί με το
+                    true shooting %, <strong>εκτοξεύτηκαν σε ανώτερα μεγέθη και από τότε ακολουθούν μία ανωδική πορεία</strong>, αν όχι σταθερή. Το 2018 συμπίπτει χρονικά με την 
+                    αλλαγή στο format της διοργάνωσης και την απόφαση να παίζουν όλες οι ομάδες μεταξύ τους. Επίσης, πριν μερικά χρόνια έγινε η αλλαγή στην απόσταση της γραμμής του
+                    τριπόντου, κάτι που μπορεί να επηρέασε τις ομάδες στην αρχή να εκδηλώσουν μεγαλύτερη αποτελεσματικότητα στην επίθεση. Βέβαια, αυτούς τους ισχυρισμούς, μόνο με 
+                    τα στατιστικά δεν μπορούμε να τους επιβεβαιώσουμε, αλλά είναι κάτι το οποίο αξίζει να αναφέρουμε.
+                </p>
+                <p>
+                    Επίσης, το 2018 σηματοδοτεί και την αρχή του συνδυασμού του γρήγορου/αποτελεσματικού παιχνιδιού με την κυκλοφορία της μπάλας στην επίθεση. Ενώ πιο πριν οι ομάδες
+                    με αυξημένο ball movement, στο μεγαλύτερο ποσοστό τους, δεν ξεπερνούσαν το τον μέσο όρο του pace και του offensive rating, <strong>από το 2018 και μετά οι ομάδες καταγράφουν
+                    στην ολότητα τους τιμές πάνω από τον μέσο όρο</strong>, μετατρέποντας την κυκλοφορία της μπάλας σε καταλύτη για αποδοτικό ρυθμό.
+                </p>
+                <p>
+                    <strong>Οι καλύτερες ομάδες κάθε χρονιάς έχουν σαν κύριο χαρακτηριστικό το υψηλό offensive rating και true shooting %</strong>. Οι κατοχές που έχουν σε 
+                    κάθε παιχνίδι δεν είναι απαραίτητα πάνω από τον μέσο όρο, δείχνοντας μας ότι μπορούν να επιβάλλουν τον ρυθμό τους και να έχουν μεγαλύτερη αποτελεσματικότητα
+                    χωρίς πολλές κατοχές.
+                </p>
+                <p>
+                    Επομένως, λοιπόν, <strong>έχει γίνει το παιχνίδι πιο γρήγορο;</strong> Η απάντηση είναι <strong>όχι</strong>, αλλά έχει γίνει πιο ποιοτικό και πιο αποτελεσματικό. Ο μέσος αριθμός των
+                    κατοχών πλέον, ναι μεν έχει αυξηθεί από τα προηγούμενα χρόνια, αλλά δεν έχει φτάσει στα επίπεδα των αρχικών σεζόν της διοργάνωσης. Αρκετοί πιστεύουν ότι το παιχνίδι
+                    έχει γίνει πιο γρήγορο, επειδή βλέπουν στο τέλος κάθε αγώνα περισσότερους πόντους. Αποδείχθηκε, όμως, ότι <strong>οι περισσότεροι πόντοι δεν είναι αποτέλεσμα περισσότερων κατοχών, 
+                    αλλά της ανόδου της αποτελεσματικότητας των ομάδων (offensive rating και true shooting %)</strong>. To σύγχρονο ευρωπαϊκό μπάσκετ έχει γίνει πιο γρήγορο στην εκτέλεση και στη λήψη αποφάσεων. Πλέον
+                    οι ομάδες εκμεταλλεύονται την κυκλοφορία της μπάλας και την καλύτερη προοπτική των επιθέσεων τους, για να παράγουν περισσότερους πόντους στο τέλος του αγώνα.
+                </p>
+
+
+
+
+<!--
+                <h3 class="section-subtitle">Οι 10 Ομάδες Με Τις Περισσότερες Συμμετοχές Στην Euroleague</h3>
+
+                <div class="Tableau">
+                    <h3>Average Pace vs Average Off. Rating</h3>
+                    <div class="tableauPlaceholder">
+                        <div class='tableauPlaceholder' id='viz1779282763255' style='position: relative'><noscript>
+                            <a href='#'><img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace&#47;Sheet1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace&#47;Sheet1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779282763255');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Average Pace vs Average True Shooting %</h3>
+                    <div class="tableauPlaceholder">
+                        <div class='tableauPlaceholder' id='viz1779625801460' style='position: relative'><noscript><a href='#'><img alt='Sheet 13 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace2&#47;Sheet13' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace2&#47;Sheet13&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779625801460');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>                </div>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Olympiacos</h3>
+                    <div class='tableauPlaceholder' id='viz1779626216628' style='position: relative'><noscript><a href='#'><img alt='Sheet 2 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace3&#47;Sheet2&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace3&#47;Sheet2' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace3&#47;Sheet2&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779626216628');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Panathinaikos</h3>
+                    <div class='tableauPlaceholder' id='viz1779628726629' style='position: relative'><noscript><a href='#'><img alt='Sheet 3 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace13&#47;Sheet3&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace13&#47;Sheet3' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace13&#47;Sheet3&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628726629');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Real Madrid</h3>
+                    <div class='tableauPlaceholder' id='viz1779626414785' style='position: relative'><noscript><a href='#'><img alt='Sheet 5 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace4&#47;Sheet5&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace4&#47;Sheet5' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace4&#47;Sheet5&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779626414785');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Baskonia</h3>
+                    <div class='tableauPlaceholder' id='viz1779627929809' style='position: relative'><noscript><a href='#'><img alt='Sheet 4 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace5&#47;Sheet4&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace5&#47;Sheet4' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace5&#47;Sheet4&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779627929809');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Barcelona</h3>
+                    <div class='tableauPlaceholder' id='viz1779628071538' style='position: relative'><noscript><a href='#'><img alt='Sheet 6 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace6&#47;Sheet6&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace6&#47;Sheet6' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace6&#47;Sheet6&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628071538');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Anadolu Efes</h3>
+                    <div class='tableauPlaceholder' id='viz1779628160478' style='position: relative'><noscript><a href='#'><img alt='Sheet 7 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace7&#47;Sheet7&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace7&#47;Sheet7' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace7&#47;Sheet7&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628160478');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Fenerbahce</h3>
+                    <div class='tableauPlaceholder' id='viz1779628233453' style='position: relative'><noscript><a href='#'><img alt='Sheet 8 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace8&#47;Sheet8&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace8&#47;Sheet8' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace8&#47;Sheet8&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628233453');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Maccabi Tel Aviv</h3>
+                    <div class='tableauPlaceholder' id='viz1779628324404' style='position: relative'><noscript><a href='#'><img alt='Sheet 9 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace9&#47;Sheet9&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace9&#47;Sheet9' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace9&#47;Sheet9&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628324404');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>AX Armani Exchange Milan</h3>
+                    <div class='tableauPlaceholder' id='viz1779628429678' style='position: relative'><noscript><a href='#'><img alt='Sheet 10 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace10&#47;Sheet10&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace10&#47;Sheet10' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace10&#47;Sheet10&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628429678');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>Zalgiris Kaunas</h3>
+                    <div class='tableauPlaceholder' id='viz1779628508095' style='position: relative'><noscript><a href='#'><img alt='Sheet 11 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace11&#47;Sheet11&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace11&#47;Sheet11' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace11&#47;Sheet11&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628508095');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+
+                <div class="Tableau">
+                    <h3>CSKA Moscow</h3>
+                    <div class='tableauPlaceholder' id='viz1779628578607' style='position: relative'><noscript><a href='#'><img alt='Sheet 12 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace12&#47;Sheet12&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='teams_pace12&#47;Sheet12' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;te&#47;teams_pace12&#47;Sheet12&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1779628578607');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                    </div>
+                </div>
+                -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-contact">
+                <h4>Contact Info</h4>
+                <p>Email: <a href="mailto:christosbellos02@gmail.com">christosbellos02@gmail.com</a></p>
+                <p>Instagram: <a href="https://www.instagram.com/thesixthmansa/">thesixthmansa</a></p>
+                <p>Location: Athens, Greece</p>
+            </div>
+            
+            <div class="footer-contact">
+                <h4>Connect</h4>
+                <p><a href="https://www.linkedin.com/in/christosbellos02/">LinkedIn</a></p>
+                <p><a href="https://github.com/ChristosBellos/ChristosBellos.github.io">GitHub Pages</a></p>
+                <p><a href="https://cursor.com/codebase/xristosmp2002/hoop-stats/tree/main">Unified repository</a></p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Sixth Man Sports Analytics. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
