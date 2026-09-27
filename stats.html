@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Στατιστικά ομάδων</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      color: #e8edf7;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(245, 185, 66, 0.16), transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, rgba(76, 141, 255, 0.14), transparent 50%),
+        #0b1020;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
+    a { color: #f5b942; }
+    .kicker { color: #f5b942; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.03em; margin: 0.2rem 0 0.4rem; }
+    h2, h3 { letter-spacing: -0.03em; }
+    .subtle, .caption { color: #a9b4cc; }
+    .team-title { font-size: 2.1rem; margin: 0.2rem 0 0.4rem; }
+    .section { margin: 1.2rem 0 0.6rem; }
+    .search { width: 100%; margin-top: 1rem; padding: 0.85rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; font-size: 1rem; }
+    .results, .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem; }
+    .result, .chip { border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; border-radius: 999px; padding: 0.4rem 0.75rem; cursor: pointer; }
+    .result:hover, .chip:hover { border-color: #f5b942; }
+    .notice { background: rgba(76, 141, 255, 0.12); border: 1px solid rgba(76, 141, 255, 0.35); border-radius: 14px; padding: 0.85rem 1rem; margin: 0.8rem 0; }
+    .insight { background: rgba(245, 185, 66, 0.1); border: 1px solid rgba(245, 185, 66, 0.28); border-radius: 14px; padding: 0.8rem 1rem; color: #f3e2b8; }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .pill { border: 1px solid; border-radius: 999px; padding: 0.28rem 0.7rem; font-size: 0.82rem; font-weight: 650; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0.8rem 0 1rem; }
+    .metric { background: rgba(20, 26, 46, 0.92); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 0.7rem 0.9rem; }
+    .metric-label { display: block; color: #a9b4cc; font-size: 0.85rem; }
+    .metric-value { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .chart { min-width: 0; }
+    .toggle { display: flex; gap: 0.6rem; align-items: center; margin: 1.2rem 0; font-weight: 650; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 0.55rem 0.45rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    th { color: #a9b4cc; font-weight: 650; }
+    .table-wrap { overflow-x: auto; }
+    @media (max-width: 800px) {
+      .metrics, .charts { grid-template-columns: 1fr 1fr; }
+      .charts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">EuroLeague · EuroCup · εγχώρια</p>
+    <h1>Στατιστικά ομάδων</h1>
+    <p class="subtle">Η σελίδα δείχνει τη σεζόν 2026-27. Ο ενιαίος μέσος σταθμίζεται μόνο μέσα σε αυτή τη σεζόν. Η περσινή αντίστοιχη αγωνιστική μένει χωριστή επιλογή.</p>
+    <p><a href="index.html">Πίσω στο site</a></p>
+    <p id="summary" class="caption"></p>
+    <div id="load-error" class="notice" hidden>Τα στατιστικά δεν φορτώθηκαν. Άνοιξε τη σελίδα από το site, όχι ως μεμονωμένο αρχείο.</div>
+    <label for="team-search">Αναζήτηση ομάδας</label>
+    <input id="team-search" class="search" placeholder="π.χ. Ολυμπιακός, Real Madrid, Partizan" autocomplete="off">
+    <div id="team-results" class="results"></div>
+    <div id="empty-state" class="notice" hidden>Μη διαθέσιμων στατιστικών</div>
+    <p id="pick-hint" class="subtle">Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους και τα γραφήματα.</p>
+    <div id="cross-picks" class="chips" aria-label="Ομάδες με Ευρώπη και πρωτάθλημα τη σεζόν 2025-26"></div>
+    <section id="current-season"></section>
+    <label class="toggle">
+      <input id="show-previous" type="checkbox">
+      Εμφάνιση στατιστικών αντίστοιχης αγωνιστικής 2025-26
+    </label>
+    <section id="previous-season"></section>
+  </main>
+  <script src="stats.js"></script>
+</body>
+</html>
