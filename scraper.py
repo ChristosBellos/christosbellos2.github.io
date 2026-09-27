@@ -777,6 +777,7 @@ def collect_euro_game_logs(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     from database import init_db, upsert_team_stats
+    from export_web import write_payload
 
     def _print_progress(done: int, total: int, label: str) -> None:
         print(f"[{done}/{total}] {label}")
@@ -784,7 +785,9 @@ if __name__ == "__main__":
     init_db()
     scraped, scrape_reports = scrape_all(_print_progress)
     saved = upsert_team_stats(scraped)
+    published = write_payload()
     print(f"Saved {saved} team-competition rows.")
+    print(f"Updated {published.name} for the site.")
     for report in scrape_reports:
         state = "OK" if report.get("ok") else "FAIL"
         print(f"{state:4} {report.get('league')}: {report.get('rows', 0)} {report.get('error') or report.get('note') or ''}")

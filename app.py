@@ -17,6 +17,7 @@ from database import (
     list_team_names,
     upsert_team_stats,
 )
+from export_web import write_payload
 from names import option_label
 from scraper import CURRENT_SEASON, LEAGUE_META, PREVIOUS_SEASON, scrape_all
 
@@ -315,8 +316,17 @@ def render_refresh() -> None:
         except Exception as exc:  # noqa: BLE001 - show the failure in the page
             st.error(f"Η ανανέωση δεν ολοκληρώθηκε: {exc}")
             return
+        try:
+            write_payload()
+        except Exception as exc:  # noqa: BLE001 - the database is already saved
+            st.session_state["last_publish_error"] = str(exc)
+            published = False
+        else:
+            st.session_state["last_publish_error"] = None
+            published = True
         st.session_state["last_report"] = reports
         st.session_state["last_saved"] = saved
+        st.session_state["last_published"] = published
         st.session_state.pop("team_choice", None)
         st.rerun()
 
@@ -327,11 +337,17 @@ def render_refresh() -> None:
     failed = [item["league"] for item in reports if not item.get("ok") and item.get("error")]
     empty = [item for item in reports if item.get("empty")]
     if saved:
-        st.success(f"Αποθηκεύτηκαν {saved} γραμμές για τη σεζόν {CURRENT_SEASON}.")
+        st.success(f"Αποθηκεύτηκαν {saved} γραμμές για τη σεζόν {CURRENT_SEASON}. Το site ενημερώθηκε από τη βάση.")
     elif empty and not failed:
         st.info(UNAVAILABLE)
+        if st.session_state.get("last_published"):
+            st.caption("Το site διαβάστηκε ξανά από τη βάση. Δεν προστέθηκαν αγώνες για τη σεζόν 2026-27.")
     elif failed:
         st.error("Δεν ενημερώθηκε καμία διοργάνωση. Τα προηγούμενα δεδομένα έμειναν ως έχουν.")
+        if st.session_state.get("last_published"):
+            st.caption("Το site έμεινε ίδιο με τη βάση, χωρίς νέες γραμμές.")
+    if st.session_state.get("last_publish_error"):
+        st.error("Η βάση ενημερώθηκε, αλλά το site δεν γράφτηκε: " + st.session_state["last_publish_error"])
     if failed:
         st.warning("Δεν διαβάστηκαν: " + ", ".join(failed))
     with st.expander("Λεπτομέρειες άντλησης"):
