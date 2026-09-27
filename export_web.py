@@ -46,6 +46,13 @@ KEEP_FIELDS = (
     "bpg",
     "tov",
     "pf",
+    "opp_ppg",
+    "possessions",
+    "off_rtg",
+    "def_rtg",
+    "net_rtg",
+    "efg_pct",
+    "ts_pct",
 )
 LOG_FIELDS = (
     "game_index",
@@ -65,6 +72,7 @@ LOG_FIELDS = (
     "tov",
     "pf",
     "minutes",
+    "points_allowed",
 )
 
 
@@ -96,7 +104,8 @@ def _logs_and_gp(db_path: Path | None = None) -> tuple[dict[str, dict], dict[str
         for row in connection.execute(
             """
             SELECT t.name, g.league_code, g.game_index, g.points, g.fgm, g.fga, g.tpm, g.tpa,
-                   g.ftm, g.fta, g.orb, g.drb, g.reb, g.ast, g.stl, g.blk, g.tov, g.pf, g.minutes
+                   g.ftm, g.fta, g.orb, g.drb, g.reb, g.ast, g.stl, g.blk, g.tov, g.pf, g.minutes,
+                   g.points_allowed
             FROM game_logs g
             JOIN teams t ON t.id = g.team_id
             WHERE g.season = ?

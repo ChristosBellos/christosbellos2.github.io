@@ -56,6 +56,12 @@ STAT_LABELS = {
     "tp_pct": "Τρίποντα",
     "ft_pct": "Βολές",
     "mpg": "Λεπτά",
+    "possessions": "Κατοχές",
+    "off_rtg": "Επιθετικό rating",
+    "def_rtg": "Αμυντικό rating",
+    "net_rtg": "Καθαρό rating",
+    "efg_pct": "eFG%",
+    "ts_pct": "TS%",
 }
 RADAR_SCALES = {
     "ppg": (70, 102),
@@ -169,7 +175,13 @@ def available_scopes(scopes: dict) -> list[tuple[str, dict]]:
     return [(key, scopes[key]) for key in order]
 
 
-def grouped_bars(scopes: dict, keys: list[str], title: str, as_percent: bool = False) -> go.Figure:
+def grouped_bars(
+    scopes: dict,
+    keys: list[str],
+    title: str,
+    as_percent: bool = False,
+    show_zero: bool = False,
+) -> go.Figure:
     fig = go.Figure()
     for key, block in available_scopes(scopes):
         values = []
@@ -191,6 +203,8 @@ def grouped_bars(scopes: dict, keys: list[str], title: str, as_percent: bool = F
     chart_layout(fig, title)
     if as_percent:
         fig.update_yaxes(ticksuffix="%")
+    if show_zero:
+        fig.update_yaxes(zeroline=True, zerolinecolor="rgba(255,255,255,0.28)")
     return fig
 
 
@@ -265,6 +279,12 @@ def competition_table(competitions: list[dict]) -> pd.DataFrame:
                 "Κλεψίματα": fmt_stat("spg", row["spg"]),
                 "Κοψίματα": fmt_stat("bpg", row["bpg"]),
                 "Λάθη": fmt_stat("tov", row["tov"]),
+                "Κατοχές": fmt_stat("possessions", row.get("possessions")),
+                "Επιθετικό rating": fmt_stat("off_rtg", row.get("off_rtg")),
+                "Αμυντικό rating": fmt_stat("def_rtg", row.get("def_rtg")),
+                "Καθαρό rating": fmt_stat("net_rtg", row.get("net_rtg")),
+                "eFG%": fmt_stat("efg_pct", row.get("efg_pct")),
+                "TS%": fmt_stat("ts_pct", row.get("ts_pct")),
                 "Πηγή": row["source_name"],
             }
         )
@@ -402,6 +422,22 @@ def render_team(profile: dict, *, show_title: bool = True) -> None:
         for column, (label, key) in zip(columns, row_cards):
             column.metric(label, fmt_stat(key, combined.get(key)))
 
+    st.caption("Προηγμένα")
+    advanced_cards = [
+        ("Κατοχές", "possessions"),
+        ("Επιθετικό rating", "off_rtg"),
+        ("Αμυντικό rating", "def_rtg"),
+        ("Καθαρό rating", "net_rtg"),
+        ("eFG%", "efg_pct"),
+        ("TS%", "ts_pct"),
+    ]
+    for row_cards in (advanced_cards[:3], advanced_cards[3:]):
+        columns = st.columns(3)
+        for column, (label, key) in zip(columns, row_cards):
+            column.metric(label, fmt_stat(key, combined.get(key)))
+    if combined.get("off_rtg") is not None and combined.get("def_rtg") is None:
+        st.caption("Το αμυντικό και το καθαρό rating εμφανίζονται όπου υπάρχουν πόντοι αντιπάλου.")
+
     left, right = st.columns(2)
     with left:
         st.plotly_chart(
@@ -422,6 +458,27 @@ def render_team(profile: dict, *, show_title: bool = True) -> None:
             grouped_bars(scopes, ["orb", "drb", "tov", "pf"], "Ριμπάουντ, λάθη και φάουλ"),
             width="stretch",
         )
+
+    left, right = st.columns(2)
+    with left:
+        st.plotly_chart(
+            grouped_bars(
+                scopes,
+                ["off_rtg", "def_rtg", "net_rtg"],
+                "Rating ανά 100 κατοχές",
+                show_zero=True,
+            ),
+            width="stretch",
+        )
+    with right:
+        st.plotly_chart(
+            grouped_bars(scopes, ["efg_pct", "ts_pct"], "eFG% και TS%", as_percent=True),
+            width="stretch",
+        )
+    st.plotly_chart(
+        grouped_bars(scopes, ["possessions"], "Κατοχές ανά αγώνα"),
+        width="stretch",
+    )
 
     st.subheader("Ανα διοργάνωση")
     st.dataframe(competition_table(competitions), width="stretch", hide_index=True)

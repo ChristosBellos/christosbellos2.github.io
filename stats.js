@@ -25,6 +25,12 @@ const STAT_LABELS = {
   tp_pct: "Τρίποντα",
   ft_pct: "Βολές",
   mpg: "Λεπτά",
+  possessions: "Κατοχές",
+  off_rtg: "Επιθετικό rating",
+  def_rtg: "Αμυντικό rating",
+  net_rtg: "Καθαρό rating",
+  efg_pct: "eFG%",
+  ts_pct: "TS%",
 };
 const RADAR_SCALES = {
   ppg: [70, 102],
@@ -61,6 +67,37 @@ function formatWhen(value) {
   return `${pad(parsed.getUTCDate())}/${pad(parsed.getUTCMonth() + 1)}/${parsed.getUTCFullYear()} ${pad(parsed.getUTCHours())}:${pad(parsed.getUTCMinutes())} UTC`;
 }
 
+function num(value) {
+  if (value == null || value === "" || Number.isNaN(Number(value))) return null;
+  return Number(value);
+}
+
+function applyAdvanced(row) {
+  const fga = num(row.fga);
+  const orb = num(row.orb);
+  const tov = num(row.tov);
+  const fta = num(row.fta);
+  const points = num(row.ppg);
+  const allowed = num(row.opp_ppg);
+  const poss = [fga, orb, tov, fta].some((value) => value == null)
+    ? null
+    : 0.96 * (fga - orb + tov + 0.44 * fta);
+  const rate = (scored, possessions) => {
+    if (scored == null || possessions == null || possessions === 0) return null;
+    return (scored * 100) / possessions;
+  };
+  row.possessions = poss;
+  row.off_rtg = rate(points, poss);
+  row.def_rtg = rate(allowed, poss);
+  row.net_rtg = row.off_rtg == null || row.def_rtg == null ? null : row.off_rtg - row.def_rtg;
+  const fgm = num(row.fgm);
+  const tpm = num(row.tpm);
+  row.efg_pct = fga && fgm != null && tpm != null ? (fgm + 0.5 * tpm) / fga : null;
+  const denominator = fga == null || fta == null ? null : 2 * (fga + 0.44 * fta);
+  row.ts_pct = points == null || !denominator ? null : points / denominator;
+  return row;
+}
+
 function weightedPercent(rows, madeKey, attemptedKey, percentKey) {
   let made = 0;
   let attempted = 0;
@@ -93,7 +130,8 @@ function weighted(rows) {
       summary[field] = null;
     });
     summary.fg_pct = summary.tp_pct = summary.ft_pct = null;
-    return summary;
+    summary.opp_ppg = null;
+    return applyAdvanced(summary);
   }
   counting.forEach((field) => {
     let total = 0;
@@ -109,7 +147,19 @@ function weighted(rows) {
   summary.fg_pct = weightedPercent(rows, "fgm", "fga", "fg_pct");
   summary.tp_pct = weightedPercent(rows, "tpm", "tpa", "tp_pct");
   summary.ft_pct = weightedPercent(rows, "ftm", "fta", "ft_pct");
-  return summary;
+  if (rows.every((row) => row.opp_ppg != null)) {
+    let total = 0;
+    let weight = 0;
+    rows.forEach((row) => {
+      const rowGames = Number(row.gp || 0);
+      total += Number(row.opp_ppg) * rowGames;
+      weight += rowGames;
+    });
+    summary.opp_ppg = weight ? total / weight : null;
+  } else {
+    summary.opp_ppg = null;
+  }
+  return applyAdvanced(summary);
 }
 
 function scopesFrom(competitions) {
@@ -142,7 +192,7 @@ function averageLogs(rows, leagueCode, season, leagues) {
   const count = rows.length;
   const total = (key) => rows.reduce((sum, row) => sum + Number(row[key] || 0), 0);
   const ratio = (made, attempted) => (total(attempted) > 0 ? total(made) / total(attempted) : null);
-  return {
+  const line = {
     league_code: leagueCode,
     league_name: meta.league_name,
     scope: meta.scope,
@@ -169,7 +219,11 @@ function averageLogs(rows, leagueCode, season, leagues) {
     bpg: total("blk") / count,
     tov: total("tov") / count,
     pf: total("pf") / count,
+    opp_ppg: rows.every((row) => row.points_allowed != null)
+      ? rows.reduce((sum, row) => sum + Number(row.points_allowed), 0) / count
+      : null,
   };
+  return applyAdvanced(line);
 }
 
 function comparisonProfile(team, limits, data) {
@@ -242,7 +296,7 @@ function chartLayout(title) {
   };
 }
 
-function groupedBars(scopes, keys, title, asPercent) {
+function groupedBars(scopes, keys, title, asPercent, showZero) {
   const traces = availableScopes(scopes).map(([key, block]) => ({
     type: "bar",
     name: SCOPE_LABELS[key],
@@ -253,6 +307,7 @@ function groupedBars(scopes, keys, title, asPercent) {
   }));
   const layout = chartLayout(title);
   if (asPercent) layout.yaxis.ticksuffix = "%";
+  if (showZero) layout.yaxis.zeroline = true;
   return { data: traces, layout };
 }
 
@@ -337,6 +392,25 @@ function renderProfile(mount, profile, data, showTitle) {
     metrics.append(card);
   });
   mount.append(metrics);
+  mount.append(el("p", "caption", "Προηγμένα"));
+  const advanced = el("div", "metrics");
+  [
+    ["Κατοχές", "possessions"],
+    ["Επιθετικό rating", "off_rtg"],
+    ["Αμυντικό rating", "def_rtg"],
+    ["Καθαρό rating", "net_rtg"],
+    ["eFG%", "efg_pct"],
+    ["TS%", "ts_pct"],
+  ].forEach(([label, key]) => {
+    const card = el("div", "metric");
+    card.append(el("span", "metric-label", label));
+    card.append(el("strong", "metric-value", fmt(key, profile.scopes.combined[key])));
+    advanced.append(card);
+  });
+  mount.append(advanced);
+  if (profile.scopes.combined.off_rtg != null && profile.scopes.combined.def_rtg == null) {
+    mount.append(el("p", "caption", "Το αμυντικό και το καθαρό rating εμφανίζονται όπου υπάρχουν πόντοι αντιπάλου."));
+  }
 
   const charts = el("div", "charts");
   [
@@ -344,6 +418,9 @@ function renderProfile(mount, profile, data, showTitle) {
     groupedBars(profile.scopes, ["fg_pct", "tp_pct", "ft_pct"], "Ποσοστά σουτ", true),
     radarChart(profile.scopes),
     groupedBars(profile.scopes, ["orb", "drb", "tov", "pf"], "Ριμπάουντ, λάθη και φάουλ", false),
+    groupedBars(profile.scopes, ["off_rtg", "def_rtg", "net_rtg"], "Rating ανά 100 κατοχές", false, true),
+    groupedBars(profile.scopes, ["efg_pct", "ts_pct"], "eFG% και TS%", true),
+    groupedBars(profile.scopes, ["possessions"], "Κατοχές ανά αγώνα", false),
   ].forEach((figure) => {
     const box = el("div", "chart");
     charts.append(box);
@@ -354,7 +431,7 @@ function renderProfile(mount, profile, data, showTitle) {
   mount.append(el("h3", "section", "Ανα διοργάνωση"));
   const table = document.createElement("table");
   const head = document.createElement("tr");
-  ["Διοργάνωση", "Κατηγορία", "Χώρα", "Αγώνες", "Πόντοι", "Ριμπάουντ", "Ασίστ", "Εντός", "Τρίποντα", "Βολές"].forEach((label) => {
+  ["Διοργάνωση", "Κατηγορία", "Χώρα", "Αγώνες", "Πόντοι", "Ριμπάουντ", "Ασίστ", "Εντός", "Τρίποντα", "Βολές", "Κατοχές", "Επιθ. rating", "Αμυν. rating", "Καθαρό rating", "eFG%", "TS%"].forEach((label) => {
     const cell = document.createElement("th");
     cell.textContent = label;
     head.append(cell);
@@ -363,7 +440,7 @@ function renderProfile(mount, profile, data, showTitle) {
   const scopeNames = { europe: "Ευρώπη", domestic: "Πρωτάθλημα", regional: "Liga ABA" };
   profile.competitions.forEach((row) => {
     const line = document.createElement("tr");
-    [row.league_name, scopeNames[row.scope] || row.scope, row.country, fmt("gp", row.gp), fmt("ppg", row.ppg), fmt("rpg", row.rpg), fmt("apg", row.apg), fmt("fg_pct", row.fg_pct), fmt("tp_pct", row.tp_pct), fmt("ft_pct", row.ft_pct)].forEach((value) => {
+    [row.league_name, scopeNames[row.scope] || row.scope, row.country, fmt("gp", row.gp), fmt("ppg", row.ppg), fmt("rpg", row.rpg), fmt("apg", row.apg), fmt("fg_pct", row.fg_pct), fmt("tp_pct", row.tp_pct), fmt("ft_pct", row.ft_pct), fmt("possessions", row.possessions), fmt("off_rtg", row.off_rtg), fmt("def_rtg", row.def_rtg), fmt("net_rtg", row.net_rtg), fmt("efg_pct", row.efg_pct), fmt("ts_pct", row.ts_pct)].forEach((value) => {
       const cell = document.createElement("td");
       cell.textContent = value;
       line.append(cell);

@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from names import canonical_team_name, matching_names, resolve_team_name
+from advanced import EXTRA_FIELDS, apply_advanced
+from names import ALIASES, canonical_team_name, fold, matching_names, resolve_team_name
 from scraper import CURRENT_SEASON, LEAGUE_META, PREVIOUS_SEASON, STAT_FIELDS
 
 ROOT = Path(__file__).resolve().parent
@@ -106,7 +107,19 @@ def init_db(db_path: Path | str | None = None) -> None:
             );
             """
         )
+        _ensure_column(connection, "competition_stats", "opp_ppg", "REAL")
+        for field in EXTRA_FIELDS:
+            if field == "opp_ppg":
+                continue
+            _ensure_column(connection, "competition_stats", field, "REAL")
+        _ensure_column(connection, "game_logs", "points_allowed", "REAL")
         _canonicalize_stored_names(connection)
+
+
+def _ensure_column(connection: sqlite3.Connection, table: str, name: str, declaration: str) -> None:
+    existing = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
+    if name not in existing:
+        connection.execute(f"ALTER TABLE {table} ADD COLUMN {name} {declaration}")
 
 
 def _canonicalize_stored_names(connection: sqlite3.Connection) -> None:
@@ -177,13 +190,19 @@ def upsert_team_stats(frame: pd.DataFrame, db_path: Path | str | None = None) ->
                 (team_name,),
             ).fetchone()["id"]
             payload = [_number(record.get(field)) for field in STAT_FIELDS]
+            rated = {field: _number(record.get(field)) for field in STAT_FIELDS}
+            rated["opp_ppg"] = _number(record.get("opp_ppg"))
+            apply_advanced(rated)
+            extra = [_number(rated.get(field)) for field in EXTRA_FIELDS]
             connection.execute(
                 f"""
                 INSERT INTO competition_stats (
                     team_id, league_code, league_name, scope, country, season,
-                    source_name, source_url, {", ".join(STAT_FIELDS)}, updated_at
+                    source_name, source_url, {", ".join(STAT_FIELDS)},
+                    {", ".join(EXTRA_FIELDS)}, updated_at
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, {", ".join("?" for _ in STAT_FIELDS)}, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, {", ".join("?" for _ in STAT_FIELDS)},
+                    {", ".join("?" for _ in EXTRA_FIELDS)}, ?
                 )
                 """,
                 [
@@ -196,6 +215,7 @@ def upsert_team_stats(frame: pd.DataFrame, db_path: Path | str | None = None) ->
                     record.get("source_name") or "",
                     record.get("source_url") or "",
                     *payload,
+                    *extra,
                     now,
                 ],
             )
@@ -269,7 +289,8 @@ def _weighted(rows: list[dict[str, object]]) -> dict[str, float | int | None]:
         for field in COUNTING_FIELDS:
             summary[field] = None
         summary["fg_pct"] = summary["tp_pct"] = summary["ft_pct"] = None
-        return summary
+        summary["opp_ppg"] = None
+        return apply_advanced(summary)
 
     for field in COUNTING_FIELDS:
         weighted = 0.0
@@ -285,7 +306,8 @@ def _weighted(rows: list[dict[str, object]]) -> dict[str, float | int | None]:
     summary["fg_pct"] = _weighted_percent(rows, "fgm", "fga", "fg_pct", games)
     summary["tp_pct"] = _weighted_percent(rows, "tpm", "tpa", "tp_pct", games)
     summary["ft_pct"] = _weighted_percent(rows, "ftm", "fta", "ft_pct", games)
-    return summary
+    summary["opp_ppg"] = _complete_weighted(rows, "opp_ppg")
+    return apply_advanced(summary)
 
 
 def _weighted_percent(
@@ -323,11 +345,22 @@ def _weighted_percent(
     return weighted / weight if games else None
 
 
+def _complete_weighted(rows: list[dict[str, object]], field: str) -> float | None:
+    """GP-weighted average only when every row has the field."""
+    if not rows or any(row.get(field) is None for row in rows):
+        return None
+    games = sum(float(row["gp"] or 0) for row in rows)
+    if games <= 0:
+        return None
+    return sum(float(row[field]) * float(row["gp"] or 0) for row in rows) / games
+
+
 def _competition_dict(row: sqlite3.Row) -> dict[str, object]:
     item = {key: row[key] for key in row.keys()}
     for field in STAT_FIELDS:
         item[field] = _number(item.get(field))
-    return item
+    item["opp_ppg"] = _number(item.get("opp_ppg"))
+    return apply_advanced(item)
 
 
 def get_team_stats(
@@ -399,6 +432,7 @@ GAME_COUNTING = (
     "pf",
     "minutes",
 )
+LOG_INSERT_FIELDS = GAME_COUNTING + ("points_allowed",)
 
 
 def replace_game_logs(frame: pd.DataFrame, league_code: str, season: str, db_path: Path | str | None = None) -> int:
@@ -422,8 +456,8 @@ def replace_game_logs(frame: pd.DataFrame, league_code: str, season: str, db_pat
                 f"""
                 INSERT INTO game_logs (
                     team_id, league_code, season, game_index, round_number,
-                    {", ".join(GAME_COUNTING)}
-                ) VALUES ({", ".join("?" for _ in range(5 + len(GAME_COUNTING)))})
+                    {", ".join(LOG_INSERT_FIELDS)}
+                ) VALUES ({", ".join("?" for _ in range(5 + len(LOG_INSERT_FIELDS)))})
                 """,
                 [
                     team_id,
@@ -431,7 +465,7 @@ def replace_game_logs(frame: pd.DataFrame, league_code: str, season: str, db_pat
                     season,
                     int(record["game_index"]),
                     int(record.get("round_number") or 0),
-                    *[_number(record.get(field)) for field in GAME_COUNTING],
+                    *[_number(record.get(field)) for field in LOG_INSERT_FIELDS],
                 ],
             )
             saved += 1
@@ -449,7 +483,7 @@ def _average_game_rows(games: list[sqlite3.Row], league_code: str, season: str) 
             return None
         return totals[made] / totals[attempted]
 
-    return {
+    averaged = {
         "league_code": league_code,
         "league_name": meta["league_name"],
         "scope": meta["scope"],
@@ -478,7 +512,20 @@ def _average_game_rows(games: list[sqlite3.Row], league_code: str, season: str) 
         "bpg": totals["blk"] / count,
         "tov": totals["tov"] / count,
         "pf": totals["pf"] / count,
+        "opp_ppg": _opponent_average(games),
     }
+    return apply_advanced(averaged)
+
+
+def _opponent_average(games: list[sqlite3.Row]) -> float | None:
+    if not games:
+        return None
+    allowed: list[float] = []
+    for game in games:
+        if "points_allowed" not in game.keys() or game["points_allowed"] is None:
+            return None
+        allowed.append(float(game["points_allowed"]))
+    return sum(allowed) / len(allowed)
 
 
 def comparison_profile(
@@ -597,3 +644,171 @@ def dataset_summary(db_path: Path | str | None = None) -> dict[str, object]:
         "refreshed_at": latest["refreshed_at"] if latest else None,
         "rows_saved": latest["rows_saved"] if latest else 0,
     }
+
+
+def store_advanced_stats(db_path: Path | str | None = None) -> int:
+    """Write possessions, ratings, eFG% and TS% onto every competition row."""
+    init_db(db_path)
+    with connect(db_path) as connection:
+        saved = _store_advanced(connection)
+        connection.commit()
+    return saved
+
+
+def _store_advanced(connection: sqlite3.Connection) -> int:
+    rows = connection.execute("SELECT * FROM competition_stats").fetchall()
+    for row in rows:
+        item = {field: _number(row[field]) for field in STAT_FIELDS}
+        item["opp_ppg"] = _number(row["opp_ppg"])
+        apply_advanced(item)
+        connection.execute(
+            f"""
+            UPDATE competition_stats
+            SET {", ".join(f"{field} = ?" for field in EXTRA_FIELDS)}
+            WHERE id = ?
+            """,
+            [*(_number(item.get(field)) for field in EXTRA_FIELDS), row["id"]],
+        )
+    return len(rows)
+
+
+def _api_club_name(club: dict) -> str:
+    for key in ("name", "editorialName", "abbreviatedName"):
+        raw = club.get(key)
+        if raw and fold(str(raw)) in ALIASES:
+            return canonical_team_name(str(raw))
+    raw = club.get("name") or ""
+    return canonical_team_name(str(raw)) if raw else ""
+
+
+def refresh_advanced_stats(db_path: Path | str | None = None) -> dict[str, object]:
+    """Attach known opponent points, then store advanced stats for every row."""
+    init_db(db_path)
+    report: dict[str, object] = {"logs": 0, "opponent_rows": 0, "unmatched": []}
+    try:
+        report.update(_fill_opponent_points(db_path))
+    except Exception as exc:  # noqa: BLE001 - counting stats can still be rated
+        report["error"] = str(exc)
+    report["advanced_rows"] = store_advanced_stats(db_path)
+    return report
+
+
+def _fill_opponent_points(db_path: Path | str | None) -> dict[str, object]:
+    """Copy opponent scores from the Euroleague games feed onto stored rows.
+
+    A competition average gets points allowed only when the feed has the same
+    number of games as the stored GP and the scoring average agrees.
+    """
+    from scraper import EUROLEAGUE_GAMES_URL, _fetch_json, euroleague_api_codes
+
+    logs_updated = 0
+    rows_updated = 0
+    unmatched: list[str] = []
+    with connect(db_path) as connection:
+        pairs = connection.execute(
+            """
+            SELECT DISTINCT league_code, season
+            FROM competition_stats
+            WHERE league_code IN ('euroleague', 'eurocup')
+            """
+        ).fetchall()
+        for pair in pairs:
+            league_code = str(pair["league_code"])
+            season = str(pair["season"])
+            codes = euroleague_api_codes(league_code, season)
+            if codes is None:
+                continue
+            competition, season_code = codes
+            payload = _fetch_json(
+                EUROLEAGUE_GAMES_URL.format(competition=competition, season_code=season_code) + "?limit=600"
+            )
+            games = [game for game in payload.get("data", []) if game.get("played")]
+            games.sort(
+                key=lambda game: (game.get("round") or 0, game.get("utcDate") or "", game.get("gameCode") or 0)
+            )
+            indexed: dict[tuple[str, int], tuple[float, float]] = {}
+            ambiguous: set[tuple[str, int]] = set()
+            per_team: dict[str, list[tuple[float, float]]] = {}
+            for game in games:
+                local = game.get("local") or {}
+                road = game.get("road") or {}
+                local_name = _api_club_name(local.get("club") or {})
+                road_name = _api_club_name(road.get("club") or {})
+                local_points = float(local.get("score") or 0)
+                road_points = float(road.get("score") or 0)
+                rnd = int(game.get("round") or 0)
+                for name, points, allowed in (
+                    (local_name, local_points, road_points),
+                    (road_name, road_points, local_points),
+                ):
+                    if not name:
+                        continue
+                    per_team.setdefault(name, []).append((points, allowed))
+                    key = (name, rnd)
+                    if key in indexed:
+                        ambiguous.add(key)
+                    indexed[key] = (points, allowed)
+            for key in ambiguous:
+                indexed.pop(key, None)
+
+            log_rows = connection.execute(
+                """
+                SELECT g.id, t.name, g.round_number, g.points
+                FROM game_logs g
+                JOIN teams t ON t.id = g.team_id
+                WHERE g.league_code = ? AND g.season = ?
+                """,
+                (league_code, season),
+            ).fetchall()
+            for log in log_rows:
+                match = indexed.get((str(log["name"]), int(log["round_number"] or 0)))
+                if match is None:
+                    continue
+                points, allowed = match
+                if abs(float(log["points"] or 0) - points) > 0.6:
+                    continue
+                connection.execute(
+                    "UPDATE game_logs SET points_allowed = ? WHERE id = ?",
+                    (allowed, log["id"]),
+                )
+                logs_updated += 1
+
+            comp_rows = connection.execute(
+                """
+                SELECT c.id, c.team_id, t.name, c.gp, c.ppg
+                FROM competition_stats c
+                JOIN teams t ON t.id = c.team_id
+                WHERE c.league_code = ? AND c.season = ?
+                """,
+                (league_code, season),
+            ).fetchall()
+            for comp in comp_rows:
+                games_played = int(round(float(comp["gp"] or 0)))
+                allowed_rows = connection.execute(
+                    """
+                    SELECT points_allowed FROM game_logs
+                    WHERE team_id = ? AND league_code = ? AND season = ?
+                    ORDER BY game_index
+                    """,
+                    (comp["team_id"], league_code, season),
+                ).fetchall()
+                logged = [row["points_allowed"] for row in allowed_rows]
+                opponent: float | None = None
+                if logged and len(logged) == games_played and all(value is not None for value in logged):
+                    opponent = sum(float(value) for value in logged) / games_played
+                else:
+                    series = per_team.get(str(comp["name"]), [])
+                    if games_played > 0 and len(series) == games_played:
+                        api_ppg = sum(points for points, _allowed in series) / games_played
+                        if abs(api_ppg - float(comp["ppg"] or 0)) <= 0.6:
+                            opponent = sum(allowed for _points, allowed in series) / games_played
+                if opponent is None:
+                    unmatched.append(f"{comp['name']} {league_code} {season}")
+                    continue
+                connection.execute(
+                    "UPDATE competition_stats SET opp_ppg = ? WHERE id = ?",
+                    (opponent, comp["id"]),
+                )
+                rows_updated += 1
+        connection.commit()
+    return {"logs": logs_updated, "opponent_rows": rows_updated, "unmatched": unmatched}

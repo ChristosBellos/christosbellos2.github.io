@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from advanced import apply_advanced, effective_fg, possessions, true_shooting
 from database import (
     comparison_profile,
     get_team_stats,
@@ -107,6 +108,22 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(row["ppg"], 90)
         self.assertAlmostEqual(row["fg_pct"], 66 / 130)
 
+    def test_advanced_formulas_and_opponent_points(self) -> None:
+        self.assertAlmostEqual(possessions(60, 8, 10, 15), 0.96 * (60 - 8 + 10 + 0.44 * 15))
+        rated = apply_advanced(
+            {"ppg": 80, "fgm": 30, "fga": 60, "tpm": 8, "fta": 15, "orb": 8, "tov": 10, "opp_ppg": 70}
+        )
+        poss = 0.96 * (60 - 8 + 10 + 0.44 * 15)
+        self.assertAlmostEqual(rated["off_rtg"], 80 * 100 / poss)
+        self.assertAlmostEqual(rated["def_rtg"], 70 * 100 / poss)
+        self.assertAlmostEqual(rated["net_rtg"], rated["off_rtg"] - rated["def_rtg"])
+        self.assertAlmostEqual(rated["efg_pct"], effective_fg(30, 8, 60))
+        self.assertAlmostEqual(rated["ts_pct"], true_shooting(80, 60, 15))
+        missing = apply_advanced({"ppg": 80, "fgm": 30, "fga": 60, "tpm": 8, "fta": 15, "orb": 8, "tov": 10})
+        self.assertIsNone(missing["def_rtg"])
+        self.assertIsNone(missing["net_rtg"])
+        self.assertIsNotNone(missing["off_rtg"])
+
     def test_unstarted_season_is_recognized(self) -> None:
         page = "## 2026-2027 Euroleague Averages - Team Totals\n\nStats are not available for this season."
         self.assertTrue(season_unavailable(page))
@@ -172,6 +189,11 @@ class DatabaseTests(unittest.TestCase):
             combined_stats = profile["scopes"]["combined"]
             self.assertAlmostEqual(float(combined_stats["ppg"]), (90 * 40 + 80 * 20) / 60)
             self.assertAlmostEqual(float(combined_stats["fg_pct"]), (30 * 40 + 20 * 20) / (60 * 40 + 50 * 20))
+            europe_only = profile["scopes"]["europe"]
+            fga = 60 * 40 + 50 * 20
+            self.assertAlmostEqual(float(combined_stats["efg_pct"]), ((30 + 0.5 * 10) * 40 + (20 + 0.5 * 8) * 20) / fga)
+            self.assertIsNotNone(europe_only["possessions"])
+            self.assertIsNone(europe_only["def_rtg"])
             self.assertEqual(profile["scopes"]["europe"]["gp"], 40)
             self.assertEqual(profile["scopes"]["domestic"]["gp"], 20)
             self.assertIsNone(get_team_stats("Άγνωστη", db_path=db_path))
@@ -269,6 +291,15 @@ class DatabaseTests(unittest.TestCase):
             assert paced is not None
             self.assertAlmostEqual(float(paced["scopes"]["europe"]["ppg"]), 90.0)
             self.assertEqual(paced["scopes"]["europe"]["gp"], 2)
+            self.assertIsNotNone(paced["scopes"]["europe"]["efg_pct"])
+            self.assertIsNone(paced["scopes"]["europe"]["def_rtg"])
+            allowed = logs.copy()
+            allowed["points_allowed"] = [70, 88, 60]
+            replace_game_logs(allowed, "euroleague", "2025-26", db_path)
+            defended = comparison_profile("Olympiacos", {"euroleague": 2}, "2025-26", db_path)
+            assert defended is not None
+            slice_poss = possessions((60 + 70) / 2, (10 + 12) / 2, (12 + 14) / 2, (10 + 20) / 2)
+            self.assertAlmostEqual(float(defended["scopes"]["europe"]["def_rtg"]), ((70 + 88) / 2) * 100 / slice_poss)
             self.assertIsNone(comparison_profile("Olympiacos", {"euroleague": 0}, "2025-26", db_path))
             self.assertIsNone(comparison_profile("Olympiacos", {"greek_a1": 2}, "2025-26", db_path))
             incomplete = short_season.copy()

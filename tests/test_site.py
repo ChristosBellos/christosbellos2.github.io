@@ -82,6 +82,12 @@ class SiteLinkTests(unittest.TestCase):
             olympiacos = next(team for team in published["teams"] if team["name"] == "Olympiacos")
             self.assertEqual(published["current_rows"], 1)
             self.assertAlmostEqual(olympiacos["current"]["scopes"]["combined"]["ppg"], 81)
+            self.assertAlmostEqual(
+                olympiacos["current"]["scopes"]["combined"]["efg_pct"],
+                (28 + 0.5 * 9) / 60,
+            )
+            self.assertIn("possessions", olympiacos["current"]["competitions"][0])
+            self.assertIsNone(olympiacos["current"]["scopes"]["combined"]["def_rtg"])
 
 
 if __name__ == "__main__":

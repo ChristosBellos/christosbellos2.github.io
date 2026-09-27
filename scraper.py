@@ -580,6 +580,9 @@ def _averages_from_logs(logs: pd.DataFrame, league: dict[str, str]) -> pd.DataFr
         fgm, fga = total("fgm"), total("fga")
         tpm, tpa = total("tpm"), total("tpa")
         ftm, fta = total("ftm"), total("fta")
+        opponent = None
+        if "points_allowed" in games.columns and games["points_allowed"].notna().all():
+            opponent = total("points_allowed") / played
         rows.append(
             {
                 "team_name": name,
@@ -603,9 +606,14 @@ def _averages_from_logs(logs: pd.DataFrame, league: dict[str, str]) -> pd.DataFr
                 "bpg": total("blk") / played,
                 "tov": total("tov") / played,
                 "pf": total("pf") / played,
+                "opp_ppg": opponent,
             }
         )
-    return annotate(pd.DataFrame(rows), league, "Euroleague API")
+    frame = pd.DataFrame(rows)
+    annotated = annotate(frame, league, "Euroleague API")
+    if not annotated.empty and "opp_ppg" in frame.columns:
+        annotated = annotated.merge(frame[["team_name", "opp_ppg"]], on="team_name", how="left")
+    return annotated
 
 
 def played_euro_games(league_code: str, season: str) -> int | None:
@@ -774,7 +782,14 @@ def _fetch_json(url: str) -> dict:
         return json.load(response)
 
 
-def _game_row(total: dict, team_name: str, league_code: str, season: str, round_number: int) -> dict:
+def _game_row(
+    total: dict,
+    team_name: str,
+    league_code: str,
+    season: str,
+    round_number: int,
+    points_allowed: float | None = None,
+) -> dict:
     made = float(total.get("fieldGoalsMadeTotal") or 0)
     attempted = float(total.get("fieldGoalsAttemptedTotal") or 0)
     return {
@@ -798,6 +813,7 @@ def _game_row(total: dict, team_name: str, league_code: str, season: str, round_
         "tov": float(total.get("turnovers") or 0),
         "pf": float(total.get("foulsCommited") or 0),
         "minutes": float(total.get("timePlayed") or 0) / 60.0,
+        "points_allowed": points_allowed,
     }
 
 
@@ -833,15 +849,28 @@ def collect_euro_game_logs(
                 time.sleep(0.8 * (attempt + 1))
         if not stats:
             return []
-        rows = []
+        prepared = []
         for side in ("local", "road"):
             club = (game.get(side) or {}).get("club") or {}
             total = (stats.get(side) or {}).get("total") or {}
             name = club.get("name") or ""
             if not name or not total:
                 continue
+            prepared.append((side, str(name), total))
+        points = {side: float(total.get("points") or 0) for side, _name, total in prepared}
+        opposite = {"local": "road", "road": "local"}
+        rows = []
+        for side, name, total in prepared:
+            allowed = points.get(opposite[side]) if opposite[side] in points else None
             rows.append(
-                _game_row(total, str(name), league_code, season, int(game.get("round") or 0))
+                _game_row(
+                    total,
+                    name,
+                    league_code,
+                    season,
+                    int(game.get("round") or 0),
+                    points_allowed=allowed,
+                )
             )
         return rows
 
