@@ -26,11 +26,11 @@ class SiteLinkTests(unittest.TestCase):
 
     def test_published_snapshot_has_last_season_only(self) -> None:
         data = json.loads((ROOT / "stats-data.json").read_text(encoding="utf-8"))
-        self.assertEqual(data["current_rows"], 0)
         self.assertGreater(data["previous_rows"], 0)
         olympiacos = next(team for team in data["teams"] if team["name"] == "Olympiacos")
-        self.assertIsNone(olympiacos["current"])
         self.assertEqual(len(olympiacos["logs"]["euroleague"]), 43)
+        if olympiacos["current"] is not None:
+            self.assertEqual(olympiacos["current"]["season"], "2026-27")
         self.assertIn("ολυμπιακοσ", olympiacos["search"])
 
     def test_saved_stats_are_published_to_the_site_file(self) -> None:

@@ -456,6 +456,9 @@ def _fetch_rendered(url: str) -> str:
             response.raise_for_status()
         except requests.RequestException as exc:
             last_error = str(exc)
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            if status == 403:
+                break
             time.sleep(1.2 * (attempt + 1))
             continue
         if season_unavailable(response.text):
@@ -563,6 +566,60 @@ def euroleague_api_codes(league_code: str, season: str) -> tuple[str, str] | Non
     return None
 
 
+def _averages_from_logs(logs: pd.DataFrame, league: dict[str, str]) -> pd.DataFrame:
+    """Turn per-game lines into one GP-weighted average row per team."""
+    if logs is None or logs.empty:
+        return pd.DataFrame(columns=OUTPUT_COLUMNS)
+    rows: list[dict[str, object]] = []
+    for name, games in logs.groupby("team_name", sort=False):
+        played = len(games)
+
+        def total(column: str) -> float:
+            return float(games[column].fillna(0).sum())
+
+        fgm, fga = total("fgm"), total("fga")
+        tpm, tpa = total("tpm"), total("tpa")
+        ftm, fta = total("ftm"), total("fta")
+        rows.append(
+            {
+                "team_name": name,
+                "gp": float(played),
+                "mpg": total("minutes") / played,
+                "ppg": total("points") / played,
+                "fgm": fgm / played,
+                "fga": fga / played,
+                "fg_pct": fgm / fga if fga else None,
+                "tpm": tpm / played,
+                "tpa": tpa / played,
+                "tp_pct": tpm / tpa if tpa else None,
+                "ftm": ftm / played,
+                "fta": fta / played,
+                "ft_pct": ftm / fta if fta else None,
+                "orb": total("orb") / played,
+                "drb": total("drb") / played,
+                "rpg": total("reb") / played,
+                "apg": total("ast") / played,
+                "spg": total("stl") / played,
+                "bpg": total("blk") / played,
+                "tov": total("tov") / played,
+                "pf": total("pf") / played,
+            }
+        )
+    return annotate(pd.DataFrame(rows), league, "Euroleague API")
+
+
+def played_euro_games(league_code: str, season: str) -> int | None:
+    """How many Euroleague or Eurocup games have a final score, if the feed answers."""
+    codes = euroleague_api_codes(league_code, season)
+    if codes is None:
+        return None
+    competition, season_code = codes
+    payload = _fetch_json(
+        EUROLEAGUE_GAMES_URL.format(competition=competition, season_code=season_code) + "?limit=600"
+    )
+    return sum(1 for game in payload.get("data", []) if game.get("played"))
+
+
 def euroleague_fallback(league: dict[str, str]) -> pd.DataFrame:
     """Official team averages used only when that RealGM page cannot be read."""
     codes = euroleague_api_codes(league["league_code"], league["season"])
@@ -575,7 +632,14 @@ def euroleague_fallback(league: dict[str, str]) -> pd.DataFrame:
         frame["source_url"] = (
             EUROLEAGUE_TEAM_API.format(competition=competition) + f"?SeasonCode={season_code}"
         )
-    return frame
+        return frame
+    logs = collect_euro_game_logs(competition, season_code, league["league_code"], league["season"])
+    averaged = _averages_from_logs(logs, league)
+    if not averaged.empty:
+        averaged["source_url"] = EUROLEAGUE_GAMES_URL.format(
+            competition=competition, season_code=season_code
+        )
+    return averaged
 
 
 def probe_euroleague_site() -> dict[str, object]:
@@ -593,6 +657,15 @@ def probe_euroleague_site() -> dict[str, object]:
         "status": response.status_code,
         "detail": "Η σελίδα της Euroleague δεν απέδωσε πίνακα ομάδων.",
     }
+
+
+def _season_not_started(league: dict[str, str]) -> bool:
+    """True when the Euroleague feed confirms this competition has no results yet."""
+    try:
+        played = played_euro_games(league["league_code"], league["season"])
+    except Exception:  # noqa: BLE001 - a feed miss is not proof that the season is empty
+        return False
+    return played == 0
 
 
 def scrape_all(progress: ProgressCallback | None = None) -> tuple[pd.DataFrame, list[dict[str, object]]]:
@@ -628,6 +701,19 @@ def scrape_all(progress: ProgressCallback | None = None) -> tuple[pd.DataFrame, 
                         "rows": int(len(fallback)),
                         "url": league["url"],
                         "note": "Εναλλακτική πηγή επειδή ο πίνακας της RealGM δεν διαβάστηκε.",
+                    }
+                )
+            elif _season_not_started(league):
+                reports.append(
+                    {
+                        "league": league["league_name"],
+                        "league_code": league["league_code"],
+                        "season": league["season"],
+                        "ok": True,
+                        "rows": 0,
+                        "empty": True,
+                        "url": league["url"],
+                        "note": "Δεν έχουν παιχτεί αγώνες.",
                     }
                 )
             else:

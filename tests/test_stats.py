@@ -19,6 +19,7 @@ from database import (
 from names import canonical_team_name, fold, option_label
 from scraper import (
     OUTPUT_COLUMNS,
+    _averages_from_logs,
     annotate,
     parse_html_table,
     parse_percent,
@@ -91,6 +92,20 @@ class ParseTests(unittest.TestCase):
     def test_challenge_page_is_ignored(self) -> None:
         page = "<title>Just a moment...</title><p>Performing security verification</p>"
         self.assertTrue(parse_stats_document(page).empty)
+
+    def test_game_logs_become_a_weighted_average(self) -> None:
+        logs = pd.DataFrame(
+            [
+                {"team_name": "Olympiacos", "points": 80, "fgm": 30, "fga": 60, "tpm": 8, "tpa": 20, "ftm": 12, "fta": 15, "orb": 8, "drb": 20, "reb": 28, "ast": 18, "stl": 6, "blk": 2, "tov": 10, "pf": 18, "minutes": 40},
+                {"team_name": "Olympiacos", "points": 100, "fgm": 36, "fga": 70, "tpm": 12, "tpa": 30, "ftm": 16, "fta": 20, "orb": 12, "drb": 24, "reb": 36, "ast": 22, "stl": 8, "blk": 4, "tov": 14, "pf": 20, "minutes": 40},
+            ]
+        )
+        frame = _averages_from_logs(logs, LEAGUE)
+        self.assertEqual(len(frame), 1)
+        row = frame.iloc[0]
+        self.assertEqual(row["gp"], 2)
+        self.assertEqual(row["ppg"], 90)
+        self.assertAlmostEqual(row["fg_pct"], 66 / 130)
 
     def test_unstarted_season_is_recognized(self) -> None:
         page = "## 2026-2027 Euroleague Averages - Team Totals\n\nStats are not available for this season."
