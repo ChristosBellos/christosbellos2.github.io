@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Στατιστικά ομάδων</title>
+  <title>Team statistics</title>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     :root { color-scheme: dark; }
@@ -44,9 +44,14 @@
     th, td { text-align: left; padding: 0.55rem 0.45rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
     th { color: #a9b4cc; font-weight: 650; }
     .table-wrap { overflow-x: auto; }
+    .hero { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+    .lang-switch { display: flex; flex: none; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; overflow: hidden; }
+    .lang-switch button { background: transparent; color: #a9b4cc; border: 0; padding: 0.45rem 0.85rem; cursor: pointer; font-weight: 750; letter-spacing: 0.04em; }
+    .lang-switch button[aria-pressed="true"] { background: #f5b942; color: #0b1020; }
     @media (max-width: 800px) {
       .metrics, .charts { grid-template-columns: 1fr 1fr; }
       .charts { grid-template-columns: 1fr; }
+      .hero { flex-wrap: wrap; }
     }
     @media (max-width: 560px) {
       .metrics { grid-template-columns: 1fr 1fr; }
@@ -55,22 +60,30 @@
 </head>
 <body>
   <main>
-    <p class="kicker">EuroLeague · EuroCup · εγχώρια</p>
-    <h1>Στατιστικά ομάδων</h1>
-    <p class="subtle">Η σελίδα δείχνει τη σεζόν 2026-27. Ο ενιαίος μέσος σταθμίζεται μόνο μέσα σε αυτή τη σεζόν. Η περσινή αντίστοιχη αγωνιστική μένει χωριστή επιλογή.</p>
-    <p><a href="index.html">Πίσω στο site</a></p>
+    <div class="hero">
+      <div>
+        <p id="kicker" class="kicker">EuroLeague · EuroCup · domestic</p>
+        <h1 id="page-title">Team statistics</h1>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" id="lang-el" data-lang="el" aria-pressed="false">ΕΛ</button>
+        <button type="button" id="lang-en" data-lang="en" aria-pressed="true">EN</button>
+      </div>
+    </div>
+    <p id="intro" class="subtle">The page shows the 2026-27 season. The combined average is weighted only within that season. Last year's matching round stays a separate option.</p>
+    <p><a id="back-link" href="index.html">Back to the site</a></p>
     <p id="summary" class="caption"></p>
-    <div id="load-error" class="notice" hidden>Τα στατιστικά δεν φορτώθηκαν. Άνοιξε τη σελίδα από το site, όχι ως μεμονωμένο αρχείο.</div>
-    <label for="team-search">Αναζήτηση ομάδας</label>
-    <input id="team-search" class="search" placeholder="π.χ. Ολυμπιακός, Real Madrid, Partizan" autocomplete="off">
+    <div id="load-error" class="notice" hidden>Statistics did not load. Open the page from the site, not as a standalone file.</div>
+    <label id="search-label" for="team-search">Search for a team</label>
+    <input id="team-search" class="search" placeholder="e.g. Olympiacos, Real Madrid, Partizan" autocomplete="off">
     <div id="team-results" class="results"></div>
-    <div id="empty-state" class="notice" hidden>Μη διαθέσιμων στατιστικών</div>
-    <p id="pick-hint" class="subtle">Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους και τα γραφήματα.</p>
-    <div id="cross-picks" class="chips" aria-label="Ομάδες με Ευρώπη και πρωτάθλημα τη σεζόν 2025-26"></div>
+    <div id="empty-state" class="notice" hidden>No statistics available</div>
+    <p id="pick-hint" class="subtle">Pick a team to see the averages and the charts.</p>
+    <div id="cross-picks" class="chips" aria-label="Teams with Europe and a domestic league in 2025-26"></div>
     <section id="current-season"></section>
     <label class="toggle">
       <input id="show-previous" type="checkbox">
-      Εμφάνιση στατιστικών αντίστοιχης αγωνιστικής 2025-26
+      <span id="previous-label">Show 2025-26 stats through the same round</span>
     </label>
     <section id="previous-season"></section>
   </main>
