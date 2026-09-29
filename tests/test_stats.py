@@ -136,6 +136,7 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(canonical_team_name("Hapoel IBI Tel Aviv"), "Hapoel Tel Aviv")
         self.assertEqual(canonical_team_name("Aris Thessaloniki Betsson"), "Aris Midea Thessaloniki")
         self.assertEqual(canonical_team_name("Cosea JL Bourg-en-Bresse"), "JL Bourg-en-Bresse")
+        self.assertEqual(canonical_team_name("Fenerbahce Tarfin Istanbul"), "Fenerbahce Beko")
         self.assertEqual(fold("Άρης"), fold("αρης"))
         self.assertIn("Ολυμπιακός", option_label("Olympiacos"))
         self.assertIn("Partizan", option_label("KK Partizan"))

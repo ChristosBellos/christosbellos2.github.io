@@ -62,6 +62,7 @@ _RAW_ALIASES: dict[str, str] = {
     "Fenerbahce Beko": "Fenerbahce Beko",
     "Fenerbahce Beko Istanbul": "Fenerbahce Beko",
     "Fenerbahce Istanbul": "Fenerbahce Beko",
+    "Fenerbahce Tarfin Istanbul": "Fenerbahce Beko",
     "Fenerbahce": "Fenerbahce Beko",
     "Φενέρμπαχτσε": "Fenerbahce Beko",
     "Anadolu Efes": "Anadolu Efes",
