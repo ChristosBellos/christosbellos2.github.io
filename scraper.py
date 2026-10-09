@@ -524,6 +524,8 @@ def fetch_euroleague_team_api(competition: str, season_code: str) -> list[dict[s
         two_attempted = parse_number(item.get("twoPointersAttempted")) or 0.0
         three_made = parse_number(item.get("threePointersMade")) or 0.0
         three_attempted = parse_number(item.get("threePointersAttempted")) or 0.0
+        free_made = parse_number(item.get("freeThrowsMade")) or 0.0
+        free_attempted = parse_number(item.get("freeThrowsAttempted")) or 0.0
         made = two_made + three_made
         attempted = two_attempted + three_attempted
         rows.append(
@@ -540,9 +542,9 @@ def fetch_euroleague_team_api(competition: str, season_code: str) -> list[dict[s
                 "tp_pct": _percent_or_ratio(
                     three_made, three_attempted, item.get("threePointersPercentage")
                 ),
-                "ftm": parse_number(item.get("freeThrowsMade")),
-                "fta": parse_number(item.get("freeThrowsAttempted")),
-                "ft_pct": parse_percent(item.get("freeThrowsPercentage")),
+                "ftm": free_made,
+                "fta": free_attempted,
+                "ft_pct": _percent_or_ratio(free_made, free_attempted, item.get("freeThrowsPercentage")),
                 "orb": parse_number(item.get("offensiveRebounds")),
                 "drb": parse_number(item.get("defensiveRebounds")),
                 "rpg": parse_number(item.get("totalRebounds")),
