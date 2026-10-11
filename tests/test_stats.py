@@ -13,6 +13,7 @@ from database import (
     comparison_profile,
     get_team_stats,
     list_team_names,
+    present_competitions,
     replace_game_logs,
     search_team_names,
     upsert_team_stats,
@@ -144,6 +145,21 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(canonical_team_name("MAXIMA ROMA"), "Maxima Roma")
         self.assertEqual(canonical_team_name("Rigas Zelli"), "Riga Zelli")
         self.assertEqual(canonical_team_name("sOliver Baskets"), "s.Oliver Baskets")
+
+    def test_aba_line_is_the_domestic_league_for_named_clubs(self) -> None:
+        row = {"league_code": "aba", "scope": "regional", "league_name": "Liga ABA"}
+        for name in (
+            "KK Partizan",
+            "KK Crvena Zvezda",
+            "KK Cedevita Olimpija Ljubljana",
+            "KK Bosna",
+            "Buducnost Voli Podgorica",
+            "U-Banca Transilvania Cluj Napoca",
+        ):
+            presented = present_competitions(name, [row])
+            self.assertEqual(presented[0]["scope"], "domestic", name)
+        self.assertEqual(present_competitions("Dubai", [row])[0]["scope"], "regional")
+        self.assertEqual(row["scope"], "regional")
         self.assertEqual(canonical_team_name("Saint Quentin Basketball"), "Saint-Quentin Basketball")
         self.assertEqual(fold("Άρης"), fold("αρης"))
         self.assertIn("Ολυμπιακός", option_label("Olympiacos"))

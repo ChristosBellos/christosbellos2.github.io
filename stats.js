@@ -7,6 +7,7 @@ const I18N = {
     search: "Αναζήτηση ομάδας",
     placeholder: "π.χ. Ολυμπιακός, Real Madrid, Partizan",
     unavailable: "Μη διαθέσιμων στατιστικών",
+    domesticPending: "Τα στατιστικά της εγχώριας λίγκας δεν είναι ακόμη διαθέσιμα.",
     hint: "Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους και τα γραφήματα.",
     cross: "Ομάδες με Ευρώπη και πρωτάθλημα τη σεζόν 2025-26",
     previous: "Εμφάνιση στατιστικών αντίστοιχης αγωνιστικής 2025-26",
@@ -58,6 +59,7 @@ const I18N = {
     search: "Search for a team",
     placeholder: "e.g. Olympiacos, Real Madrid, Partizan",
     unavailable: "No statistics available",
+    domesticPending: "Domestic league statistics are not available yet.",
     hint: "Pick a team to see the averages and the charts.",
     cross: "Teams with Europe and a domestic league in 2025-26",
     previous: "Show 2025-26 stats through the same round",
@@ -307,7 +309,7 @@ function viewKeys(scopes) {
   return keys;
 }
 
-function scopeComparison(scopes) {
+function scopeComparison(scopes, domesticPending) {
   const strings = copy();
   const keys = viewKeys(scopes);
   const fields = [
@@ -332,7 +334,11 @@ function scopeComparison(scopes) {
     keys.forEach((key) => {
       const cell = document.createElement("td");
       const block = scopes[key];
-      if (!block) cell.textContent = field === "gp" ? strings.unavailable : "—";
+      if (!block) {
+        cell.textContent = field === "gp"
+          ? (key === "domestic" && domesticPending ? strings.domesticPending : strings.unavailable)
+          : "—";
+      }
       else cell.textContent = fmt(field, block[field]);
       line.append(cell);
     });
@@ -552,7 +558,10 @@ function renderProfile(mount, profile, data, showTitle) {
   if (insight) mount.append(el("div", "insight", insight));
   mount.append(el("p", "caption", weightSentence(profile.scopes)));
   mount.append(el("h3", "section", strings.views));
-  mount.append(scopeComparison(profile.scopes));
+  mount.append(scopeComparison(profile.scopes, profile.domestic_pending));
+  if (profile.domestic_pending && !profile.scopes.domestic) {
+    mount.append(el("p", "caption", strings.domesticPending));
+  }
   if (profile.scopes.combined.off_rtg != null && profile.scopes.combined.def_rtg == null) {
     mount.append(el("p", "caption", strings.ratingGap));
   }
@@ -683,6 +692,7 @@ function boot(data) {
       return;
     }
     const previous = comparisonProfile(selected, limits, data);
+    if (previous && selected.current) previous.domestic_pending = selected.current.domestic_pending;
     if (!previous) {
       previousMount.append(el("div", "notice", copy().unavailable));
       return;

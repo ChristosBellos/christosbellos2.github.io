@@ -86,6 +86,7 @@ def _slim(profile: dict | None) -> dict | None:
         "updated_at": profile["updated_at"],
         "competitions": competitions,
         "scopes": profile["scopes"],
+        "domestic_pending": bool(profile.get("domestic_pending")),
     }
 
 

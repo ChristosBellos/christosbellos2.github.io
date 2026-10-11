@@ -172,7 +172,10 @@ def available_scopes(scopes: dict) -> list[tuple[str, dict]]:
     return [(key, scopes[key]) for key in order]
 
 
-def scope_overview(scopes: dict) -> pd.DataFrame:
+DOMESTIC_PENDING = "Τα στατιστικά της εγχώριας λίγκας δεν είναι ακόμη διαθέσιμα."
+
+
+def scope_overview(scopes: dict, *, domestic_pending: bool = False) -> pd.DataFrame:
     """One row per view. A missing domestic league stays an explicit empty row."""
     keys = ["combined", "europe", "domestic"]
     if scopes.get("regional"):
@@ -203,7 +206,7 @@ def scope_overview(scopes: dict) -> pd.DataFrame:
         block = scopes.get(key)
         row = {"Όψη": SCOPE_LABELS[key]}
         if not block:
-            row["Αγώνες"] = UNAVAILABLE
+            row["Αγώνες"] = DOMESTIC_PENDING if key == "domestic" and domestic_pending else UNAVAILABLE
             for label, _field in fields[1:]:
                 row[label] = "—"
         else:
@@ -447,7 +450,13 @@ def render_team(profile: dict, *, show_title: bool = True) -> None:
         st.markdown(f"<div class='insight'>{insight}</div>", unsafe_allow_html=True)
     st.caption(weight_sentence(scopes))
     st.subheader("Τρεις όψεις")
-    st.dataframe(scope_overview(scopes), width="stretch", hide_index=True)
+    st.dataframe(
+        scope_overview(scopes, domestic_pending=bool(profile.get("domestic_pending"))),
+        width="stretch",
+        hide_index=True,
+    )
+    if profile.get("domestic_pending"):
+        st.caption(DOMESTIC_PENDING)
     if combined.get("off_rtg") is not None and combined.get("def_rtg") is None:
         st.caption("Το αμυντικό και το καθαρό rating εμφανίζονται όπου υπάρχουν πόντοι αντιπάλου.")
 

@@ -16,6 +16,19 @@ ROOT = Path(__file__).resolve().parent
 DB_PATH = ROOT / "data" / "basketball.db"
 
 SCOPE_ORDER = {"europe": 0, "regional": 1, "domestic": 2}
+# These clubs' national championship is not published separately. Their Liga ABA
+# line is the domestic league on the chart page.
+DOMESTIC_VIA_ABA = frozenset(
+    {
+        "KK Crvena Zvezda",
+        "KK Partizan",
+        "KK Cedevita Olimpija Ljubljana",
+        "KK Bosna",
+        "Buducnost Voli Podgorica",
+        "U-Banca Transilvania Cluj Napoca",
+    }
+)
+DOMESTIC_NOT_YET = frozenset({"Balkan Botevgrad", "London Lions"})
 COUNTING_FIELDS = [field for field in STAT_FIELDS if not field.endswith("_pct") and field != "gp"]
 
 
@@ -355,6 +368,18 @@ def _complete_weighted(rows: list[dict[str, object]], field: str) -> float | Non
     return sum(float(row[field]) * float(row["gp"] or 0) for row in rows) / games
 
 
+def present_competitions(team: str, competitions: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Show Liga ABA as the domestic league for the clubs that use it that way."""
+    if team not in DOMESTIC_VIA_ABA:
+        return competitions
+    presented = []
+    for row in competitions:
+        if row.get("league_code") == "aba":
+            row = {**row, "scope": "domestic"}
+        presented.append(row)
+    return presented
+
+
 def _competition_dict(row: sqlite3.Row) -> dict[str, object]:
     item = {key: row[key] for key in row.keys()}
     for field in STAT_FIELDS:
@@ -387,7 +412,7 @@ def get_team_stats(
         parameters.append(season)
     with connect(db_path) as connection:
         rows = connection.execute(query, parameters).fetchall()
-    competitions = [_competition_dict(row) for row in rows]
+    competitions = present_competitions(resolved, [_competition_dict(row) for row in rows])
     competitions.sort(key=lambda item: (SCOPE_ORDER.get(str(item["scope"]), 9), str(item["league_name"])))
     if not competitions:
         return None
@@ -411,6 +436,7 @@ def get_team_stats(
         "updated_at": updated,
         "competitions": competitions,
         "scopes": scopes,
+        "domestic_pending": resolved in DOMESTIC_NOT_YET and scopes.get("domestic") is None,
     }
 
 
