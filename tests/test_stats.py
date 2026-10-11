@@ -143,6 +143,8 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(canonical_team_name("Bosna Sarajevo"), "KK Bosna")
         self.assertEqual(canonical_team_name("MAXIMA ROMA"), "Maxima Roma")
         self.assertEqual(canonical_team_name("Rigas Zelli"), "Riga Zelli")
+        self.assertEqual(canonical_team_name("sOliver Baskets"), "s.Oliver Baskets")
+        self.assertEqual(canonical_team_name("Saint Quentin Basketball"), "Saint-Quentin Basketball")
         self.assertEqual(fold("Άρης"), fold("αρης"))
         self.assertIn("Ολυμπιακός", option_label("Olympiacos"))
         self.assertIn("Partizan", option_label("KK Partizan"))
