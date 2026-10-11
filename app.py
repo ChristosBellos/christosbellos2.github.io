@@ -167,12 +167,50 @@ def chart_layout(fig: go.Figure, title: str) -> go.Figure:
 
 
 def available_scopes(scopes: dict) -> list[tuple[str, dict]]:
-    """Parts of the profile, plus the combined line when more than one exists."""
-    parts = [key for key in ("europe", "regional", "domestic") if scopes.get(key)]
-    order = parts + (["combined"] if len(parts) > 1 else [])
-    if not order and scopes.get("combined"):
-        order = ["combined"]
+    """Combined, Europe, domestic, and Liga ABA, in that order, when present."""
+    order = [key for key in ("combined", "europe", "domestic", "regional") if scopes.get(key)]
     return [(key, scopes[key]) for key in order]
+
+
+def scope_overview(scopes: dict) -> pd.DataFrame:
+    """One row per view. A missing domestic league stays an explicit empty row."""
+    keys = ["combined", "europe", "domestic"]
+    if scopes.get("regional"):
+        keys.append("regional")
+    fields = [
+        ("Αγώνες", "gp"),
+        ("Πόντοι", "ppg"),
+        ("Ριμπάουντ", "rpg"),
+        ("Ασίστ", "apg"),
+        ("Κλεψίματα", "spg"),
+        ("Κοψίματα", "bpg"),
+        ("Λάθη", "tov"),
+        ("Φάουλ", "pf"),
+        ("Επιθ. ριμπ.", "orb"),
+        ("Αμυν. ριμπ.", "drb"),
+        ("Εντός πεδιάς", "fg_pct"),
+        ("Τρίποντα", "tp_pct"),
+        ("Βολές", "ft_pct"),
+        ("Κατοχές", "possessions"),
+        ("Επιθετικό rating", "off_rtg"),
+        ("Αμυντικό rating", "def_rtg"),
+        ("Καθαρό rating", "net_rtg"),
+        ("eFG%", "efg_pct"),
+        ("TS%", "ts_pct"),
+    ]
+    records = []
+    for key in keys:
+        block = scopes.get(key)
+        row = {"Όψη": SCOPE_LABELS[key]}
+        if not block:
+            row["Αγώνες"] = UNAVAILABLE
+            for label, _field in fields[1:]:
+                row[label] = "—"
+        else:
+            for label, field in fields:
+                row[label] = fmt_stat(field, block.get(field))
+        records.append(row)
+    return pd.DataFrame(records)
 
 
 def grouped_bars(
@@ -408,33 +446,8 @@ def render_team(profile: dict, *, show_title: bool = True) -> None:
     if insight:
         st.markdown(f"<div class='insight'>{insight}</div>", unsafe_allow_html=True)
     st.caption(weight_sentence(scopes))
-
-    cards = [
-        ("Πόντοι", "ppg"),
-        ("Ριμπάουντ", "rpg"),
-        ("Ασίστ", "apg"),
-        ("Εντός πεδιάς", "fg_pct"),
-        ("Τρίποντα", "tp_pct"),
-        ("Βολές", "ft_pct"),
-    ]
-    for row_cards in (cards[:3], cards[3:]):
-        columns = st.columns(3)
-        for column, (label, key) in zip(columns, row_cards):
-            column.metric(label, fmt_stat(key, combined.get(key)))
-
-    st.caption("Προηγμένα")
-    advanced_cards = [
-        ("Κατοχές", "possessions"),
-        ("Επιθετικό rating", "off_rtg"),
-        ("Αμυντικό rating", "def_rtg"),
-        ("Καθαρό rating", "net_rtg"),
-        ("eFG%", "efg_pct"),
-        ("TS%", "ts_pct"),
-    ]
-    for row_cards in (advanced_cards[:3], advanced_cards[3:]):
-        columns = st.columns(3)
-        for column, (label, key) in zip(columns, row_cards):
-            column.metric(label, fmt_stat(key, combined.get(key)))
+    st.subheader("Τρεις όψεις")
+    st.dataframe(scope_overview(scopes), width="stretch", hide_index=True)
     if combined.get("off_rtg") is not None and combined.get("def_rtg") is None:
         st.caption("Το αμυντικό και το καθαρό rating εμφανίζονται όπου υπάρχουν πόντοι αντιπάλου.")
 

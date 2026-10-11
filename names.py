@@ -143,6 +143,8 @@ _RAW_ALIASES: dict[str, str] = {
     "London Lions": "London Lions",
     "WKS Slask Wroclaw": "WKS Slask Wroclaw",
     "Slask Wroclaw": "WKS Slask Wroclaw",
+    "Riga Zelli": "Riga Zelli",
+    "Rigas Zelli": "Riga Zelli",
     "Dolomiti Energia Trento": "Dolomiti Energia Trento",
     "BOSNA BH Telecom Sarajevo": "KK Bosna",
     "Bosna Sarajevo": "KK Bosna",

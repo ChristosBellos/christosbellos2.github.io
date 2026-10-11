@@ -2,7 +2,7 @@ const I18N = {
   el: {
     title: "Στατιστικά ομάδων",
     kicker: "EuroLeague · EuroCup · εγχώρια",
-    intro: "Η σελίδα δείχνει τη σεζόν 2026-27. Ο ενιαίος μέσος σταθμίζεται μόνο μέσα σε αυτή τη σεζόν. Η περσινή αντίστοιχη αγωνιστική μένει χωριστή επιλογή.",
+    intro: "Η σελίδα δείχνει τη σεζόν 2026-27 σε τρεις όψεις: συμψηφισμένα, μόνο την ευρωπαϊκή διοργάνωση και μόνο το εγχώριο πρωτάθλημα. Ο ενιαίος μέσος σταθμίζεται μόνο μέσα σε αυτή τη σεζόν. Η περσινή αντίστοιχη αγωνιστική μένει χωριστή επιλογή.",
     back: "Πίσω στο site",
     search: "Αναζήτηση ομάδας",
     placeholder: "π.χ. Ολυμπιακός, Real Madrid, Partizan",
@@ -14,6 +14,7 @@ const I18N = {
     notYet: "ακόμη",
     advanced: "Προηγμένα",
     byCompetition: "Ανα διοργάνωση",
+    views: "Τρεις όψεις",
     gamesShort: "αγ.",
     sameRound: (season) => `Σεζόν ${season} · αντίστοιχη αγωνιστική`,
     seasonHeading: (season) => `Σεζόν ${season}`,
@@ -43,7 +44,7 @@ const I18N = {
     scopes: { combined: "Ενιαίος μέσος", europe: "Ευρώπη", domestic: "Πρωτάθλημα", regional: "Liga ABA" },
     scopeTable: { europe: "Ευρώπη", domestic: "Πρωτάθλημα", regional: "Liga ABA" },
     stats: {
-      ppg: "Πόντοι", rpg: "Ριμπάουντ", apg: "Ασίστ", spg: "Κλεψίματα", bpg: "Κοψίματα", tov: "Λάθη", pf: "Φάουλ",
+      gp: "Αγώνες", ppg: "Πόντοι", rpg: "Ριμπάουντ", apg: "Ασίστ", spg: "Κλεψίματα", bpg: "Κοψίματα", tov: "Λάθη", pf: "Φάουλ",
       orb: "Επιθ. ριμπ.", drb: "Αμυν. ριμπ.", fg_pct: "Εντός πεδιάς", tp_pct: "Τρίποντα", ft_pct: "Βολές", mpg: "Λεπτά",
       possessions: "Κατοχές", off_rtg: "Επιθετικό rating", def_rtg: "Αμυντικό rating", net_rtg: "Καθαρό rating", efg_pct: "eFG%", ts_pct: "TS%",
     },
@@ -52,7 +53,7 @@ const I18N = {
   en: {
     title: "Team statistics",
     kicker: "EuroLeague · EuroCup · domestic",
-    intro: "The page shows the 2026-27 season. The combined average is weighted only within that season. Last year's matching round stays a separate option.",
+    intro: "The page shows the 2026-27 season in three views: combined, the European competition only, and the domestic league only. The combined average is weighted only within that season. Last year's matching round stays a separate option.",
     back: "Back to the site",
     search: "Search for a team",
     placeholder: "e.g. Olympiacos, Real Madrid, Partizan",
@@ -64,6 +65,7 @@ const I18N = {
     notYet: "not yet",
     advanced: "Advanced",
     byCompetition: "By competition",
+    views: "Three views",
     gamesShort: "GP",
     sameRound: (season) => `Season ${season} · same round`,
     seasonHeading: (season) => `Season ${season}`,
@@ -93,7 +95,7 @@ const I18N = {
     scopes: { combined: "Combined average", europe: "Europe", domestic: "Domestic", regional: "Liga ABA" },
     scopeTable: { europe: "Europe", domestic: "Domestic", regional: "Liga ABA" },
     stats: {
-      ppg: "Points", rpg: "Rebounds", apg: "Assists", spg: "Steals", bpg: "Blocks", tov: "Turnovers", pf: "Fouls",
+      gp: "Games", ppg: "Points", rpg: "Rebounds", apg: "Assists", spg: "Steals", bpg: "Blocks", tov: "Turnovers", pf: "Fouls",
       orb: "Off. reb.", drb: "Def. reb.", fg_pct: "Field goals", tp_pct: "Three-pointers", ft_pct: "Free throws", mpg: "Minutes",
       possessions: "Possessions", off_rtg: "Offensive rating", def_rtg: "Defensive rating", net_rtg: "Net rating", efg_pct: "eFG%", ts_pct: "TS%",
     },
@@ -108,6 +110,16 @@ const I18N = {
       "Γαλλία": "France",
       "Γερμανία": "Germany",
       "Λιθουανία": "Lithuania",
+      "Σερβία": "Serbia",
+      "Σλοβενία": "Slovenia",
+      "Βοσνία": "Bosnia",
+      "Μαυροβούνιο": "Montenegro",
+      "Πολωνία": "Poland",
+      "Βουλγαρία": "Bulgaria",
+      "Λετονία": "Latvia",
+      "Ρουμανία": "Romania",
+      "Βρετανία": "Britain",
+      "Εσθονία-Λετονία": "Estonia-Latvia",
     },
   },
 };
@@ -285,10 +297,50 @@ function scopesFrom(competitions) {
 }
 
 function availableScopes(scopes) {
-  const parts = ["europe", "regional", "domestic"].filter((key) => scopes[key]);
-  const order = parts.concat(parts.length > 1 ? ["combined"] : []);
-  if (!order.length && scopes.combined) order.push("combined");
+  const order = ["combined", "europe", "domestic", "regional"].filter((key) => scopes[key]);
   return order.map((key) => [key, scopes[key]]);
+}
+
+function viewKeys(scopes) {
+  const keys = ["combined", "europe", "domestic"];
+  if (scopes.regional) keys.push("regional");
+  return keys;
+}
+
+function scopeComparison(scopes) {
+  const strings = copy();
+  const keys = viewKeys(scopes);
+  const fields = [
+    "gp", "ppg", "rpg", "apg", "spg", "bpg", "tov", "pf", "orb", "drb",
+    "fg_pct", "tp_pct", "ft_pct", "possessions", "off_rtg", "def_rtg", "net_rtg", "efg_pct", "ts_pct",
+  ];
+  const table = document.createElement("table");
+  const head = document.createElement("tr");
+  head.append(document.createElement("th"));
+  keys.forEach((key) => {
+    const cell = document.createElement("th");
+    cell.textContent = scopeLabel(key);
+    cell.style.color = SCOPE_COLORS[key];
+    head.append(cell);
+  });
+  table.append(head);
+  fields.forEach((field) => {
+    const line = document.createElement("tr");
+    const label = document.createElement("th");
+    label.textContent = statLabel(field);
+    line.append(label);
+    keys.forEach((key) => {
+      const cell = document.createElement("td");
+      const block = scopes[key];
+      if (!block) cell.textContent = field === "gp" ? strings.unavailable : "—";
+      else cell.textContent = fmt(field, block[field]);
+      line.append(cell);
+    });
+    table.append(line);
+  });
+  const wrap = el("div", "table-wrap");
+  wrap.append(table);
+  return wrap;
 }
 
 function logRow(fields, values) {
@@ -499,24 +551,8 @@ function renderProfile(mount, profile, data, showTitle) {
   const insight = scoringInsight(profile.scopes);
   if (insight) mount.append(el("div", "insight", insight));
   mount.append(el("p", "caption", weightSentence(profile.scopes)));
-
-  const metrics = el("div", "metrics");
-  ["ppg", "rpg", "apg", "fg_pct", "tp_pct", "ft_pct"].forEach((key) => {
-    const card = el("div", "metric");
-    card.append(el("span", "metric-label", statLabel(key)));
-    card.append(el("strong", "metric-value", fmt(key, profile.scopes.combined[key])));
-    metrics.append(card);
-  });
-  mount.append(metrics);
-  mount.append(el("p", "caption", strings.advanced));
-  const advanced = el("div", "metrics");
-  ["possessions", "off_rtg", "def_rtg", "net_rtg", "efg_pct", "ts_pct"].forEach((key) => {
-    const card = el("div", "metric");
-    card.append(el("span", "metric-label", statLabel(key)));
-    card.append(el("strong", "metric-value", fmt(key, profile.scopes.combined[key])));
-    advanced.append(card);
-  });
-  mount.append(advanced);
+  mount.append(el("h3", "section", strings.views));
+  mount.append(scopeComparison(profile.scopes));
   if (profile.scopes.combined.off_rtg != null && profile.scopes.combined.def_rtg == null) {
     mount.append(el("p", "caption", strings.ratingGap));
   }
