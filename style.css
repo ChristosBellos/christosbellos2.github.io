@@ -158,20 +158,28 @@ section {
 .about-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 3rem;
+    gap: 2rem;
     align-items: flex-start;
 }
 
+.brand-mark {
+    flex: 0 0 220px;
+    width: min(220px, 100%);
+    height: auto;
+    object-fit: contain;
+    align-self: flex-start;
+}
+
 .profile-img {
-    flex: 1;
-    min-width: 300px;
-    max-width: 400px;
+    flex: 0 1 280px;
+    min-width: 200px;
+    max-width: 300px;
     border-radius: 12px;
 }
 
 .bio-text {
-    flex: 2;
-    min-width: 300px;
+    flex: 1 1 340px;
+    min-width: 260px;
 }
 
 .timeline {
@@ -209,6 +217,13 @@ section {
     }
     .hero h1 {
         font-size: 2rem;
+    }
+    .about-container {
+        justify-content: center;
+    }
+    .brand-mark {
+        flex-basis: min(240px, 100%);
+        width: min(240px, 100%);
     }
 }
 
