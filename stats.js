@@ -424,7 +424,10 @@ function comparisonProfile(team, limits, data) {
       missing.push(code);
       return;
     }
-    competitions.push(averageLogs(rows, code, data.previous_season, data.leagues));
+    const averaged = averageLogs(rows, code, data.previous_season, data.leagues);
+    const currentRow = (team.current?.competitions || []).find((row) => row.league_code === code);
+    if (currentRow?.scope) averaged.scope = currentRow.scope;
+    competitions.push(averaged);
   });
   if (!competitions.length) return null;
   competitions.sort((a, b) => (SCOPE_ORDER[a.scope] ?? 9) - (SCOPE_ORDER[b.scope] ?? 9) || a.league_name.localeCompare(b.league_name));

@@ -34,6 +34,14 @@ class SiteLinkTests(unittest.TestCase):
         self.assertIn("ολυμπιακοσ", olympiacos["search"])
         self.assertIn("Virtus Bologna", olympiacos["opponents"]["europe"])
         self.assertTrue(olympiacos["opponents"]["domestic"])
+        dubai = next(team for team in data["teams"] if team["name"] == "Dubai")
+        aba = next(row for row in dubai["current"]["competitions"] if row["league_code"] == "aba")
+        self.assertEqual(aba["scope"], "domestic")
+        self.assertIsNone(dubai["current"]["scopes"]["regional"])
+        self.assertEqual(dubai["opponents"]["domestic"], ["Ilirija", "U-Banca Transilvania Cluj Napoca"])
+        mega = next(team for team in data["teams"] if team["name"] == "KK Mega Bemax")
+        self.assertEqual(mega["current"]["scopes"]["domestic"]["ppg"], mega["current"]["competitions"][0]["ppg"])
+        self.assertIsNone(mega["current"]["scopes"]["regional"])
 
     def test_saved_stats_are_published_to_the_site_file(self) -> None:
         league = {

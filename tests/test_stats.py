@@ -157,10 +157,22 @@ class ParseTests(unittest.TestCase):
             "KK Bosna",
             "Buducnost Voli Podgorica",
             "U-Banca Transilvania Cluj Napoca",
+            "Dubai",
+            "BC Hallmann Vienna",
+            "BC Igokea",
+            "FMP Beograd",
+            "KK Borac Cacak",
+            "KK Cibona",
+            "KK Mega Bemax",
+            "KK Spartak Subotica",
+            "KK Zadar",
+            "Slovan Bratislava",
+            "Studentski Centar Podgorica",
         ):
-            presented = present_competitions(name, [row])
+            presented = present_competitions(name, [dict(row)])
             self.assertEqual(presented[0]["scope"], "domestic", name)
-        self.assertEqual(present_competitions("Dubai", [row])[0]["scope"], "regional")
+        self.assertEqual(present_competitions("Olympiacos", [dict(row)])[0]["scope"], "regional")
+        self.assertEqual(row["scope"], "regional")
         self.assertEqual(row["scope"], "regional")
         self.assertEqual(canonical_team_name("Saint Quentin Basketball"), "Saint-Quentin Basketball")
         self.assertEqual(fold("Άρης"), fold("αρης"))

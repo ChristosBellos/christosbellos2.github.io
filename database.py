@@ -26,6 +26,17 @@ DOMESTIC_VIA_ABA = frozenset(
         "KK Bosna",
         "Buducnost Voli Podgorica",
         "U-Banca Transilvania Cluj Napoca",
+        "Dubai",
+        "BC Hallmann Vienna",
+        "BC Igokea",
+        "FMP Beograd",
+        "KK Borac Cacak",
+        "KK Cibona",
+        "KK Mega Bemax",
+        "KK Spartak Subotica",
+        "KK Zadar",
+        "Slovan Bratislava",
+        "Studentski Centar Podgorica",
     }
 )
 DOMESTIC_NOT_YET = frozenset({"Balkan Botevgrad", "London Lions"})
@@ -694,6 +705,7 @@ def comparison_profile(
 
     if not competitions:
         return None
+    competitions = present_competitions(resolved, competitions)
     competitions.sort(key=lambda item: (SCOPE_ORDER.get(str(item["scope"]), 9), str(item["league_name"])))
     scopes = {
         "combined": _weighted(competitions),
