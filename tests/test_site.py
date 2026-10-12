@@ -32,6 +32,8 @@ class SiteLinkTests(unittest.TestCase):
         if olympiacos["current"] is not None:
             self.assertEqual(olympiacos["current"]["season"], "2026-27")
         self.assertIn("ολυμπιακοσ", olympiacos["search"])
+        self.assertIn("Virtus Bologna", olympiacos["opponents"]["europe"])
+        self.assertTrue(olympiacos["opponents"]["domestic"])
 
     def test_saved_stats_are_published_to_the_site_file(self) -> None:
         league = {

@@ -32,6 +32,13 @@
     .notice { background: rgba(76, 141, 255, 0.12); border: 1px solid rgba(76, 141, 255, 0.35); border-radius: 14px; padding: 0.85rem 1rem; margin: 0.8rem 0; }
     .insight { background: rgba(245, 185, 66, 0.1); border: 1px solid rgba(245, 185, 66, 0.28); border-radius: 14px; padding: 0.8rem 1rem; color: #f3e2b8; }
     .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .opponents { margin: 0.9rem 0 0.2rem; background: rgba(20, 26, 46, 0.92); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0.75rem 1rem 0.9rem; }
+    .opponents summary { cursor: pointer; font-weight: 750; }
+    .opponent-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; margin-top: 0.85rem; }
+    .opponent-groups h4 { margin: 0 0 0.35rem; color: #a9b4cc; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .opponent-groups ol { margin: 0; padding-left: 1.2rem; }
+    .opponent-groups li { margin: 0.22rem 0; }
+    .opponent-groups a { font-weight: 700; }
     .pill { border: 1px solid; border-radius: 999px; padding: 0.28rem 0.7rem; font-size: 0.82rem; font-weight: 650; }
     .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0.8rem 0 1rem; }
     .metric { background: rgba(20, 26, 46, 0.92); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 0.7rem 0.9rem; }
@@ -53,7 +60,7 @@
     .lang-switch button[aria-pressed="true"] { background: #f5b942; color: #0b1020; }
     @media (max-width: 800px) {
       .metrics, .charts { grid-template-columns: 1fr 1fr; }
-      .charts { grid-template-columns: 1fr; }
+      .charts, .opponent-groups { grid-template-columns: 1fr; }
       .hero { flex-wrap: wrap; }
     }
     @media (max-width: 560px) {

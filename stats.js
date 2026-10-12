@@ -8,6 +8,9 @@ const I18N = {
     placeholder: "π.χ. Ολυμπιακός, Real Madrid, Partizan",
     unavailable: "Μη διαθέσιμων στατιστικών",
     domesticPending: "Τα στατιστικά της εγχώριας λίγκας δεν είναι ακόμη διαθέσιμα.",
+    opponentsSummary: "Ομάδες που έχει αντιμετωπίσει",
+    opponentsEurope: "Ευρώπη",
+    opponentsDomestic: "Πρωτάθλημα",
     hint: "Διάλεξε ομάδα για να δεις την κάρτα με τους μέσους όρους και τα γραφήματα.",
     cross: "Ομάδες με Ευρώπη και πρωτάθλημα τη σεζόν 2025-26",
     previous: "Εμφάνιση στατιστικών αντίστοιχης αγωνιστικής 2025-26",
@@ -60,6 +63,9 @@ const I18N = {
     placeholder: "e.g. Olympiacos, Real Madrid, Partizan",
     unavailable: "No statistics available",
     domesticPending: "Domestic league statistics are not available yet.",
+    opponentsSummary: "Teams played so far",
+    opponentsEurope: "Europe",
+    opponentsDomestic: "Domestic",
     hint: "Pick a team to see the averages and the charts.",
     cross: "Teams with Europe and a domestic league in 2025-26",
     previous: "Show 2025-26 stats through the same round",
@@ -540,7 +546,52 @@ function el(tag, className, text) {
   return node;
 }
 
-function renderProfile(mount, profile, data, showTitle) {
+function teamPageLink(name, data) {
+  const known = data.teams.some((team) => team.name === name);
+  if (!known) return document.createTextNode(name);
+  const params = new URLSearchParams();
+  params.set("team", name);
+  params.set("lang", lang);
+  const link = document.createElement("a");
+  link.href = `stats.html?${params.toString()}`;
+  link.textContent = name;
+  return link;
+}
+
+function opponentGroup(title, names, emptyText, data) {
+  const section = document.createElement("section");
+  section.append(el("h4", "", title));
+  if (!names.length) {
+    section.append(el("p", "caption", emptyText));
+    return section;
+  }
+  const list = document.createElement("ol");
+  names.forEach((name) => {
+    const item = document.createElement("li");
+    item.append(teamPageLink(name, data));
+    list.append(item);
+  });
+  section.append(list);
+  return section;
+}
+
+function renderOpponents(opponents, profile, data) {
+  const strings = copy();
+  const details = document.createElement("details");
+  details.className = "opponents";
+  const summary = document.createElement("summary");
+  summary.textContent = strings.opponentsSummary;
+  details.append(summary);
+  const groups = el("div", "opponent-groups");
+  const played = opponents || { europe: [], domestic: [] };
+  groups.append(opponentGroup(strings.opponentsEurope, played.europe || [], strings.unavailable, data));
+  const domesticEmpty = profile.domestic_pending ? strings.domesticPending : strings.unavailable;
+  groups.append(opponentGroup(strings.opponentsDomestic, played.domestic || [], domesticEmpty, data));
+  details.append(groups);
+  return details;
+}
+
+function renderProfile(mount, profile, data, showTitle, opponents) {
   mount.replaceChildren();
   if (showTitle) mount.append(el("h2", "team-title", profile.team));
   const pills = el("div", "pills");
@@ -560,6 +611,7 @@ function renderProfile(mount, profile, data, showTitle) {
   mount.append(el("p", "caption", weightSentence(profile.scopes)));
   mount.append(el("h3", "section", strings.views));
   mount.append(scopeComparison(profile.scopes, profile.domestic_pending));
+  if (opponents) mount.append(renderOpponents(opponents, profile, data));
   if (profile.domestic_pending && !profile.scopes.domestic) {
     mount.append(el("p", "caption", strings.domesticPending));
   }
@@ -674,7 +726,7 @@ function boot(data) {
       currentMount.append(el("div", "notice", copy().unavailable));
     } else {
       const card = el("div");
-      renderProfile(card, team.current, data, false);
+      renderProfile(card, team.current, data, false, team.opponents || { europe: [], domestic: [] });
       currentMount.append(card);
     }
     renderPrevious();

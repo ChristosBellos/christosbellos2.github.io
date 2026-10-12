@@ -12,9 +12,11 @@ from advanced import apply_advanced, effective_fg, possessions, true_shooting
 from database import (
     comparison_profile,
     get_team_stats,
+    list_played_opponents,
     list_team_names,
     present_competitions,
     replace_game_logs,
+    replace_played_opponents,
     search_team_names,
     upsert_team_stats,
 )
@@ -334,6 +336,29 @@ class DatabaseTests(unittest.TestCase):
 
             columns = set(combined.columns)
             self.assertTrue(set(OUTPUT_COLUMNS).issubset(columns))
+
+    def test_played_opponents_keep_first_seen_order(self) -> None:
+        league = dict(LEAGUE)
+        frame = annotate(parse_stats_document(MARKDOWN), league, "RealGM")
+        with tempfile.TemporaryDirectory() as folder:
+            db_path = Path(folder) / "basketball.db"
+            upsert_team_stats(frame, db_path)
+            saved = replace_played_opponents(
+                [
+                    {"team_name": "Olympiacos", "opponent_name": "Virtus Bologna", "scope": "europe", "game_order": 1},
+                    {"team_name": "Olympiacos", "opponent_name": "Real Madrid", "scope": "europe", "game_order": 2},
+                    {"team_name": "Olympiacos", "opponent_name": "Iraklis BC", "scope": "domestic", "game_order": 1},
+                    {"team_name": "Άγνωστη", "opponent_name": "Real Madrid", "scope": "europe", "game_order": 1},
+                ],
+                "2026-27",
+                db_path,
+            )
+            self.assertEqual(saved, 3)
+            listed = list_played_opponents("2026-27", db_path)
+            self.assertEqual(listed["Olympiacos"]["europe"], ["Virtus Bologna", "Real Madrid"])
+            self.assertEqual(listed["Olympiacos"]["domestic"], ["Iraklis BC"])
+            replace_played_opponents([], "2026-27", db_path)
+            self.assertEqual(list_played_opponents("2026-27", db_path), {})
 
 
 if __name__ == "__main__":

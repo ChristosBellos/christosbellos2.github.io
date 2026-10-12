@@ -11,6 +11,7 @@ from database import (
     get_team_stats,
     init_db,
     list_cross_competition_teams,
+    list_played_opponents,
     list_team_names,
 )
 from names import ALIASES, fold, option_label
@@ -134,6 +135,7 @@ def build_payload(db_path: Path | None = None) -> dict:
     init_db(db_path)
     summary = dataset_summary(db_path)
     logs, previous_gp = _logs_and_gp(db_path)
+    opponents = list_played_opponents(CURRENT_SEASON, db_path)
     teams = []
     for name in list_team_names(db_path):
         teams.append(
@@ -142,6 +144,7 @@ def build_payload(db_path: Path | None = None) -> dict:
                 "label": option_label(name),
                 "search": _search_text(name),
                 "current": _slim(get_team_stats(name, CURRENT_SEASON, db_path)),
+                "opponents": opponents.get(name, {"europe": [], "domestic": []}),
                 "logs": logs.get(name, {}),
                 "previous_gp": previous_gp.get(name, {}),
             }

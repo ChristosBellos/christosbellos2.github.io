@@ -118,6 +118,15 @@ def init_db(db_path: Path | str | None = None) -> None:
                 leagues_ok INTEGER NOT NULL,
                 leagues_failed INTEGER NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS played_opponents (
+                team_id INTEGER NOT NULL REFERENCES teams(id),
+                season TEXT NOT NULL,
+                scope TEXT NOT NULL,
+                opponent_name TEXT NOT NULL,
+                game_order INTEGER NOT NULL,
+                PRIMARY KEY (team_id, season, scope, game_order)
+            );
             """
         )
         _ensure_column(connection, "competition_stats", "opp_ppg", "REAL")
@@ -158,7 +167,74 @@ def _canonicalize_stored_names(connection: sqlite3.Connection) -> None:
             (target_id, source_id),
         )
         connection.execute("DELETE FROM competition_stats WHERE team_id = ?", (source_id,))
+        connection.execute(
+            "UPDATE OR IGNORE played_opponents SET team_id = ? WHERE team_id = ?",
+            (target_id, source_id),
+        )
+        connection.execute("DELETE FROM played_opponents WHERE team_id = ?", (source_id,))
         connection.execute("DELETE FROM teams WHERE id = ?", (source_id,))
+
+
+def replace_played_opponents(
+    rows: list[dict[str, object]],
+    season: str = CURRENT_SEASON,
+    db_path: Path | str | None = None,
+) -> int:
+    """Replace one season's list of opponents already played.
+
+    Each row needs team_name, opponent_name, scope (europe or domestic), and
+    game_order. Names are stored in the same canonical form as the team table.
+    """
+    init_db(db_path)
+    saved = 0
+    with connect(db_path) as connection:
+        connection.execute("DELETE FROM played_opponents WHERE season = ?", (season,))
+        for row in rows:
+            team_name = canonical_team_name(str(row.get("team_name") or ""))
+            opponent = canonical_team_name(str(row.get("opponent_name") or ""))
+            scope = str(row.get("scope") or "")
+            if not team_name or not opponent or scope not in {"europe", "domestic"}:
+                continue
+            team = connection.execute("SELECT id FROM teams WHERE name = ?", (team_name,)).fetchone()
+            if team is None:
+                continue
+            connection.execute(
+                """
+                INSERT OR REPLACE INTO played_opponents
+                    (team_id, season, scope, opponent_name, game_order)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (team["id"], season, scope, opponent, int(row.get("game_order") or 0)),
+            )
+            saved += 1
+        connection.commit()
+    return saved
+
+
+def list_played_opponents(
+    season: str = CURRENT_SEASON,
+    db_path: Path | str | None = None,
+) -> dict[str, dict[str, list[str]]]:
+    """Return each team's opponents so far, in the order the games were played."""
+    init_db(db_path)
+    grouped: dict[str, dict[str, list[str]]] = {}
+    with connect(db_path) as connection:
+        rows = connection.execute(
+            """
+            SELECT t.name, p.scope, p.opponent_name
+            FROM played_opponents p
+            JOIN teams t ON t.id = p.team_id
+            WHERE p.season = ?
+            ORDER BY t.name, p.scope, p.game_order
+            """,
+            (season,),
+        )
+        for row in rows:
+            bucket = grouped.setdefault(row["name"], {"europe": [], "domestic": []})
+            scope = str(row["scope"])
+            if scope in bucket:
+                bucket[scope].append(str(row["opponent_name"]))
+    return grouped
 
 
 def _number(value: object) -> float | None:
