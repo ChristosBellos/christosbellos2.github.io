@@ -705,11 +705,21 @@ function boot(data) {
     return data.teams.filter((team) => team.search.includes(key) || fold(team.label).includes(key)).slice(0, 8);
   }
 
+  function hideResults() {
+    results.replaceChildren();
+    results.hidden = true;
+    search.setAttribute("aria-expanded", "false");
+  }
+
   function showResults(query) {
     results.replaceChildren();
-    matches(query).forEach((team) => {
+    const found = matches(query);
+    results.hidden = found.length === 0;
+    search.setAttribute("aria-expanded", found.length ? "true" : "false");
+    found.forEach((team) => {
       const button = el("button", "result", team.label);
       button.type = "button";
+      button.setAttribute("role", "option");
       button.addEventListener("click", () => choose(team));
       results.append(button);
     });
@@ -718,7 +728,7 @@ function boot(data) {
   function choose(team) {
     selected = team;
     search.value = team.label;
-    results.replaceChildren();
+    hideResults();
     empty.hidden = true;
     cross.hidden = true;
     document.querySelector("#pick-hint").hidden = true;
@@ -778,6 +788,30 @@ function boot(data) {
   search.addEventListener("input", () => {
     selected = null;
     showResults(search.value);
+  });
+  search.addEventListener("focus", () => showResults(search.value));
+  search.addEventListener("keydown", (event) => {
+    const options = [...results.querySelectorAll(".result")];
+    const current = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
+    if (event.key === "Escape") {
+      hideResults();
+      return;
+    }
+    if (!options.length) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const next = event.key === "ArrowDown" ? Math.min(current + 1, options.length - 1) : Math.max(current - 1, 0);
+      options.forEach((option, index) => option.setAttribute("aria-selected", index === next ? "true" : "false"));
+      options[next].scrollIntoView({ block: "nearest" });
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const picked = options[current] || options[0];
+      picked.click();
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".search-wrap")) hideResults();
   });
   toggle.addEventListener("change", renderPrevious);
   document.querySelectorAll(".lang-switch button").forEach((button) => {

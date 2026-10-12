@@ -25,10 +25,41 @@
     .subtle, .caption { color: #a9b4cc; }
     .team-title { font-size: 2.1rem; margin: 0.2rem 0 0.4rem; }
     .section { margin: 1.2rem 0 0.6rem; }
-    .search { width: 100%; margin-top: 1rem; padding: 0.85rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; font-size: 1rem; }
-    .results, .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem; }
-    .result, .chip { border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; border-radius: 999px; padding: 0.4rem 0.75rem; cursor: pointer; }
-    .result:hover, .chip:hover { border-color: #f5b942; }
+    .search-wrap { position: relative; }
+    .search { width: 100%; margin-top: 0.45rem; padding: 0.85rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; font-size: 1rem; }
+    .results {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: calc(100% + 0.35rem);
+      display: flex;
+      flex-direction: column;
+      max-height: 18rem;
+      overflow: auto;
+      margin: 0;
+      padding: 0.35rem;
+      background: #141a2e;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+    }
+    .results[hidden] { display: none; }
+    .result {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #e8edf7;
+      padding: 0.72rem 0.85rem;
+      cursor: pointer;
+      font: inherit;
+    }
+    .result:hover, .result:focus, .result[aria-selected="true"] { background: rgba(245, 185, 66, 0.16); outline: none; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem; }
+    .chip { border: 1px solid rgba(255,255,255,0.12); background: #141a2e; color: #e8edf7; border-radius: 999px; padding: 0.4rem 0.75rem; cursor: pointer; }
+    .chip:hover { border-color: #f5b942; }
     .notice { background: rgba(76, 141, 255, 0.12); border: 1px solid rgba(76, 141, 255, 0.35); border-radius: 14px; padding: 0.85rem 1rem; margin: 0.8rem 0; }
     .insight { background: rgba(245, 185, 66, 0.1); border: 1px solid rgba(245, 185, 66, 0.28); border-radius: 14px; padding: 0.8rem 1rem; color: #f3e2b8; }
     .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -84,9 +115,11 @@
     <p><a id="back-link" href="index.html">Back to the site</a></p>
     <p id="summary" class="caption"></p>
     <div id="load-error" class="notice" hidden>Statistics did not load. Open the page from the site, not as a standalone file.</div>
-    <label id="search-label" for="team-search">Search for a team</label>
-    <input id="team-search" class="search" placeholder="e.g. Olympiacos, Real Madrid, Partizan" autocomplete="off">
-    <div id="team-results" class="results"></div>
+    <div class="search-wrap">
+      <label id="search-label" for="team-search">Search for a team</label>
+      <input id="team-search" class="search" placeholder="e.g. Olympiacos, Real Madrid, Partizan" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="team-results">
+      <div id="team-results" class="results" role="listbox" hidden></div>
+    </div>
     <div id="empty-state" class="notice" hidden>No statistics available</div>
     <p id="pick-hint" class="subtle">Pick a team to see the averages and the charts.</p>
     <div id="cross-picks" class="chips" aria-label="Teams with Europe and a domestic league in 2025-26"></div>
