@@ -493,12 +493,8 @@ def render_team(profile: dict, *, show_title: bool = True) -> None:
             width="stretch",
         )
     with right:
-        st.plotly_chart(
-            grouped_bars(scopes, ["efg_pct", "ts_pct"], "eFG% και TS%", as_percent=True),
-            width="stretch",
-        )
     st.plotly_chart(
-        grouped_bars(scopes, ["possessions"], "Κατοχές ανά αγώνα"),
+        grouped_bars(scopes, ["efg_pct", "ts_pct"], "eFG% και TS%", as_percent=True),
         width="stretch",
     )
 

@@ -38,7 +38,10 @@
     .metric-label { display: block; color: #a9b4cc; font-size: 0.85rem; }
     .metric-value { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
     .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-    .chart { min-width: 0; }
+    .chart { min-width: 0; max-width: 100%; overflow: hidden; }
+    .chart .js-plotly-plot,
+    .chart .plot-container,
+    .chart .svg-container { max-width: 100% !important; }
     .toggle { display: flex; gap: 0.6rem; align-items: center; margin: 1.2rem 0; font-weight: 650; }
     table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
     th, td { text-align: left; padding: 0.55rem 0.45rem; border-bottom: 1px solid rgba(255,255,255,0.08); }

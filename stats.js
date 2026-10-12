@@ -461,10 +461,11 @@ function chartLayout(title) {
     plot_bgcolor: "rgba(0,0,0,0)",
     font: { color: "#e8edf7", family: "Arial" },
     legend: { orientation: "h", yanchor: "top", y: -0.2, x: 0 },
-    margin: { l: 40, r: 16, t: 48, b: 72 },
+    margin: { l: 48, r: 28, t: 48, b: 80 },
     height: 420,
-    bargap: 0.28,
-    xaxis: { showgrid: false },
+    bargap: 0.32,
+    bargroupgap: 0.08,
+    xaxis: { showgrid: false, automargin: true },
     yaxis: { gridcolor: "rgba(255,255,255,0.06)", zeroline: false },
   };
 }
@@ -575,11 +576,12 @@ function renderProfile(mount, profile, data, showTitle) {
     groupedBars(profile.scopes, ["orb", "drb", "tov", "pf"], titles.extras, false),
     groupedBars(profile.scopes, ["off_rtg", "def_rtg", "net_rtg"], titles.ratings, false, true),
     groupedBars(profile.scopes, ["efg_pct", "ts_pct"], titles.efficiency, true),
-    groupedBars(profile.scopes, ["possessions"], titles.possessions, false),
   ].forEach((figure) => {
     const box = el("div", "chart");
     charts.append(box);
-    window.Plotly.newPlot(box, figure.data, figure.layout, { displayModeBar: false, responsive: true });
+    window.Plotly.newPlot(box, figure.data, figure.layout, { displayModeBar: false, responsive: true }).then(() => {
+      window.Plotly.Plots.resize(box);
+    });
   });
   mount.append(charts);
 
