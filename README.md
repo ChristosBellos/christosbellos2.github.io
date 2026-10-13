@@ -48,6 +48,16 @@ python scraper.py
 
 Η RealGM προστατεύεται από Cloudflare. Αν το απευθείας request δεν φέρει πίνακα, το module ξαναζητά την ίδια διεύθυνση μέσω αναγνώστη που επιστρέφει το περιεχόμενο της σελίδας σε κείμενο.
 
+## Διαβολοβδομάδες
+
+Το `euroleague-devil-weeks.xlsx` συγκεντρώνει τους αγώνες κανονικής περιόδου της Euroleague από το 2016-17 και μετά που ανήκουν σε διαβολοβδομάδα: εβδομάδα Δευτέρα–Κυριακή στην οποία μία ομάδα δίνει δύο αγώνες.
+
+Το `euroleague-devil-weeks-boxscores.xlsx` έχει τα στατιστικά κάθε τέτοιου αγώνα, με τη γηπεδούχο και τη φιλοξενούμενη σε χωριστές γραμμές: PTS, FGM, FGA, FG%, 3PM, 3PA, 3P%, FTM, FTA, FT%, ORB, DRB, TRB, AST, STL, BLK, TOV, PF, TS%, eFG%, ORB%, DRB%, TRB%, AST%, TOV%, STL%, BLK%, PPS, ORtg, DRtg, Pace. Τα απόλυτα νούμερα έρχονται από το game-stats feed της Euroleague. Τα ποσοστά και τα ratings υπολογίζονται όπως στο `advanced.py`. Οι προγραμματισμένοι αγώνες μένουν με κενά κελιά. Η αναδημιουργία γίνεται με:
+
+```bash
+python devil_boxscores.py
+```
+
 ## Έλεγχοι
 
 ```bash
