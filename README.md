@@ -64,6 +64,12 @@ python devil_boxscores.py
 python greater_boxscores.py
 ```
 
+Το `filtered_games.xlsx` είναι η δεύτερη λίστα αγώνων Euroleague. Το `filtered_games-boxscores.xlsx` έχει τα ίδια στατιστικά, πάλι με χωριστή γραμμή για τη γηπεδούχο και τη φιλοξενούμενη. Οι 23 αγώνες χωρίς box score μένουν κενά. Η αναδημιουργία γίνεται με:
+
+```bash
+python filtered_boxscores.py
+```
+
 ## Έλεγχοι
 
 ```bash
