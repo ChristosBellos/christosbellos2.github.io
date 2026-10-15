@@ -58,7 +58,7 @@ python scraper.py
 python devil_boxscores.py
 ```
 
-Το `greater_games.xlsx` είναι η λίστα αγώνων Euroleague και Eurocup που δόθηκε για εξαγωγή box score. Το `greater_games-boxscores.xlsx` έχει, για κάθε μοναδικό κωδικό, τη γηπεδούχο και τη φιλοξενούμενη σε χωριστές γραμμές με τα ίδια στατιστικά. Οι 59 αγώνες χωρίς box score, κυρίως ακυρωμένοι του Μαρτίου 2020 και ένας walkover, μένουν κενά. Η αναδημιουργία γίνεται με:
+Το `greater_games.xlsx` είναι η λίστα 1.810 αγώνων Euroleague που δόθηκε για εξαγωγή box score. Το `greater_games-boxscores.xlsx` έχει μόνο αυτούς τους αγώνες, με τη γηπεδούχο και τη φιλοξενούμενη σε χωριστές γραμμές. Οι 50 αγώνες χωρίς box score, του Μαρτίου–Απριλίου 2020 και του Μαρτίου–Απριλίου 2022, μένουν κενά. Η αναδημιουργία γίνεται με:
 
 ```bash
 python greater_boxscores.py
