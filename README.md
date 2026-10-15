@@ -58,6 +58,8 @@ python scraper.py
 python devil_boxscores.py
 ```
 
+Το `euroleague-non-devil-boxscores.xlsx` έχει τους υπόλοιπους αγώνες Euroleague από το 2016-17, όσους δεν ανήκουν σε διαβολοβδομάδα, με τα ίδια στατιστικά ανά ομάδα. Η αναδημιουργία γίνεται με `python non_devil_boxscores.py`.
+
 Το `greater_games.xlsx` είναι η λίστα 1.810 αγώνων Euroleague που δόθηκε για εξαγωγή box score. Το `greater_games-boxscores.xlsx` έχει μόνο αυτούς τους αγώνες, με τη γηπεδούχο και τη φιλοξενούμενη σε χωριστές γραμμές. Οι 50 αγώνες χωρίς box score, του Μαρτίου–Απριλίου 2020 και του Μαρτίου–Απριλίου 2022, μένουν κενά. Η αναδημιουργία γίνεται με:
 
 ```bash
